@@ -10,7 +10,8 @@
  * because a game is fully determined by its seed and the actions taken. The
  * shadow picks the human's moves with the hard AI, enters them as taps and
  * button clicks, and compares what the interface shows with what it expects.
- * In a game for two players it plays both fleets that way.
+ * In a game for two players it plays both fleets that way. To look at a game
+ * in progress, set window.autoplayUntilRound first: it then stops at that round.
  * Resolves to { done, actions, tricks, round, errors, result, title, detail }.
  */
 async () => {
@@ -74,7 +75,8 @@ async () => {
     });
     status.first = state.firstPlayer;
 
-    while (!state.result) {
+    const lastRound = window.autoplayUntilRound ?? Infinity;
+    while (!state.result && state.round < lastRound) {
       await idle();
       if (state.current === 1 && !duel) { // mirror the rival's whole turn; the interface plays it on its own
         while (!state.result && state.current === 1) state = Rules.applyAction(state, AI.chooseAction(state, rival)).state;
@@ -136,11 +138,11 @@ async () => {
       }
     }
 
-    for (let i = 0; i < 400 && !$('end').open; i++) await wait(25);
+    for (let i = 0; i < 400 && state.result && !$('end').open; i++) await wait(25);
     Object.assign(status, {
       result: state.result,
       endOpen: $('end').open,
-      title: $('endTitle').textContent,
+      title: $('endTitle').getAttribute('aria-label'),
       detail: $('endDetail').textContent,
       gain: $('endXp').textContent,
       rewards: [...$('endRewards').children].map((item) => item.textContent),

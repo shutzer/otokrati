@@ -6,76 +6,86 @@
 <title>Otokrati</title>
 <style>
 /*
- * Visual direction: a sunny archipelago, made for players of 10 to 13.
- * The page is a bright sea; land tiles are chunky slabs floating in it.
- * The player is sun yellow, every rival brings a colour of its own (a
- * second player at the same device sails under green), and unclaimed land
- * is sand. Controls are cream "stickers" with a thick lower
- * edge that sinks when pressed. The canvas reads its colours and font from
- * the custom properties below, so they are defined only here.
+ * Visual direction: a game drawn in a school notebook during class, which
+ * came alive. The page is squared paper. Outlines are ballpoint pen, the
+ * two sides are felt-tips (the player a yellow highlighter, every rival a
+ * colour of its own, a second player green), land nobody owns is pencil,
+ * and a black marker shows what the player is pointing at. Everything on
+ * the page is a scrap of paper, a sticky note or a sticker. The canvas
+ * reads its colours and font from the custom properties below, so they
+ * are defined only here.
  */
 :root {
-  --sky: #63d6ea;
-  --sea: #1eb0d8;
-  --sea-deep: #0a7fb8;
-  --water: rgba(7, 96, 158, 0.42);
-  --foam: rgba(255, 255, 255, 0.6);
-  --shallows: rgba(190, 248, 240, 0.4);
-  --glow: #8ff2ff;
+  --page: #fbfaf2;          /* the notebook page */
+  --grid: #d2e2f3;          /* its squares */
+  --margin: #f2a2ad;        /* the red margin line */
+  --scrap: #fffefa;         /* loose paper: cards, tags, dialogs */
+  --ink: #26329f;           /* ballpoint pen: every outline */
+  --text: #1b2260;          /* the same pen pressed harder: words */
+  --text-soft: #5a6294;
+  --pencil: #7d8496;        /* graphite: whatever belongs to nobody */
+  --marker: #17171f;        /* black felt-tip: what the player points at */
+  --red: #e5334b;           /* the teacher's pen */
+  --sea: #55b6ee;
+  --sea-soft: #c5e6fb;
+  --well: #edf0fa;          /* an area shaded with the pencil */
+  --rule: rgba(38, 50, 159, 0.22);
+  --shade: rgba(27, 34, 96, 0.17);
+  --gold: #ffc531;
+  --leaf: #3fc56a;
+  --leaf-hi: #7fe09c;
+  --tape: rgba(255, 212, 94, 0.7);
 
-  --ink: #16324f;
-  --ink-soft: #5b7692;
-  --rule: rgba(22, 50, 79, 0.16);
-  --paper: #fffaf0;
-  --paper-edge: #e3d6b8;
-  --well: #f3ead4;
+  --sun: #ffe019;
+  --sun-hi: #fff18a;
+  --sun-lo: #a98200;
+  --sun-soft: #fff6b8;
+  --rival: #ff62b8;
+  --rival-hi: #ffa3d6;
+  --rival-lo: #c2247f;
+  --rival-soft: #ffe1f2;
 
-  --sand: #f6dfa6;
-  --sand-hi: #fff2cc;
-  --sand-lo: #c59d55;
-  --sun: #ffc531;
-  --sun-hi: #ffe37d;
-  --sun-lo: #c98300;
-  --rival: #e2409a;
-  --rival-hi: #ff86c6;
-  --rival-lo: #98145f;
-  --rival-soft: #ffe0f1;
-  --leaf: #2fb968;
-  --coral: #f2553d;
-
-  --font: ui-rounded, 'Avenir Next', 'Segoe UI', 'Trebuchet MS', Roboto, sans-serif;
-  --lift: 5px; /* height of the lower edge under buttons and cards */
+  --font: 'Chalkboard SE', 'Comic Sans MS', 'Comic Neue', ui-rounded, 'Avenir Next', 'Segoe UI', Roboto, sans-serif;
+  --cell: 26px;             /* one square of the paper */
+  --line: 2.5px;            /* the pen */
+  /* Corners nobody drew with a ruler. */
+  --wob-1: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  --wob-2: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  --wob-3: 225px 18px 240px 16px / 16px 240px 20px 225px;
+  --blot: 52% 48% 47% 53% / 49% 53% 47% 51%;
 }
 
-/* Each rival paints its side of the board. */
-[data-rival='easy'] { --rival: #ef4b4b; --rival-hi: #ff8f82; --rival-lo: #a51f2b; --rival-soft: #ffe2dd; }
-[data-rival='normal'] { --rival: #e2409a; --rival-hi: #ff86c6; --rival-lo: #98145f; --rival-soft: #ffe0f1; }
-[data-rival='hard'] { --rival: #8250e6; --rival-hi: #b796ff; --rival-lo: #4a249c; --rival-soft: #ece2ff; }
-[data-rival='friend'] { --rival: #27a152; --rival-hi: #7fdc9b; --rival-lo: #14693a; --rival-soft: #dbf5e2; }
+/* Each rival brings a felt-tip of its own. */
+[data-rival='easy'] { --rival: #ff6157; --rival-hi: #ffa69f; --rival-lo: #c22c25; --rival-soft: #ffe2de; }
+[data-rival='normal'] { --rival: #ff62b8; --rival-hi: #ffa3d6; --rival-lo: #c2247f; --rival-soft: #ffe1f2; }
+[data-rival='hard'] { --rival: #a877ff; --rival-hi: #cdb3ff; --rival-lo: #6a3fd0; --rival-soft: #ece2ff; }
+[data-rival='friend'] { --rival: #45cf6d; --rival-hi: #9be9af; --rival-lo: #1d8f43; --rival-soft: #dcf7e3; }
 
 *, *::before, *::after { box-sizing: border-box; }
 
 html, body { height: 100%; margin: 0; }
 
 body {
-  font: 600 16px/1.4 var(--font);
-  color: var(--ink);
-  background: linear-gradient(180deg, var(--sky) 0%, var(--sea) 42%, var(--sea-deep) 100%) var(--sea);
+  font: 400 17px/1.35 var(--font);
+  color: var(--text);
+  background:
+    linear-gradient(90deg, transparent 52px, var(--margin) 52px, var(--margin) 54px, transparent 54px),
+    linear-gradient(var(--grid) 1.5px, transparent 1.5px) 0 -1px / var(--cell) var(--cell),
+    linear-gradient(90deg, var(--grid) 1.5px, transparent 1.5px) -1px 0 / var(--cell) var(--cell),
+    var(--page);
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
 }
-
-/* Slow swells across the whole sea. */
+/* The holes of the binder, down the left edge. */
 body::before {
   content: '';
   position: fixed;
-  inset: -20% -20%;
-  background: repeating-radial-gradient(ellipse 120% 60% at 50% 120%, rgba(255, 255, 255, 0.09) 0 5px, transparent 5px 54px);
-  animation: swell 9s ease-in-out infinite alternate;
+  inset: 0 auto 0 14px;
+  width: 22px;
+  background: radial-gradient(circle at 50% 50%, #c9cfdd 0 8px, #b3bacb 8px 9.5px, transparent 10px) 0 30px / 22px 104px repeat-y;
   pointer-events: none;
 }
-@keyframes swell { to { transform: translate3d(2.5%, -2%, 0); } }
 
 button, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
@@ -83,74 +93,101 @@ button:disabled { cursor: default; }
 p, h1, h2, h3, ol, ul, fieldset, figure { margin: 0; padding: 0; }
 ol, ul { list-style: none; }
 svg { display: block; width: 100%; height: 100%; }
+b, strong { font-weight: 700; }
 [hidden] { display: none !important; }
-:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+:focus-visible { outline: 3px solid var(--marker); outline-offset: 2px; }
+.defs { position: absolute; width: 0; height: 0; }
 
 /* ── Shared pieces ───────────────────────────────────────────────────── */
 
+/* A scrap of paper lying on the page. */
 .card {
-  background: var(--paper);
-  border-radius: 20px;
-  box-shadow: 0 var(--lift) 0 rgba(8, 58, 99, 0.3);
+  position: relative;
+  background: var(--scrap);
+  border: var(--line) solid var(--ink);
+  border-radius: var(--wob-1);
+  box-shadow: 3px 4px 0 var(--shade);
 }
 
 .btn {
-  --edge: var(--paper-edge);
-  border: 0;
-  border-radius: 16px;
-  padding: 0.7em 1.2em;
-  background: #fff;
-  box-shadow: 0 var(--lift) 0 var(--edge), 0 0 0 2px var(--edge) inset;
-  font-weight: 800;
+  border: var(--line) solid var(--ink);
+  border-radius: var(--wob-2);
+  padding: 0.55em 1.1em;
+  background: var(--scrap);
+  box-shadow: 2px 3px 0 var(--ink);
+  font-weight: 700;
   line-height: 1.15;
-  transition: transform 0.08s, box-shadow 0.08s, filter 0.12s;
+  transition: transform 0.1s, box-shadow 0.1s;
 }
-.btn.primary { --edge: var(--sun-lo); background: var(--sun); box-shadow: 0 var(--lift) 0 var(--edge); }
-.btn.big { font-size: 1.35rem; padding: 0.65em 1.4em; }
-.btn.small { padding: 0.55em 0.9em; font-size: 0.95rem; }
-.btn:hover:not(:disabled) { filter: brightness(1.05); }
-.btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--edge), 0 0 0 2px var(--edge) inset; }
-.btn:disabled { opacity: 0.45; }
+/* The important button is gone over with the highlighter. */
+.btn.primary { background: repeating-linear-gradient(-7deg, var(--sun) 0 11px, var(--sun-hi) 11px 13px); }
+.btn.big { font-size: 1.45rem; padding: 0.5em 1.3em; border-radius: var(--wob-1); }
+.btn.small { padding: 0.4em 0.8em; font-size: 0.95rem; }
+.btn:hover:not(:disabled) { transform: rotate(-1.5deg) translateY(-1px); }
+.btn:active:not(:disabled) { transform: translate(2px, 3px); box-shadow: 0 0 0 var(--ink); }
+.btn:disabled { opacity: 0.4; box-shadow: none; }
 
-.note { font-size: 0.92rem; font-weight: 500; color: var(--ink-soft); }
+.note { font-size: 0.95rem; color: var(--text-soft); }
+
+/* Words in the game's own lettering (drawn by the script). */
+.lettering { height: 1em; overflow: visible; }
+.lettering path { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+.lettering .swash { stroke: var(--sun); opacity: 0.9; }
+.lettering .eye { fill: var(--scrap); stroke: none; }
 
 .pearl {
+  position: relative;
   display: inline-block;
   flex: none;
   width: 0.95em;
   height: 0.95em;
-  border: 2px solid var(--ink);
-  border-radius: 50%;
-  background: radial-gradient(circle at 34% 30%, #fff 0 20%, #ffe6f4 48%, #f2a7d6 100%);
+  border: 2px solid var(--marker);
+  border-radius: var(--blot);
+  background: radial-gradient(circle at 34% 32%, #ff9ed2 0 22%, var(--scrap) 26%);
   vertical-align: -0.12em;
 }
 
+/* Faces: a rival's portrait, or the ship of a player. */
 .avatar, .portrait {
   display: block;
   flex: none;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  border: var(--line) solid var(--ink);
+  border-radius: var(--blot);
+  overflow: hidden;
 }
-.avatar { padding: 11px; background: var(--sun); box-shadow: 0 0 0 3px var(--sun-lo) inset; }
-.avatar.big { width: 72px; height: 72px; padding: 15px; }
+.avatar { --sail: var(--sun); padding: 3px; background: var(--sun-soft); }
+.avatar.big { width: 84px; height: 84px; }
 /* The second player's ship, turned to face the first. */
-.avatar.away { background: var(--rival); box-shadow: 0 0 0 3px var(--rival-lo) inset; color: #fff; }
+.avatar.away { --sail: var(--rival); background: var(--rival-soft); }
 .avatar.away svg { transform: scaleX(-1); }
-.duo { position: relative; flex: none; width: 52px; height: 52px; }
-.duo .avatar { position: absolute; left: 0; top: 0; width: 35px; height: 35px; padding: 7px; }
-.duo .avatar.away { left: auto; top: auto; right: 0; bottom: 0; box-shadow: 0 0 0 3px var(--rival-lo) inset, 0 0 0 2px #fff; }
-.portrait { background: var(--rival-soft); box-shadow: 0 0 0 3px var(--rival) inset; overflow: hidden; }
+.portrait { background: var(--rival-soft); }
 .portrait .sour, .portrait.sour .glad { display: none; }
 .portrait.sour .sour { display: inline; }
+/* Eyes follow the pointer and blink now and then. */
+.pupils {
+  transform-box: fill-box;
+  transform-origin: center;
+  translate: calc(var(--look-x, 0) * 2.4px) calc(var(--look-y, 0) * 1.8px);
+  animation: blink 5.2s infinite;
+}
+.rival:nth-of-type(2n) .pupils, .side-1 .pupils { animation-delay: -1.7s; }
+@keyframes blink { 0%, 95%, 100% { scale: 1 1; } 97% { scale: 1 0.1; } }
 
-.stars { display: flex; gap: 2px; }
-.stars i { width: 20px; height: 20px; color: #d9cfb8; }
-.stars i.on { color: var(--sun); filter: drop-shadow(0 1.5px 0 var(--sun-lo)); }
+/* Stars are stickers: gold once earned, an empty spot until then. */
+.stars { display: flex; gap: 1px; }
+.stars i { width: 20px; height: 20px; color: transparent; }
+.stars svg { overflow: visible; }
+.stars path { stroke: var(--pencil); stroke-width: 1.4; stroke-dasharray: 2.4 2; stroke-linejoin: round; }
+.stars i.on { color: var(--gold); rotate: -8deg; }
+.stars i.on:nth-child(2) { rotate: 6deg; }
+.stars i.on path { stroke: var(--ink); stroke-width: 1.8; stroke-dasharray: none; }
 
-.xp-bar { display: block; height: 10px; border-radius: 6px; background: var(--paper-edge); overflow: hidden; }
-.xp-bar.big { height: 16px; border-radius: 9px; }
-.xp-bar i { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--leaf); transition: width 1.1s cubic-bezier(0.2, 0.9, 0.3, 1) 0.5s; }
+/* Progress is a box coloured in with the green felt-tip. */
+.xp-bar { display: block; height: 13px; border: 2px solid var(--ink); border-radius: var(--wob-2); background: var(--scrap); overflow: hidden; }
+.xp-bar.big { height: 20px; border-width: var(--line); }
+.xp-bar i { display: block; height: 100%; width: 0; background: repeating-linear-gradient(-60deg, var(--leaf) 0 7px, var(--leaf-hi) 7px 9px); transition: width 1.1s cubic-bezier(0.2, 0.9, 0.3, 1) 0.5s; }
 
 /* ── Screens ─────────────────────────────────────────────────────────── */
 
@@ -162,139 +199,183 @@ svg { display: block; width: 100%; height: 100%; }
 /* ── Start screen ────────────────────────────────────────────────────── */
 
 .menu {
-  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 440px);
+  grid-template-columns: minmax(0, 1.25fr) minmax(330px, 450px);
   align-items: center;
-  gap: clamp(12px, 3vw, 48px);
-  padding: clamp(12px, min(3vw, 3vh), 40px);
-  padding-bottom: max(clamp(12px, min(3vw, 3vh), 40px), env(safe-area-inset-bottom));
+  gap: clamp(12px, 3vw, 44px);
+  padding: clamp(12px, min(3vw, 3vh), 36px);
+  padding-left: max(clamp(12px, min(3vw, 3vh), 36px), 64px);
+  padding-bottom: max(clamp(12px, min(3vw, 3vh), 36px), env(safe-area-inset-bottom));
   overflow: auto;
 }
 .menu-map { position: relative; height: min(100%, 88vh); min-height: 220px; }
 .menu-map canvas, .board canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.menu-side { display: grid; gap: 12px; }
+.menu-side { display: grid; gap: 14px; }
 
-.brand { text-align: center; color: #fff; }
-.brand h1 {
-  font-size: clamp(3rem, min(8vw, 11vh), 4.6rem);
-  font-weight: 900;
-  line-height: 0.95;
-  letter-spacing: 0.01em;
-  text-shadow: 0 5px 0 var(--ink);
-  -webkit-text-stroke: 2px var(--ink);
-  paint-order: stroke fill;
-}
-.brand p { margin-top: 8px; font-size: 1.1rem; font-weight: 800; color: var(--ink); }
+.brand { text-align: center; }
+.brand h1 { height: clamp(3.4rem, min(9vw, 12vh), 5.4rem); color: var(--ink); font-size: 3rem; line-height: 1; rotate: -2deg; }
+.brand h1 .lettering { height: 100%; }
+.brand p { margin-top: 2px; font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.brand p span { text-decoration: underline wavy var(--red); text-decoration-thickness: 2px; text-underline-offset: 4px; }
 
-.menu-card { display: grid; gap: 14px; padding: 16px; }
+.menu-card { display: grid; gap: 12px; }
 
+/* The name tag of the player's ship; it opens the logbook. */
 .profile {
+  position: relative;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 12px;
-  border: 0;
-  border-radius: 14px;
-  padding: 8px 12px 8px 8px;
-  background: var(--well);
+  border: var(--line) solid var(--ink);
+  border-radius: var(--wob-3);
+  padding: 6px 14px 6px 8px;
+  background: var(--scrap);
+  box-shadow: 3px 4px 0 var(--shade);
   text-align: left;
+  rotate: -0.8deg;
+  transition: rotate 0.15s;
 }
-.profile:hover { filter: brightness(0.97); }
-.profile .avatar { width: 44px; height: 44px; padding: 9px; }
-.profile-text { display: grid; gap: 5px; }
-.profile-more { font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+/* A strip of sticky tape holds it to the page. */
+.profile::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -12px;
+  width: 78px;
+  height: 22px;
+  translate: -50% 0;
+  rotate: -3deg;
+  background: var(--tape);
+  border-inline: 2px dotted rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+}
+.profile:hover { rotate: 0.6deg; }
+.profile .avatar { width: 50px; height: 50px; }
+.profile-text { display: grid; gap: 4px; }
+.profile-more { font-weight: 700; text-decoration: underline wavy var(--sea); text-decoration-thickness: 2px; text-underline-offset: 4px; }
 
-.rivals { border: 0; display: grid; gap: 8px; }
-.rivals legend { padding: 0; margin-bottom: 8px; font-weight: 800; }
+.rivals { border: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+.rivals legend { padding: 0; margin-bottom: 9px; font-size: 1.15rem; font-weight: 700; text-decoration: underline wavy var(--sun); text-decoration-thickness: 3px; text-underline-offset: 5px; }
 .rival { position: relative; display: block; }
 .rival input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
 .rival-card {
+  position: relative;
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  grid-template-areas: 'face name stars' 'face blurb blurb';
+  grid-template-columns: auto 1fr;
+  grid-template-areas: 'face name' 'face stars';
   align-items: center;
-  gap: 0 12px;
-  padding: 8px 12px 8px 8px;
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 0 0 2px var(--paper-edge) inset;
-  transition: transform 0.12s, box-shadow 0.12s, background-color 0.12s;
+  gap: 0 10px;
+  height: 100%;
+  padding: 6px 10px 6px 7px;
+  border: var(--line) solid var(--ink);
+  border-radius: var(--wob-1);
+  background: var(--scrap);
+  box-shadow: 2px 3px 0 var(--shade);
+  rotate: -1.2deg;
+  transition: rotate 0.15s, scale 0.15s, background-color 0.15s, box-shadow 0.15s;
 }
+.rival:nth-of-type(2n) .rival-card { rotate: 1deg; border-radius: var(--wob-2); }
+.rival:nth-of-type(3) .rival-card { rotate: 0.7deg; border-radius: var(--wob-3); }
 .rival-card .portrait, .rival-card .duo { grid-area: face; }
-.rival-card b { grid-area: name; font-size: 1.08rem; font-weight: 800; }
-.rival-card small { grid-area: blurb; font-size: 0.9rem; font-weight: 500; color: var(--ink-soft); }
-.rival-card .stars { grid-area: stars; }
-.rival:hover .rival-card { transform: translateX(3px); }
-.rival input:checked + .rival-card { background: var(--rival-soft); box-shadow: 0 0 0 4px var(--rival) inset; }
-.rival input:focus-visible + .rival-card { outline: 3px solid var(--ink); outline-offset: 2px; }
+.rival-card b { grid-area: name; align-self: end; font-size: 1.02rem; line-height: 1.12; }
+.rival-card small { display: none; } /* shown as what the chosen rival says, under the cards */
+.rival-card .stars { grid-area: stars; align-self: start; margin-top: 2px; }
+.rival[data-rival='friend'] b { grid-row: 1 / -1; align-self: center; }
+.rival:hover .rival-card { rotate: 0deg; scale: 1.02; }
+.rival input:checked + .rival-card { rotate: 0deg; scale: 1.03; background: var(--rival-soft); box-shadow: 3px 4px 0 var(--rival-lo); }
+/* The chosen one is ticked off by hand. */
+.rival input:checked + .rival-card::after {
+  content: '';
+  position: absolute;
+  right: 9px;
+  top: -9px;
+  width: 13px;
+  height: 25px;
+  border: solid var(--marker);
+  border-width: 0 4.5px 4.5px 0;
+  border-radius: 2px 3px 4px 3px;
+  rotate: 38deg;
+}
+.rival input:focus-visible + .rival-card { outline: 3px solid var(--marker); outline-offset: 2px; }
+.duo { position: relative; flex: none; width: 56px; height: 56px; }
+.duo .avatar { position: absolute; left: 0; top: 0; width: 38px; height: 38px; padding: 2px; }
+.duo .avatar.away { left: auto; top: auto; right: 0; bottom: 0; }
+
+/* What the chosen rival has to say for itself. */
+.rival-note {
+  grid-column: 1 / -1;
+  padding: 5px 12px;
+  border: 2px solid var(--ink);
+  border-radius: var(--wob-2);
+  background: var(--scrap);
+  font-size: 0.95rem;
+}
 
 /* Names of the two fleets, asked for once a duel is chosen. */
-.names { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.names label { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 4px; border-radius: 14px; background: var(--well); box-shadow: 0 0 0 2px var(--paper-edge) inset; }
-.names label:focus-within { box-shadow: 0 0 0 3px var(--ink) inset; }
-.names .avatar { width: 34px; height: 34px; padding: 7px; }
-.name-input { flex: 1; min-width: 0; border: 0; padding: 0.3em 0.2em; background: none; font-weight: 800; outline: none; }
-.name-input::placeholder { color: var(--ink-soft); font-weight: 600; opacity: 1; }
-
-.options { display: grid; gap: 8px; }
-.mode { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 14px; background: var(--well); }
-.mode label { position: relative; }
-.mode input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
-.mode span { display: block; padding: 7px 4px; border-radius: 10px; text-align: center; font-weight: 800; color: var(--ink-soft); }
-.mode input:checked + span { background: #fff; color: var(--ink); box-shadow: 0 2px 0 var(--paper-edge); }
-.mode input:focus-visible + span { outline: 3px solid var(--ink); }
-
-.seed-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; }
-.seed-row label { font-weight: 800; }
-.seed-input {
+.names { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.names label { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.names .avatar { width: 38px; height: 38px; padding: 2px; }
+.name-input, .seed-input {
+  flex: 1;
   min-width: 0;
   border: 0;
-  border-radius: 12px;
-  padding: 0.45em 0.7em;
-  background: var(--well);
-  box-shadow: 0 0 0 2px var(--paper-edge) inset;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  border-bottom: var(--line) solid var(--ink);
+  border-radius: 0;
+  padding: 0.2em 0.15em 0.1em;
+  background: transparent;
+  font-weight: 700;
+  outline: none;
 }
+.name-input:focus-visible, .seed-input:focus-visible { border-bottom-color: var(--marker); background: var(--sun-soft); }
+.name-input::placeholder { color: var(--pencil); font-weight: 400; opacity: 1; }
 
-.menu-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.options { display: grid; gap: 7px; }
+/* The kind of game is ticked in a hand-drawn box. */
+.mode { display: flex; flex-wrap: wrap; gap: 4px 22px; }
+.mode label { position: relative; }
+.mode input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.mode span { position: relative; display: block; padding: 3px 4px 3px 32px; font-size: 1.08rem; font-weight: 700; color: var(--text-soft); }
+.mode span::before { content: ''; position: absolute; left: 2px; top: 50%; width: 21px; height: 21px; translate: 0 -50%; border: var(--line) solid var(--ink); border-radius: var(--wob-2); background: var(--scrap); }
+.mode input:checked + span { color: var(--text); }
+.mode input:checked + span::after { content: ''; position: absolute; left: 10px; top: 50%; width: 10px; height: 21px; translate: 0 -78%; border: solid var(--marker); border-width: 0 4px 4px 0; border-radius: 2px; rotate: 38deg; }
+.mode input:focus-visible + span { outline: 3px solid var(--marker); outline-offset: 1px; }
+
+.seed-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; gap: 10px; }
+.seed-row label { font-weight: 700; }
+.seed-input { letter-spacing: 0.16em; text-transform: uppercase; }
+
+.menu-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .menu-actions .primary { flex: 1 1 auto; }
 
-/* Upright phone: the map on top, the choices below. */
+/* Upright phone: the map on top, the choices below; no room for the margin and the binder. */
 @media (max-width: 820px) {
-  .menu { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 4px; }
-  .menu-map { height: 24vh; min-height: 170px; }
-  .brand h1 { font-size: 2.6rem; }
-  .brand p { display: none; }
+  body { background: linear-gradient(var(--grid) 1.5px, transparent 1.5px) 0 -1px / var(--cell) var(--cell), linear-gradient(90deg, var(--grid) 1.5px, transparent 1.5px) -1px 0 / var(--cell) var(--cell), var(--page); }
+  body::before { display: none; }
+  .menu { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 2px; padding: 10px 14px; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+  .menu-map { height: max(150px, min(34vh, 100vh - 640px)); min-height: 0; }
+  .brand h1 { height: 3.1rem; }
+  .brand p { font-size: 0.98rem; }
 }
-/* Laptop screens: slimmer cards, so that all four choices fit without scrolling. */
-@media (min-width: 821px) and (max-height: 880px) {
-  .menu-card { gap: 12px; }
-  .rival-card { padding: 5px 12px 5px 6px; }
+/* Small screens: everything a size smaller. */
+@media (max-width: 820px), (max-height: 720px) {
+  .menu-side { gap: 10px; }
+  .menu-card { gap: 9px; }
+  .rivals { gap: 8px 10px; }
+  .rivals legend { margin-bottom: 7px; font-size: 1.05rem; }
+  .rival-card { padding: 4px 8px 4px 5px; gap: 0 8px; }
   .rival-card .portrait, .duo { width: 46px; height: 46px; }
-  .duo .avatar { width: 31px; height: 31px; padding: 6px; }
-}
-/* Small screens: rivals side by side, the chosen one described below them. */
-@media (max-width: 820px), (max-height: 700px) {
-  .menu-card { gap: 10px; padding: 12px; }
-  .rivals { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-  .rivals legend { margin-bottom: 6px; }
-  .rival-card { grid-template-columns: 1fr; grid-template-areas: 'face' 'name' 'stars'; justify-items: center; gap: 3px; padding: 8px 2px; text-align: center; }
-  .rival-card b { font-size: 0.88rem; line-height: 1.15; }
-  .rival-card small { display: none; }
-  .rival-card .stars i { width: 16px; height: 16px; }
-  .rival[data-rival='friend'], .names { grid-column: 1 / -1; }
-  .rival[data-rival='friend'] .rival-card { grid-template-columns: auto 1fr; grid-template-areas: 'face name' 'face blurb'; justify-items: start; gap: 0 10px; padding: 7px 10px 7px 9px; text-align: left; }
-  .rival[data-rival='friend'] .rival-card small { display: block; font-size: 0.82rem; line-height: 1.2; }
-  .duo { width: 40px; height: 40px; }
-  .duo .avatar { width: 27px; height: 27px; padding: 5px; }
-  .btn.big { font-size: 1.2rem; }
+  .duo .avatar { width: 31px; height: 31px; }
+  .rival-card b { font-size: 0.94rem; }
+  .rival-card .stars i { width: 17px; height: 17px; }
+  .rival-note { font-size: 0.9rem; padding: 4px 10px; }
+  .profile .avatar { width: 42px; height: 42px; }
+  .btn.big { font-size: 1.25rem; }
 }
 /* Phone on its side: the map stays put while the choices scroll. */
 @media (min-width: 821px) and (max-height: 620px) {
   .menu { align-items: start; }
   .menu-map { position: sticky; top: 0; height: calc(100vh - 24px); min-height: 0; }
-  .brand h1 { font-size: 2.4rem; }
+  .brand h1 { height: 2.8rem; }
   .brand p, #modeNote { display: none; }
 }
 
@@ -304,51 +385,56 @@ svg { display: block; width: 100%; height: 100%; }
   grid-template-columns: minmax(0, 1fr) 360px;
   grid-template-rows: auto auto minmax(0, 1fr) auto auto;
   grid-template-areas: 'board bar' 'board versus' 'board .' 'board tricks' 'board panel';
-  gap: 10px;
-  padding: 10px 10px calc(10px + var(--lift));
+  gap: 12px;
+  padding: 12px 14px 16px 64px;
 }
 .board { grid-area: board; position: relative; min-height: 0; }
 .board canvas { touch-action: none; }
 .board.shake { animation: shake 0.32s; }
 @keyframes shake {
-  20% { transform: translate(-5px, 3px); }
-  40% { transform: translate(5px, -3px); }
+  20% { transform: translate(-5px, 3px) rotate(-0.4deg); }
+  40% { transform: translate(5px, -3px) rotate(0.4deg); }
   60% { transform: translate(-3px, -2px); }
   80% { transform: translate(3px, 2px); }
 }
-.bar { grid-area: bar; }
-.versus { grid-area: versus; }
-.tricks { grid-area: tricks; }
+.bar { grid-area: bar; border-radius: var(--wob-2); rotate: 0.4deg; }
+.versus { grid-area: versus; rotate: -0.5deg; }
+.tricks { grid-area: tricks; border-radius: var(--wob-3); rotate: 0.3deg; }
 .panel { grid-area: panel; }
-.bar, .versus, .tricks, .panel { padding: 12px 14px; min-width: 0; }
+.bar, .versus, .tricks, .panel { padding: 11px 14px; min-width: 0; }
 #app[data-mode='classic'] .tricks, #app[data-mode='classic'] .side-purse { display: none; }
 /* Against the computer the player's own pearls are shown once, large, beside the tricks. */
 #app:not([data-rival='friend']) .side-0 .side-purse { display: none; }
 /* In a duel the controls take the colour of the fleet on the move. */
-#app[data-rival='friend'][data-turn='1'] :is(.tricks, .panel) { --sun: var(--rival); --sun-hi: var(--rival-hi); --sun-lo: var(--rival-lo); }
+#app[data-rival='friend'][data-turn='1'] :is(.tricks, .panel) { --sun: var(--rival); --sun-hi: var(--rival-hi); --sun-lo: var(--rival-lo); --sun-soft: var(--rival-soft); }
 
-.bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.round { position: relative; padding-bottom: 7px; color: var(--ink-soft); white-space: nowrap; }
-.round b { color: var(--ink); font-size: 1.2em; font-weight: 900; }
-.round-track { position: absolute; left: 0; right: 0; bottom: 0; height: 5px; border-radius: 3px; background: var(--well); overflow: hidden; }
-.round-track i { display: block; height: 100%; width: 0; background: var(--ink-soft); transition: width 0.4s; }
-.bar-tools { display: flex; gap: 5px; }
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-block: 8px; }
+.round { position: relative; padding-bottom: 7px; color: var(--text-soft); white-space: nowrap; }
+.round b { color: var(--text); font-size: 1.35em; }
+/* The rounds played, as a pencil line that grows. */
+.round-track { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; border-radius: 3px; background: var(--well); overflow: hidden; }
+.round-track i { display: block; height: 100%; width: 0; border-radius: 3px; background: var(--pencil); transition: width 0.4s; }
+.bar-tools { display: flex; gap: 6px; }
 .tool {
   display: grid;
   place-items: center;
   width: 38px;
   height: 38px;
-  border: 0;
-  border-radius: 12px;
-  padding: 8px;
-  background: var(--well);
-  font-weight: 900;
+  border: 2px solid var(--ink);
+  border-radius: var(--blot);
+  padding: 7px;
+  background: var(--scrap);
+  color: var(--ink);
+  font-weight: 700;
   line-height: 1;
+  transition: transform 0.1s;
 }
-.tool:hover { filter: brightness(0.95); }
+.tool:nth-child(2n) { border-radius: 48% 52% 53% 47% / 53% 47% 51% 49%; }
+.tool:hover { transform: rotate(-8deg) scale(1.08); }
+.tool:active { transform: scale(0.92); }
 #soundBtn[aria-pressed='true'] .cross, #soundBtn[aria-pressed='false'] .waves { display: none; }
 
-.versus { position: relative; display: grid; gap: 10px; }
+.versus { display: grid; gap: 9px; }
 .side {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -356,190 +442,219 @@ svg { display: block; width: 100%; height: 100%; }
   align-items: center;
   gap: 0 10px;
 }
-.side .avatar, .side .portrait { grid-area: face; }
-/* A ring around the face of whoever is on the move. */
-#app[data-turn='0'] .side-0 .avatar, #app[data-turn='1'] .side-1 :is(.avatar, .portrait) { outline: 3px solid var(--ink); outline-offset: 2px; }
-.side-name { grid-area: name; font-weight: 800; }
+.side .avatar, .side .portrait { grid-area: face; transition: scale 0.2s; }
+/* Whoever is on the move is circled with the marker. */
+#app[data-turn='0'] .side-0 .avatar, #app[data-turn='1'] .side-1 :is(.avatar, .portrait) { outline: 3.5px solid var(--marker); outline-offset: 2px; scale: 1.06; }
+.side-name { grid-area: name; font-weight: 700; }
 .stat { white-space: nowrap; }
 .stat.tiles { grid-area: tiles; }
-.stat.tiles b { font-size: 1.9rem; font-weight: 900; line-height: 1; }
-.stat.minor { grid-area: minor; font-size: 0.92rem; font-weight: 500; color: var(--ink-soft); }
-.stat.minor b { color: var(--ink); font-weight: 800; }
-.purse { display: inline-flex; align-items: center; gap: 5px; font-weight: 900; }
-.side-purse { margin-left: 10px; color: var(--ink); }
-.share { display: flex; height: 10px; gap: 2px; border-radius: 6px; overflow: hidden; }
-.share i { min-width: 0; transition: flex-grow 0.4s; }
-.share-0 { background: var(--sun); }
-.share-n { background: var(--sand-lo); opacity: 0.55; }
-.share-1 { background: var(--rival); }
+.stat.tiles b { font-size: 2rem; line-height: 1; }
+.stat.minor { grid-area: minor; font-size: 0.92rem; color: var(--text-soft); }
+.stat.minor b { color: var(--text); }
+.purse { display: inline-flex; align-items: center; gap: 5px; font-weight: 700; }
+.side-purse { margin-left: 10px; color: var(--text); }
+/* Who holds how much of the archipelago: two felt-tip strokes over a pencil line. */
+.share { display: flex; height: 13px; gap: 3px; }
+.share i { min-width: 0; border-radius: var(--wob-2); transition: flex-grow 0.4s; }
+.share-0 { background: repeating-linear-gradient(-60deg, var(--sun) 0 6px, var(--sun-hi) 6px 8px); border: 2px solid var(--ink); }
+.share i.share-n { background: repeating-linear-gradient(-60deg, transparent 0 5px, var(--rule) 5px 6.5px); border-block: 2px dashed var(--pencil); border-radius: 0; }
+.share-1 { background: repeating-linear-gradient(-60deg, var(--rival) 0 6px, var(--rival-hi) 6px 8px); border: 2px solid var(--ink); }
 
-/* The rival speaks: a bubble hanging from its card. */
+/* The rival speaks: a comic bubble hanging from its card. */
 .bubble {
   position: absolute;
   z-index: 3;
   left: 14px;
-  top: calc(100% + 12px);
+  top: calc(100% + 13px);
   max-width: calc(100% - 28px);
-  padding: 8px 12px;
-  border-radius: 14px;
-  background: var(--ink);
-  color: #fff;
+  padding: 7px 13px;
+  border: var(--line) solid var(--ink);
+  border-radius: var(--wob-2);
+  background: var(--scrap);
+  box-shadow: 2px 3px 0 var(--shade);
   font-weight: 700;
   line-height: 1.25;
   pointer-events: none;
   opacity: 0;
-  transform: translateY(-6px) scale(0.9);
+  transform: translateY(-6px) scale(0.85) rotate(-3deg);
   transform-origin: 26px top;
-  transition: opacity 0.16s, transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1);
+  transition: opacity 0.16s, transform 0.22s cubic-bezier(0.3, 1.7, 0.5, 1);
 }
-.bubble::before { content: ''; position: absolute; left: 18px; top: -7px; border: 8px solid transparent; border-top: 0; border-bottom-color: var(--ink); }
-.bubble.show { opacity: 1; transform: none; }
+.bubble::before { content: ''; position: absolute; left: 20px; top: -9px; width: 14px; height: 14px; border: solid var(--ink); border-width: var(--line) 0 0 var(--line); background: var(--scrap); transform: rotate(45deg) skew(12deg, 12deg); }
+.bubble.show { opacity: 1; transform: rotate(-1deg); }
 
 .tricks { display: flex; align-items: center; gap: 12px; }
-.tricks > .purse { font-size: 1.5rem; min-width: 2.6em; }
-.trick-row { display: flex; gap: 7px; flex: 1; justify-content: flex-end; }
+.tricks > .purse { font-size: 1.6rem; min-width: 2.5em; }
+.trick-row { display: flex; gap: 8px; flex: 1; justify-content: flex-end; }
+/* Tricks are stickers; one not yet earned is an empty spot. */
 .trick {
-  --edge: var(--paper-edge);
   position: relative;
   flex: 0 1 52px;
   aspect-ratio: 1;
   min-width: 40px;
-  border: 0;
-  border-radius: 15px;
-  padding: 9px 9px 13px;
-  background: #fff;
-  box-shadow: 0 4px 0 var(--edge), 0 0 0 2px var(--edge) inset;
-  transition: transform 0.08s, box-shadow 0.08s, background-color 0.12s;
+  border: var(--line) solid var(--ink);
+  border-radius: var(--wob-1);
+  padding: 8px 8px 11px;
+  background: var(--scrap);
+  box-shadow: 2px 3px 0 var(--ink);
+  color: var(--ink);
+  transition: transform 0.1s, box-shadow 0.1s, background-color 0.12s;
 }
-.trick:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--edge), 0 0 0 2px var(--edge) inset; }
+.trick:nth-child(2n) { border-radius: var(--wob-2); rotate: 2deg; }
+.trick:nth-child(3n) { rotate: -2.5deg; }
+.trick:hover { transform: translateY(-2px) rotate(-3deg); }
+.trick:active { transform: translate(2px, 3px); box-shadow: 0 0 0 var(--ink); }
 .trick .cost {
   position: absolute;
-  right: -4px;
-  bottom: -6px;
+  right: -7px;
+  bottom: -8px;
   display: flex;
   align-items: center;
   gap: 2px;
   padding: 0 5px 0 3px;
-  border-radius: 9px;
-  background: var(--ink);
-  color: #fff;
-  font-size: 0.78rem;
-  font-weight: 900;
-  line-height: 1.5;
+  border: 2px solid var(--ink);
+  border-radius: var(--wob-3);
+  background: var(--scrap);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.35;
 }
-.trick .cost .pearl { width: 0.85em; height: 0.85em; border-width: 1.5px; border-color: #fff; }
-.trick .lock { display: none; position: absolute; inset: 0; padding: 14px; color: var(--ink-soft); }
-.trick.off { background: var(--well); box-shadow: 0 4px 0 var(--edge); }
-.trick.off > svg { opacity: 0.35; }
-.trick.locked { background: var(--well); box-shadow: 0 0 0 2px var(--paper-edge) inset; }
+.trick .cost .pearl { width: 0.8em; height: 0.8em; border-width: 1.5px; }
+.trick .lock { display: none; position: absolute; inset: 0; padding: 14px; color: var(--pencil); }
+.trick.off { box-shadow: none; color: var(--pencil); border-color: var(--pencil); }
+.trick.off > svg { opacity: 0.5; }
+.trick.locked { border: 2px dashed var(--pencil); background: transparent; box-shadow: none; }
 .trick.locked > svg, .trick.locked .cost { display: none; }
 .trick.locked .lock { display: block; }
-.trick.armed { --edge: var(--sun-lo); background: var(--sun); transform: translateY(-3px); }
-.trick.glowing { --edge: var(--sun-lo); background: var(--sun-hi); animation: glow 0.9s ease-in-out infinite alternate; }
-@keyframes glow { to { box-shadow: 0 4px 0 var(--edge), 0 0 0 5px var(--sun); } }
+.trick.armed { background: var(--sun); transform: translateY(-4px) rotate(-5deg); color: var(--marker); }
+.trick.glowing { background: var(--sun-hi); animation: wiggle 0.5s ease-in-out infinite alternate; }
+@keyframes wiggle { from { rotate: -5deg; } to { rotate: 5deg; } }
+/* The game points at a button when the player hesitates. */
+.btn.nudge { animation: wiggle 0.35s ease-in-out infinite alternate; }
 
-.panel { display: grid; gap: 10px; }
-.steps { display: flex; gap: 16px; counter-reset: step; color: var(--ink-soft); }
-.steps li { counter-increment: step; display: flex; align-items: center; gap: 7px; font-weight: 800; }
+/* The controls are a sticky note in the colour of whoever is on the move. */
+.panel {
+  position: relative;
+  display: grid;
+  gap: 9px;
+  padding: 18px 16px 16px;
+  border: 0;
+  background: var(--sun-soft);
+  box-shadow: 3px 5px 0 var(--shade);
+  border-radius: 3px 3px 26px 3px / 3px 3px 20px 3px;
+  rotate: -0.5deg;
+  transition: background-color 0.3s;
+}
+.panel::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 12px; border-radius: 3px 3px 0 0; background: rgba(27, 34, 96, 0.06); }
+#app[data-turn='1'] .panel { background: var(--rival-soft); }
+.steps { display: flex; gap: 14px; counter-reset: step; color: var(--pencil); }
+.steps li { counter-increment: step; display: flex; align-items: center; gap: 6px; padding: 1px 8px 1px 2px; font-weight: 700; border-radius: var(--wob-2); }
 .steps li::before {
   content: counter(step);
   display: grid;
   place-items: center;
-  width: 1.6em;
-  height: 1.6em;
-  border-radius: 50%;
-  background: var(--well);
-  font-weight: 900;
+  width: 1.55em;
+  height: 1.55em;
+  border: 2px solid currentColor;
+  border-radius: var(--blot);
   font-size: 0.9rem;
 }
-.steps li.on { color: var(--ink); }
-.steps li.on::before { background: var(--sun); }
-.steps li.theirs::before { background: var(--rival); color: #fff; }
+/* The step in progress is gone over with the highlighter. */
+.steps li.on { color: var(--text); background: repeating-linear-gradient(-7deg, var(--sun) 0 9px, var(--sun-hi) 9px 11px); rotate: -1.5deg; }
+.steps li.theirs { background: repeating-linear-gradient(-7deg, var(--rival) 0 9px, var(--rival-hi) 9px 11px); }
 
-.hint { min-height: 2.8em; font-weight: 600; }
-.hint.alert { color: var(--coral); }
+.hint { min-height: 2.7em; }
+.hint.alert { color: var(--red); font-weight: 700; }
 
 .place-box, .order-box { display: none; }
 .panel[data-mode='place'] .place-box { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .panel[data-mode='order'] .order-box { display: grid; gap: 6px; }
-.place-left b { font-size: 1.5rem; font-weight: 900; }
-.chips { display: flex; gap: 4px; }
-.chip { border: 0; border-radius: 11px; padding: 0.45em 0.8em; background: var(--well); font-weight: 800; }
-.chip[aria-pressed='true'] { background: var(--ink); color: #fff; }
+.place-left b { font-size: 1.6rem; line-height: 1; }
+.chips { display: flex; gap: 6px; }
+.chip { border: 2px solid var(--ink); border-radius: var(--wob-2); padding: 0.3em 0.7em; background: var(--scrap); font-weight: 700; }
+.chip:nth-child(2n) { border-radius: var(--wob-1); }
+.chip[aria-pressed='true'] { background: var(--marker); border-color: var(--marker); color: #fff; rotate: -3deg; }
 
-.order-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-weight: 800; }
-.stepper { display: inline-flex; align-items: center; gap: 4px; }
+.order-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-weight: 700; }
+.stepper { display: inline-flex; align-items: center; gap: 5px; }
 .stepper button {
   width: 38px;
   height: 38px;
-  border: 0;
-  border-radius: 12px;
+  border: var(--line) solid var(--ink);
+  border-radius: var(--blot);
   padding: 0;
-  background: var(--ink);
-  color: #fff;
+  background: var(--scrap);
+  box-shadow: 1px 2px 0 var(--ink);
   font-size: 1.4rem;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1;
 }
-.stepper button:disabled { opacity: 0.3; }
-.stepper b { min-width: 1.5em; text-align: center; font-size: 1.9rem; font-weight: 900; line-height: 1; }
-.order-defense { font-size: 0.92rem; font-weight: 500; color: var(--ink-soft); }
+.stepper button:active:not(:disabled) { transform: translate(1px, 2px); box-shadow: none; }
+.stepper button:disabled { opacity: 0.3; box-shadow: none; }
+.stepper b { min-width: 1.5em; text-align: center; font-size: 2rem; line-height: 1; }
+.order-defense { font-size: 0.92rem; color: var(--text-soft); }
 .odds { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 2px 10px; font-weight: 700; }
-.odds b { font-size: 2.2rem; font-weight: 900; line-height: 1; }
-.odds-bar { grid-column: 1 / -1; height: 10px; border-radius: 6px; background: var(--well); overflow: hidden; }
-.odds-bar i { display: block; height: 100%; border-radius: inherit; background: var(--leaf); transition: width 0.15s; }
+.odds b { font-size: 2.3rem; line-height: 1; }
+.odds-bar { grid-column: 1 / -1; height: 14px; border: 2px solid var(--ink); border-radius: var(--wob-2); background: var(--scrap); overflow: hidden; }
+.odds-bar i { display: block; height: 100%; background: repeating-linear-gradient(-60deg, var(--leaf) 0 7px, var(--leaf-hi) 7px 9px); transition: width 0.15s; }
 .panel[data-kind='merge'] .odds, .panel[data-kind='merge'] .order-defense { display: none; }
 
-.actions { display: flex; gap: 8px; }
+.actions { display: flex; gap: 10px; }
 .actions .btn { flex: 1 1 0; padding-inline: 0.5em; }
 .panel:not([data-mode='order']) .for-order,
 .panel[data-mode='order'] .for-turn { display: none; }
 
+/* Announcements: a strip of paper slapped across the map. */
 .banner, .toast {
   position: absolute;
   left: 50%;
   display: flex;
   align-items: center;
   white-space: nowrap;
+  border: var(--line) solid var(--ink);
   pointer-events: none;
   opacity: 0;
-  box-shadow: 0 var(--lift) 0 rgba(8, 58, 99, 0.35);
+  box-shadow: 3px 5px 0 var(--shade);
 }
 .banner {
   top: 50%;
   flex-direction: column;
-  padding: 12px 34px 10px;
-  border-radius: 24px;
+  gap: 2px;
+  padding: 14px 34px 9px;
+  border-radius: var(--wob-1);
   transform: translate(-50%, -50%);
 }
-.banner strong { font-size: clamp(1.5rem, 5vw, 2.3rem); font-weight: 900; line-height: 1.1; }
+.banner strong { display: block; height: clamp(1.5rem, 5vw, 2.3rem); font-size: clamp(1.5rem, 5vw, 2.3rem); line-height: 1; color: var(--marker); }
+.banner strong .lettering { height: 100%; width: auto; }
 .banner span { font-weight: 700; }
-.banner[data-side='0'], .toast[data-side='0'] { background: var(--sun); color: var(--ink); }
-.banner[data-side='1'], .toast[data-side='1'] { background: var(--rival); color: #fff; }
+.banner[data-side='0'], .toast[data-side='0'] { background: repeating-linear-gradient(-7deg, var(--sun) 0 13px, var(--sun-hi) 13px 15px); }
+.banner[data-side='1'], .toast[data-side='1'] { background: repeating-linear-gradient(-7deg, var(--rival) 0 13px, var(--rival-hi) 13px 15px); }
 .banner.show { animation: banner var(--banner-ms, 1000ms) both; }
 @keyframes banner {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
-  14% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
-  22% { transform: translate(-50%, -50%) scale(1); }
-  72% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  100% { opacity: 0; transform: translate(-50%, -64%) scale(1); }
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5) rotate(-12deg); }
+  14% { opacity: 1; transform: translate(-50%, -50%) scale(1.1) rotate(-1deg); }
+  22% { transform: translate(-50%, -50%) scale(1) rotate(-3deg); }
+  72% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(-3deg); }
+  100% { opacity: 0; transform: translate(-50%, -70%) scale(1) rotate(-6deg); }
 }
 .toast {
   top: 12px;
   gap: 8px;
-  padding: 7px 16px 7px 10px;
-  border-radius: 18px;
-  font-weight: 900;
+  padding: 6px 16px 6px 10px;
+  border-radius: var(--wob-2);
+  font-weight: 700;
+  color: var(--marker);
   transform: translateX(-50%);
 }
 .toast svg { width: 26px; height: 26px; }
 .toast.show { animation: toast 1.9s both; }
 @keyframes toast {
-  0% { opacity: 0; transform: translate(-50%, -20px) scale(0.8); }
-  10% { opacity: 1; transform: translate(-50%, 0) scale(1.06); }
-  16% { transform: translate(-50%, 0) scale(1); }
-  80% { opacity: 1; transform: translate(-50%, 0) scale(1); }
-  100% { opacity: 0; transform: translate(-50%, -10px) scale(1); }
+  0% { opacity: 0; transform: translate(-50%, -20px) scale(0.8) rotate(4deg); }
+  10% { opacity: 1; transform: translate(-50%, 0) scale(1.06) rotate(-2deg); }
+  16% { transform: translate(-50%, 0) scale(1) rotate(1.5deg); }
+  80% { opacity: 1; transform: translate(-50%, 0) scale(1) rotate(1.5deg); }
+  100% { opacity: 0; transform: translate(-50%, -10px) scale(1) rotate(1.5deg); }
 }
 
 /* Upright phones and narrow windows: map in the middle, controls under the thumb. */
@@ -548,31 +663,31 @@ svg { display: block; width: 100%; height: 100%; }
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto minmax(0, 1fr) auto auto;
     grid-template-areas: 'bar' 'versus' 'board' 'tricks' 'panel';
-    gap: 6px;
-    padding: 6px 6px calc(6px + var(--lift));
+    gap: 7px;
+    padding: 6px 8px 10px;
     padding-top: max(6px, env(safe-area-inset-top));
-    padding-bottom: max(calc(6px + var(--lift)), env(safe-area-inset-bottom));
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
   }
-  .bar, .versus, .tricks, .panel { padding: 7px 10px; border-radius: 16px; }
-  .tool { width: 34px; height: 34px; padding: 7px; border-radius: 10px; }
+  .bar, .versus, .tricks { padding: 6px 10px; rotate: none; }
+  .bar { padding-block: 4px; }
+  .tool { width: 34px; height: 34px; padding: 6px; }
   .versus { grid-template-columns: 1fr 1fr; gap: 6px 10px; }
   .side { grid-template-areas: 'face name' 'face tiles'; grid-template-columns: auto 1fr; gap: 0 8px; }
-  .side .avatar, .side .portrait { width: 38px; height: 38px; }
-  .side .avatar { padding: 8px; }
-  .side-name { font-size: 0.85rem; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .side .avatar, .side .portrait { width: 40px; height: 40px; }
+  .side-name { font-size: 0.88rem; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .side .stat.minor { display: none; }
-  .stat.tiles b { font-size: 1.35rem; }
+  .stat.tiles b { font-size: 1.4rem; }
   .side-1 { grid-template-areas: 'name face' 'tiles face'; grid-template-columns: 1fr auto; text-align: right; }
-  .share { grid-column: 1 / -1; height: 8px; }
+  .share { grid-column: 1 / -1; height: 10px; }
   .bubble { left: auto; right: 10px; transform-origin: calc(100% - 20px) top; }
-  .bubble::before { left: auto; right: 14px; }
+  .bubble::before { left: auto; right: 16px; }
   .tricks { gap: 8px; }
-  .tricks > .purse { font-size: 1.25rem; min-width: 2.3em; }
-  .trick { flex-basis: 46px; padding: 8px 8px 11px; border-radius: 13px; }
+  .tricks > .purse { font-size: 1.3rem; min-width: 2.2em; }
+  .trick { flex-basis: 46px; padding: 7px 7px 9px; }
   /* One height for every mode, so the map never jumps when the panel changes. */
-  .panel { gap: 7px; min-height: 222px; align-content: start; }
-  .steps { font-size: 0.9rem; }
-  .hint { min-height: 2.8em; font-size: 0.95rem; }
+  .panel { gap: 6px; min-height: 216px; align-content: start; padding: 16px 12px 12px; rotate: none; }
+  .steps { font-size: 0.92rem; }
+  .hint { min-height: 2.7em; font-size: 0.96rem; }
   .panel[data-mode='order'] .hint, .panel[data-mode='order'] .steps { display: none; }
   .panel[data-mode='order'] .order-box { gap: 3px; }
   .odds b { font-size: 1.9rem; }
@@ -581,138 +696,172 @@ svg { display: block; width: 100%; height: 100%; }
 
 /* A phone on its side: the side column stays, tightened to fit the height. */
 @media (orientation: landscape) and (min-width: 621px) and (max-height: 520px) {
+  body::before { display: none; }
   .game {
     grid-template-columns: minmax(0, 1fr) 300px;
     grid-template-rows: auto auto minmax(0, 1fr) auto auto;
-    gap: 5px;
-    padding: 5px 5px calc(5px + var(--lift));
+    gap: 6px;
+    padding: 5px 8px 8px 60px;
   }
-  .bar, .versus, .tricks, .panel { padding: 6px 10px; border-radius: 14px; }
+  .bar, .versus, .tricks { padding: 4px 10px; rotate: none; }
   .steps, .side .stat.minor, .odds-bar { display: none; }
-  .tool { width: 32px; height: 32px; padding: 6px; }
+  .tool { width: 31px; height: 31px; padding: 5px; }
   .versus { grid-template-columns: 1fr 1fr; gap: 4px 8px; }
   .side { grid-template-areas: 'face name' 'face tiles'; grid-template-columns: auto 1fr; gap: 0 6px; }
-  .side .avatar, .side .portrait { width: 32px; height: 32px; }
-  .side .avatar { padding: 7px; }
+  .side .avatar, .side .portrait { width: 34px; height: 34px; }
   .side-name { font-size: 0.8rem; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .stat.tiles b { font-size: 1.2rem; }
-  .share { grid-column: 1 / -1; height: 6px; }
-  .trick { flex-basis: 38px; min-width: 34px; padding: 6px 6px 9px; border-radius: 11px; }
+  .share { grid-column: 1 / -1; height: 8px; }
+  .trick { flex-basis: 38px; min-width: 34px; padding: 5px 5px 8px; }
   .tricks > .purse { font-size: 1.1rem; }
   .hint { min-height: 0; font-size: 0.88rem; line-height: 1.25; }
-  .panel { gap: 5px; }
+  .panel { gap: 5px; padding: 14px 12px 10px; rotate: none; }
   .odds b { font-size: 1.6rem; }
   .stepper button { width: 32px; height: 32px; }
-  .btn { padding-block: 0.5em; }
+  .btn { padding-block: 0.4em; }
 }
 
-/* ── Dialogs ─────────────────────────────────────────────────────────── */
+/* ── Dialogs: sheets torn out of the notebook ────────────────────────── */
 
 dialog {
   width: min(600px, calc(100vw - 20px));
   max-height: calc(100vh - 20px);
   max-height: calc(100dvh - 20px);
-  border: 0;
-  border-radius: 26px;
+  border: var(--line) solid var(--ink);
+  border-radius: var(--wob-3);
   padding: clamp(16px, 4vw, 26px);
-  background: var(--paper);
-  color: var(--ink);
-  box-shadow: 0 8px 0 rgba(8, 58, 99, 0.45);
+  padding-top: 36px;
+  /* a row of torn binder holes along the top */
+  background: radial-gradient(circle at 15px 14px, var(--well) 0 5.5px, var(--rule) 5.5px 7px, transparent 7.5px) 6px 0 / 30px 28px repeat-x local, var(--scrap);
+  color: var(--text);
+  box-shadow: 5px 7px 0 var(--shade);
   overflow: auto;
   scrollbar-width: thin;
-  scrollbar-color: var(--paper-edge) transparent;
+  scrollbar-color: var(--rule) transparent;
 }
-dialog[open] { animation: pop 0.28s cubic-bezier(0.3, 1.5, 0.5, 1); }
-@keyframes pop { from { opacity: 0; transform: scale(0.88); } }
-dialog::backdrop { background: rgba(8, 70, 118, 0.6); }
-dialog h2 { font-size: 1.9rem; font-weight: 900; line-height: 1.1; margin-bottom: 12px; }
-dialog h3 { margin: 16px 0 8px; font-size: 1.05rem; font-weight: 900; }
-dialog .menu-actions { margin-top: 18px; }
-dialog p { font-weight: 500; }
+dialog[open] { animation: pop 0.3s cubic-bezier(0.3, 1.5, 0.5, 1); }
+@keyframes pop { from { opacity: 0; transform: scale(0.85) rotate(-3deg); } }
+dialog::backdrop { background: rgba(27, 34, 96, 0.38); }
+dialog h2 { height: 2.1rem; margin-bottom: 14px; font-size: 1.9rem; line-height: 1.1; color: var(--ink); }
+dialog h2 .lettering { height: 100%; width: auto; max-width: 100%; }
+dialog h3 { display: inline-block; margin: 16px 0 8px; font-size: 1.12rem; text-decoration: underline wavy var(--sun); text-decoration-thickness: 3px; text-underline-offset: 5px; }
+dialog .menu-actions { margin-top: 20px; }
 
 .rules { display: grid; gap: 10px; }
-.rules section { display: grid; gap: 5px; }
-.rules h3 { margin: 0; color: var(--sea-deep); }
-.rules p { max-width: 64ch; line-height: 1.4; }
-.legend { display: grid; gap: 7px; font-weight: 500; }
+.rules section { display: grid; gap: 5px; justify-items: start; }
+.rules h3 { margin: 4px 0 2px; }
+.rules p { max-width: 62ch; line-height: 1.4; }
+.legend { display: grid; gap: 8px; }
 .legend li { display: flex; align-items: center; gap: 12px; }
-.swatch { flex: none; display: grid; place-items: center; width: 34px; height: 34px; padding: 7px; border-radius: 11px; background: var(--sun); }
-.swatch.token::after { content: ''; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 2px 0 var(--sun-lo); }
-.swatch.resting { background: repeating-linear-gradient(-45deg, transparent 0 4px, rgba(22, 50, 79, 0.28) 4px 6px), var(--sun); }
+.swatch { flex: none; display: grid; place-items: center; width: 36px; height: 36px; padding: 6px; border: 2px solid var(--ink); border-radius: var(--wob-1); background: repeating-linear-gradient(-60deg, var(--sun) 0 7px, var(--sun-hi) 7px 9px); color: var(--text); font-weight: 700; line-height: 1; }
+.swatch.token::after { content: '3'; display: grid; place-items: center; width: 22px; height: 22px; border: 2.5px solid var(--marker); border-radius: var(--blot); background: var(--scrap); font-size: 0.85rem; }
+.swatch.resting::after { content: 'z z'; font-size: 0.8rem; opacity: 0.75; }
 
+/* The result: a rubber stamp, sticker stars and what the game earned. */
 .verdict { text-align: center; }
-.verdict h2 { font-size: clamp(2.6rem, 9vw, 3.6rem); margin-bottom: 4px; }
-.verdict[data-outcome='win'] h2 { color: var(--sun-lo); }
-.verdict[data-outcome='loss'] h2 { color: var(--rival-lo); }
-#app[data-rival='friend'] .verdict h2 { font-size: clamp(2rem, 7vw, 2.8rem); margin-bottom: 8px; }
-.quote { display: flex; align-items: center; gap: 12px; margin: 14px 0; padding: 8px 14px 8px 8px; border-radius: 18px; background: var(--well); text-align: left; }
-.quote p { font-weight: 700; }
-.goals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.goals li { display: grid; justify-items: center; gap: 2px; font-size: 0.9rem; font-weight: 700; color: var(--ink-soft); }
-.goals svg { width: 54px; height: 54px; color: #dccfae; }
-.goals li.won { color: var(--ink); }
-.goals li.won svg { color: var(--sun); filter: drop-shadow(0 3px 0 var(--sun-lo)); animation: star 0.5s cubic-bezier(0.3, 1.8, 0.5, 1) both; animation-delay: calc(0.7s + var(--order) * 0.26s); }
-@keyframes star { from { transform: scale(0) rotate(-40deg); } }
+.verdict h2 {
+  display: inline-grid;
+  justify-items: center;
+  gap: 0.12em;
+  height: auto;
+  margin: 2px 0 12px;
+  padding: 0.24em 0.5em 0.2em;
+  border: 4px solid currentColor;
+  border-radius: var(--wob-1);
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  font-size: clamp(2.1rem, 8vw, 3rem);
+  color: var(--red);
+  rotate: -4deg;
+}
+.verdict h2 .lettering { height: 1em; width: auto; max-width: min(74vw, 440px); }
+.verdict[open] h2 { animation: stamp 0.42s 0.18s cubic-bezier(0.2, 1.3, 0.4, 1) both; }
+@keyframes stamp { from { opacity: 0; scale: 2.6; rotate: 9deg; } }
+.verdict[data-outcome='loss'] h2 { color: var(--pencil); rotate: 3deg; }
+.verdict[data-outcome='draw'] h2 { color: var(--ink); rotate: -2deg; }
+#app[data-rival='friend'] .verdict[data-outcome='win'] h2 { color: var(--sun-lo); }
+#app[data-rival='friend'] .verdict[data-outcome='loss'] h2 { color: var(--rival-lo); rotate: -4deg; }
+.quote { display: flex; align-items: center; gap: 12px; margin: 12px 0; text-align: left; }
+.quote p { position: relative; flex: 1; padding: 8px 14px; border: var(--line) solid var(--ink); border-radius: var(--wob-2); background: var(--scrap); font-weight: 700; rotate: 0.6deg; }
+.quote p::before { content: ''; position: absolute; left: -8.5px; top: 50%; width: 13px; height: 13px; margin-top: -7px; border: solid var(--ink); border-width: 0 0 var(--line) var(--line); background: var(--scrap); transform: rotate(45deg); }
+.goals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
+.goals li { display: grid; justify-items: center; gap: 2px; font-size: 0.92rem; font-weight: 700; color: var(--pencil); }
+.goals svg { width: 58px; height: 58px; overflow: visible; color: transparent; }
+.goals path { stroke: var(--pencil); stroke-width: 1.1; stroke-dasharray: 2 1.8; stroke-linejoin: round; }
+.goals li.won { color: var(--text); }
+.goals li.won svg { color: var(--gold); filter: drop-shadow(2px 3px 0 var(--shade)); animation: star 0.5s cubic-bezier(0.3, 1.8, 0.5, 1) both; animation-delay: calc(0.7s + var(--order) * 0.26s); }
+.goals li.won path { stroke: var(--ink); stroke-width: 1.3; stroke-dasharray: none; }
+.goals li.won:nth-child(odd) svg { rotate: -9deg; }
+.goals li.won:nth-child(even) svg { rotate: 7deg; }
+@keyframes star { from { transform: scale(0) rotate(-60deg); } }
 .gain { display: grid; gap: 7px; margin-top: 16px; text-align: left; }
 .gain-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
-.gain-head b { font-weight: 900; }
-.gain-head span { font-weight: 800; color: var(--leaf); }
-.rewards { display: grid; gap: 6px; }
-.rewards li { display: flex; align-items: center; gap: 10px; padding: 7px 12px 7px 8px; border-radius: 14px; background: var(--sun-hi); font-weight: 700; }
-.rewards svg { flex: none; width: 30px; height: 30px; }
-.more { margin-top: 12px; text-align: left; }
-.more summary { cursor: pointer; font-weight: 800; color: var(--ink-soft); }
+.gain-head span { font-weight: 700; color: #1f8f47; }
+.rewards { display: grid; gap: 7px; margin-top: 2px; }
+.rewards li { display: flex; align-items: center; gap: 10px; padding: 6px 12px 6px 8px; border-radius: 3px; background: var(--sun-soft); box-shadow: 2px 3px 0 var(--shade); font-weight: 700; rotate: -0.5deg; }
+.rewards li:nth-child(2n) { rotate: 0.6deg; margin-left: 10px; }
+.rewards svg { flex: none; width: 30px; height: 30px; color: var(--ink); }
+.more { margin-top: 14px; text-align: left; }
+.more summary { cursor: pointer; font-weight: 700; color: var(--text-soft); }
 .tally { width: 100%; margin-top: 8px; border-collapse: collapse; }
-.tally th, .tally td { padding: 4px 0; border-bottom: 2px solid var(--well); font-weight: 800; text-align: right; }
-.tally th:first-child, .tally td:first-child { text-align: left; font-weight: 500; color: var(--ink-soft); }
+.tally th, .tally td { padding: 4px 0; border-bottom: 2px dashed var(--rule); font-weight: 700; text-align: right; }
+.tally th:first-child, .tally td:first-child { text-align: left; font-weight: 400; color: var(--text-soft); }
 .tally td:not(:first-child) { width: 5.5em; font-size: 1.1rem; }
 .tally .col-0 { color: var(--sun-lo); }
-.tally .col-1 { color: var(--rival); }
+.tally .col-1 { color: var(--rival-lo); }
 .chart { margin-top: 12px; }
-.chart figcaption { font-size: 0.92rem; font-weight: 500; color: var(--ink-soft); margin-bottom: 4px; }
+.chart figcaption { font-size: 0.92rem; color: var(--text-soft); margin-bottom: 4px; }
 .chart canvas { display: block; width: 100%; height: 120px; }
 .verdict .menu-actions { justify-content: center; }
 
+/* The logbook: a sticker album of everything earned so far. */
 .rank { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 14px; }
-.rank b { display: block; margin-bottom: 6px; font-size: 1.3rem; font-weight: 900; }
+.rank b { display: block; margin-bottom: 6px; font-size: 1.3rem; }
 .rank .note { margin-top: 6px; }
-.trick-list { display: grid; gap: 8px; }
+.trick-list { display: grid; gap: 9px; }
 .trick-list li { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 12px; }
-.trick-icon { width: 46px; height: 46px; padding: 9px; border-radius: 14px; background: var(--sun); }
-.trick-list b { font-weight: 900; margin-right: 8px; }
-.trick-list .cost { display: inline-flex; align-items: center; gap: 3px; font-weight: 900; }
-.trick-list p { font-size: 0.92rem; color: var(--ink-soft); }
-.trick-list .locked .trick-icon { background: var(--well); color: var(--ink-soft); }
+.trick-icon { width: 46px; height: 46px; padding: 8px; border: var(--line) solid var(--ink); border-radius: var(--wob-1); background: var(--sun); box-shadow: 2px 3px 0 var(--shade); color: var(--marker); rotate: -3deg; }
+.trick-list li:nth-child(2n) .trick-icon { rotate: 3deg; border-radius: var(--wob-2); }
+.trick-list b { margin-right: 8px; }
+.trick-list .cost { display: inline-flex; align-items: center; gap: 3px; font-weight: 700; }
+.trick-list p { font-size: 0.92rem; color: var(--text-soft); }
+.trick-list .locked .trick-icon { border: 2px dashed var(--pencil); background: transparent; box-shadow: none; color: var(--pencil); rotate: none; }
 .rival-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.rival-list li { display: grid; justify-items: center; gap: 3px; font-size: 0.9rem; text-align: center; }
-.rival-list b { font-weight: 800; line-height: 1.15; }
-.rival-list li:nth-child(1) { --rival: #ef4b4b; --rival-soft: #ffe2dd; }
-.rival-list li:nth-child(2) { --rival: #e2409a; --rival-soft: #ffe0f1; }
-.rival-list li:nth-child(3) { --rival: #8250e6; --rival-soft: #ece2ff; }
-.badge-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
-.badge-list li { display: grid; grid-template-columns: 34px 1fr; gap: 0 8px; align-items: center; padding: 8px; border-radius: 14px; background: var(--well); color: var(--ink-soft); }
-.badge-list svg { grid-row: span 2; width: 34px; height: 34px; color: #cfc3a4; }
-.badge-list b { font-size: 0.95rem; font-weight: 900; line-height: 1.15; }
-.badge-list small { font-size: 0.8rem; font-weight: 500; line-height: 1.2; }
-.badge-list li.won { background: var(--sun-hi); color: var(--ink); }
-.badge-list li.won svg { color: var(--sun-lo); }
+.rival-list li { display: grid; justify-items: center; gap: 3px; font-size: 0.92rem; text-align: center; }
+.rival-list b { line-height: 1.15; }
+.rival-list li:nth-child(1) { --rival-soft: #ffe2de; }
+.rival-list li:nth-child(2) { --rival-soft: #ffe1f2; }
+.rival-list li:nth-child(3) { --rival-soft: #ece2ff; }
+.badge-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 10px; }
+.badge-list li { display: grid; grid-template-columns: 34px 1fr; gap: 0 8px; align-items: center; padding: 7px 8px; border: 2px dashed var(--pencil); border-radius: var(--wob-2); color: var(--pencil); }
+.badge-list svg { grid-row: span 2; width: 34px; height: 34px; opacity: 0.45; }
+.badge-list b { font-size: 0.95rem; line-height: 1.15; }
+.badge-list small { font-size: 0.8rem; line-height: 1.2; }
+/* An earned badge is a sticker pressed onto its spot, never quite straight. */
+.badge-list li.won { border: var(--line) solid var(--ink); background: var(--sun-soft); box-shadow: 2px 3px 0 var(--shade); color: var(--text); rotate: -1.2deg; }
+.badge-list li.won:nth-child(2n) { rotate: 1deg; background: #e3f7e9; }
+.badge-list li.won:nth-child(3n) { rotate: 0.4deg; background: #ffe6f3; }
+.badge-list li.won svg { color: var(--red); opacity: 1; }
 #logTotals { margin-top: 14px; }
 
-/* The rival cards on the start screen show each rival in its own colour. */
-.rival[data-rival='easy'] { --rival: #ef4b4b; --rival-soft: #ffe2dd; }
-.rival[data-rival='normal'] { --rival: #e2409a; --rival-soft: #ffe0f1; }
-.rival[data-rival='hard'] { --rival: #8250e6; --rival-soft: #ece2ff; }
-
 @media (prefers-reduced-motion: reduce) {
-  body::before, .trick.glowing, dialog[open], .goals li.won svg { animation: none; }
+  .pupils, .trick.glowing, .btn.nudge, dialog[open], .verdict[open] h2, .goals li.won svg { animation: none; }
   .banner.show, .toast.show { animation-name: fade; }
   @keyframes fade { 0%, 100% { opacity: 0; } 16%, 72% { opacity: 1; } }
-  .btn, .share i, .round-track i, .xp-bar i, .bubble { transition: none; }
+  .btn, .share i, .round-track i, .xp-bar i, .bubble, .rival-card, .profile, .tool, .trick { transition: none; }
 }
 </style>
 </head>
 <body>
 <main id="app" data-screen="menu" data-rival="normal" data-mode="adventure">
+
+  <!-- Makes doodles look redrawn by hand; the script changes the seed a few times a second. -->
+  <svg class="defs" aria-hidden="true">
+    <filter id="boil" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence id="boilNoise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="3.4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </svg>
 
   <!-- Start screen -->
   <section class="screen menu" aria-labelledby="title">
@@ -721,12 +870,12 @@ dialog p { font-weight: 500; }
     <div class="menu-side">
       <header class="brand">
         <h1 id="title">Otokrati</h1>
-        <p>Bitka za otočje</p>
+        <p>Bitka za otočje, <span>nacrtana pod satom</span></p>
       </header>
 
-      <form class="card menu-card" id="setup">
+      <form class="menu-card" id="setup">
         <button class="profile" type="button" data-open="logbook" title="Otvori brodski dnevnik">
-          <span class="avatar" data-icon="ship"></span>
+          <span class="avatar" data-ship></span>
           <span class="profile-text">
             <b id="rankName"></b>
             <span class="xp-bar"><i id="xpFill"></i></span>
@@ -766,14 +915,15 @@ dialog p { font-weight: 500; }
           <label class="rival" data-rival="friend">
             <input type="radio" name="rival" value="friend">
             <span class="rival-card">
-              <span class="duo"><span class="avatar" data-icon="ship"></span><span class="avatar away" data-icon="ship"></span></span>
+              <span class="duo"><span class="avatar" data-ship></span><span class="avatar away" data-ship></span></span>
               <b>Dva igrača</b>
               <small>Udvoje na istom uređaju, potez po potez.</small>
             </span>
           </label>
+          <p class="rival-note" id="rivalNote" role="status"></p>
           <div class="names" id="names" hidden>
-            <label><span class="avatar" data-icon="ship"></span><input class="name-input" id="playerName0" type="text" autocomplete="off" spellcheck="false" aria-label="Ime žute flote"></label>
-            <label><span class="avatar away" data-icon="ship"></span><input class="name-input" id="playerName1" type="text" autocomplete="off" spellcheck="false" aria-label="Ime zelene flote"></label>
+            <label><span class="avatar" data-ship></span><input class="name-input" id="playerName0" type="text" autocomplete="off" spellcheck="false" aria-label="Ime žute flote"></label>
+            <label><span class="avatar away" data-ship></span><input class="name-input" id="playerName1" type="text" autocomplete="off" spellcheck="false" aria-label="Ime zelene flote"></label>
           </div>
         </fieldset>
 
@@ -829,7 +979,7 @@ dialog p { font-weight: 500; }
 
     <div class="card versus">
       <div class="side side-0">
-        <span class="avatar" data-icon="ship"></span>
+        <span class="avatar" data-ship></span>
         <span class="side-name" id="name0"></span>
         <span class="stat tiles"><b id="tiles0"></b> <span id="tilesNoun0"></span></span>
         <span class="stat minor"><b id="units0"></b> <span id="unitsNoun0"></span>, <b id="income0"></b> po potezu<span class="purse side-purse"><i class="pearl"></i><b id="pearls0"></b></span></span>
@@ -894,7 +1044,7 @@ dialog p { font-weight: 500; }
 
   <!-- How to play -->
   <dialog id="help" aria-labelledby="helpTitle">
-    <h2 id="helpTitle">Kako se igra</h2>
+    <h2 id="helpTitle" data-lettering>Kako se igra</h2>
     <div class="rules">
       <section>
         <h3>Cilj</h3>
@@ -910,8 +1060,8 @@ dialog p { font-weight: 500; }
         <p>U svakoj rundi obje strane bacaju kocku. Manji broj gubi jedinicu, a izjednačenje ide branitelju. Prijestolnica u obrani dodaje 1 svom bacanju. Borba traje dok jedna strana ne ostane bez jedinica, a prije napada vidiš točne izglede.</p>
       </section>
       <ul class="legend">
-        <li><span class="swatch token"></span>Bijeli žeton: polje još može djelovati.</li>
-        <li><span class="swatch resting"></span>Šrafura: polje je primilo jedinice i miruje.</li>
+        <li><span class="swatch token"></span>Budan žeton s očima: polje još može djelovati.</li>
+        <li><span class="swatch resting"></span>Z z: polje je primilo jedinice i spava do sljedećeg poteza.</li>
         <li><span class="swatch" data-icon="crown"></span>Kruna: prijestolnica.</li>
       </ul>
       <section class="adventure-only">
@@ -935,7 +1085,7 @@ dialog p { font-weight: 500; }
 
   <!-- Leave the game -->
   <dialog id="leave" aria-labelledby="leaveTitle">
-    <h2 id="leaveTitle">Napustiti partiju?</h2>
+    <h2 id="leaveTitle" data-lettering>Napustiti partiju?</h2>
     <p>Partija se ne sprema i ne donosi iskustvo. Istu mapu možeš ponovno odigrati s istim kodom.</p>
     <div class="menu-actions">
       <button class="btn primary" type="button" data-close>Nastavi igrati</button>
@@ -974,9 +1124,9 @@ dialog p { font-weight: 500; }
 
   <!-- Logbook: everything the player has earned so far -->
   <dialog id="logbook" aria-labelledby="logTitle">
-    <h2 id="logTitle">Brodski dnevnik</h2>
+    <h2 id="logTitle" data-lettering>Brodski dnevnik</h2>
     <div class="rank">
-      <span class="avatar big" data-icon="ship"></span>
+      <span class="avatar big" data-ship></span>
       <div>
         <b id="logRank"></b>
         <span class="xp-bar big"><i id="logXpFill"></i></span>
@@ -1141,6 +1291,9 @@ dialog p { font-weight: 500; }
       nameLength: 12,            // longest name a player may give their fleet
       bubbleMs: 2600,            // how long a rival's remark stays up
       chatter: 0.55,             // chance that a rival remarks on an ordinary event
+      boilMs: 170,               // how often living lines are redrawn
+      gagEvery: [6000, 14000],   // ms between things turning up in the sea, from .. to
+      nudgeAfter: 9000,          // ms a player may hesitate before the game points at a move
       timing: {                  // milliseconds at speed 1
         think: 200,              // pause before each move of the computer
         place: 190,
@@ -2845,7 +2998,9 @@ dialog p { font-weight: 500; }
    *     app is started at the very bottom, so loading this file in Node
    *     stops here.
    *
-   *       LORE, ICONS, PORTRAITS  words and pictures of the game world
+   *       LORE                    words of the game world
+   *       Sketch                  the hand that draws: wobbly lines, lettering
+   *       ICONS, PORTRAITS        pictures of the game world
    *       createAnimator          frame-driven tweens
    *       createSound             synthesised effects (Web Audio)
    *       createPainter           draws a scene on a canvas
@@ -2975,6 +3130,241 @@ dialog p { font-weight: 500; }
     },
   };
 
+  /* ── the hand that draws ────────────────────────────────────────── */
+
+  /**
+   * Everything in the game looks drawn by hand in a school notebook. Sketch
+   * turns ideal shapes into wobbly ones and writes in the game's own
+   * lettering. It returns SVG path data, which serves the page (inline SVG)
+   * and the canvas (Path2D) alike; the same seed always gives the same
+   * drawing, and a different seed the same thing drawn once more.
+   */
+  const Sketch = (() => {
+    const f = (n) => Math.round(n * 10) / 10;
+
+    /** A repeatable unsteady hand: seed -> () => a deviation in -1..1. */
+    const hand = (seed) => {
+      let s = (Math.imul((seed | 0) + 1, 2654435761) ^ 0x9e3779b9) >>> 0 || 1;
+      const next = () => {
+        s ^= s << 13; s >>>= 0;
+        s ^= s >>> 17;
+        s ^= s << 5; s >>>= 0;
+        return s / 2147483648 - 1;
+      };
+      next();
+      next();
+      return next;
+    };
+
+    /** One pen stroke from a to b: slightly bowed, its ends a little off. */
+    const stroke = (ax, ay, bx, by, r, sway) => {
+      const end = sway * 0.6;
+      return `M${f(ax + r() * end)} ${f(ay + r() * end)}`
+        + `Q${f((ax + bx) / 2 + r() * sway)} ${f((ay + by) / 2 + r() * sway)} ${f(bx + r() * end)} ${f(by + r() * end)}`;
+    };
+
+    /** A polygon drawn edge by edge; every edge overshoots its corners a bit. */
+    const polygon = (points, r, sway, over = 0.07) => points.map(([ax, ay], k) => {
+      const [bx, by] = points[(k + 1) % points.length];
+      const before = over * Math.abs(r());
+      const after = over * Math.abs(r());
+      return stroke(ax - (bx - ax) * before, ay - (by - ay) * before, bx + (bx - ax) * after, by + (by - ay) * after, r, sway);
+    }).join('');
+
+    /** A smooth curve through the middles of consecutive points. */
+    const smooth = (points, closed) => {
+      const mid = (a, b) => `${f((a[0] + b[0]) / 2)} ${f((a[1] + b[1]) / 2)}`;
+      const n = points.length;
+      let d = `M${mid(points[0], points[1])}`;
+      const last = closed ? n : n - 2;
+      for (let k = 1; k <= last; k++) {
+        const p = points[k % n];
+        d += `Q${f(p[0])} ${f(p[1])} ${mid(p, points[(k + 1) % n])}`;
+      }
+      return closed ? `${d}Z` : d;
+    };
+
+    /**
+     * A ring around (cx, cy). Open, it is drawn in one go and overlaps
+     * itself where the pen arrives back; closed, it is a blob to fill.
+     */
+    const loop = (cx, cy, rx, ry, r, sway, closed = false) => {
+      const steps = 11;
+      const start = r() * Math.PI;
+      const count = closed ? steps : steps + 3;
+      const points = Array.from({ length: count }, (_, k) => {
+        const angle = start + (k / steps) * TAU;
+        const reach = 1 + r() * sway;
+        return [cx + Math.cos(angle) * rx * reach, cy + Math.sin(angle) * ry * reach];
+      });
+      return smooth(points, closed);
+    };
+
+    /**
+     * A marker colouring in a convex shape: one zigzag across it, at
+     * `angle`, with rows `gap` apart that end a little inside or outside
+     * the lines. Returns the path and its length (to draw it progressively).
+     */
+    const scribble = (points, angle, gap, r, sway) => {
+      const ux = Math.cos(angle);
+      const uy = Math.sin(angle);
+      const across = points.map(([x, y]) => y * ux - x * uy);
+      const turns = [];
+      let back = false;
+      for (let row = Math.min(...across) + gap * 0.45; row < Math.max(...across); row += gap) {
+        const level = row + r() * gap * 0.12;
+        const hits = [];
+        points.forEach(([ax, ay], k) => {
+          const [bx, by] = points[(k + 1) % points.length];
+          const da = across[k] - level;
+          const db = across[(k + 1) % points.length] - level;
+          if ((da < 0) !== (db < 0)) hits.push([ax + ((bx - ax) * da) / (da - db), ay + ((by - ay) * da) / (da - db)]);
+        });
+        if (hits.length < 2) continue;
+        hits.sort((p, q) => (p[0] - q[0]) * ux + (p[1] - q[1]) * uy);
+        const ends = [hits[0], hits[hits.length - 1]].map(([x, y]) => {
+          const slip = r() * sway;
+          return [x + ux * slip, y + uy * slip];
+        });
+        turns.push(...(back ? ends.reverse() : ends));
+        back = !back;
+      }
+      let length = 0;
+      for (let k = 1; k < turns.length; k++) length += Math.hypot(turns[k][0] - turns[k - 1][0], turns[k][1] - turns[k - 1][1]);
+      return { d: turns.length ? `M${turns.map(([x, y]) => `${f(x)} ${f(y)}`).join('L')}` : '', length };
+    };
+
+    /*
+     * Lettering: capitals and digits made of single pen strokes on a grid
+     * ten units tall (y grows downwards, the baseline is at 10). The seven
+     * has a crossbar and the one a long flag, as they are written at school.
+     */
+    const GLYPHS = (() => {
+      const round = 'M4.2 0C-1.4 0 -1.4 10 4 10C9.4 10 9.4 0 3.6 0.1';
+      const c = 'M7 2.4C5.6 -0.7 0 -0.7 0 5C0 10.7 5.6 10.7 7 7.6';
+      const d = 'M0 10L0 0L2.4 0C8.6 0 8.6 10 2.4 10L0 10';
+      const p = 'M0 10L0 0L3 0C7.6 0 7.6 5.6 3 5.6L0 5.6';
+      const s = 'M6.2 1.9C5 -0.7 0.2 -0.5 0.3 2.6C0.4 5.2 6.4 4.6 6.4 7.6C6.4 10.7 1.2 10.7 0 8.2';
+      const z = 'M0 0L6.6 0L0 10L6.6 10';
+      const caron = (x) => `M${x - 1.8} -3.5L${x} -1.6L${x + 1.8} -3.5`;
+      const acute = (x) => `M${x - 0.8} -1.6L${x + 1.4} -3.7`;
+      const raw = {
+        A: [7, 'M0 10L3.5 0L7 10M1.3 6.6L5.7 6.6'],
+        B: [6.6, 'M0 10L0 0L3 0C7 0 7 4.9 3 4.9L0 4.9M3 4.9C7.8 4.9 7.8 10 3 10L0 10'],
+        C: [7, c],
+        Č: [7, c + caron(3.7)],
+        Ć: [7, c + acute(3.7)],
+        D: [7, d],
+        Đ: [7.6, 'M1 10L1 0L3.2 0C9 0 9 10 3.2 10L1 10M-0.6 4.9L3.4 4.9'],
+        E: [5.8, 'M5.8 0L0 0L0 10L5.8 10M0 4.9L4.4 4.9'],
+        F: [5.6, 'M5.6 0L0 0L0 10M0 4.9L4.2 4.9'],
+        G: [7.4, 'M7 2.4C5.6 -0.7 0 -0.7 0 5C0 10.7 6 10.7 7.2 7.6L7.2 5.4L4 5.4'],
+        H: [7, 'M0 0L0 10M7 0L7 10M0 4.9L7 4.9'],
+        I: [1, 'M0.5 0L0.5 10'],
+        J: [5.4, 'M5.4 0L5.4 7C5.4 10.8 0.6 10.8 0 7.4'],
+        K: [6.6, 'M0 0L0 10M6.4 0L0 6.2M2.4 4.2L6.6 10'],
+        L: [5.4, 'M0 0L0 10L5.4 10'],
+        M: [9, 'M0 10L0 0L4.5 6.6L9 0L9 10'],
+        N: [7, 'M0 10L0 0L7 10L7 0'],
+        O: [8, round],
+        P: [6.6, p],
+        Q: [8, `${round}M5 7L8.3 10.6`],
+        R: [6.8, `${p}M2.8 5.6L6.8 10`],
+        S: [6.4, s],
+        Š: [6.4, s + caron(3.3)],
+        T: [7, 'M0 0L7 0M3.5 0L3.5 10'],
+        U: [7, 'M0 0L0 6.4C0 11.2 7 11.2 7 6.4L7 0'],
+        V: [7, 'M0 0L3.5 10L7 0'],
+        W: [10, 'M0 0L2.5 10L5 3.2L7.5 10L10 0'],
+        X: [6.6, 'M0 0L6.6 10M6.6 0L0 10'],
+        Y: [7, 'M0 0L3.5 5.2L7 0M3.5 5.2L3.5 10'],
+        Z: [6.6, z],
+        Ž: [6.6, z + caron(3.3)],
+        0: [6.4, 'M3.3 0C-1 0 -1 10 3.2 10C7.4 10 7.4 0 2.9 0.1'],
+        1: [4, 'M0.3 3.2L3.6 0L3.6 10'],
+        2: [6.2, 'M0.3 2.5C1 -0.8 6 -0.8 6 2.6C6 5 2.5 7 0 10L6.2 10'],
+        3: [6.2, 'M0.4 1.6C2 -0.8 6 -0.4 5.8 2.6C5.7 4.3 4 4.9 2.4 4.9C4.4 4.9 6.2 5.8 6.2 7.6C6.2 10.7 1.6 10.8 0 8.4'],
+        4: [6.6, 'M4.7 10L4.7 0L0 6.9L6.6 6.9'],
+        5: [6.2, 'M5.8 0L1 0L0.5 4.4C2.5 3 6.2 3.6 6.2 6.8C6.2 10.7 1.6 10.8 0 8.6'],
+        6: [6.2, 'M5.6 0.5C2.5 0.2 0.2 3.5 0.2 6.8C0.2 11 6.2 11 6.2 7C6.2 3.6 1.4 3.6 0.4 6.4'],
+        7: [6.2, 'M0 0L6.2 0L2.2 10M1.5 5L5.5 5'],
+        8: [6.4, 'M3.2 4.8C-0.4 4.6 -0.2 0 3.2 0C6.6 0 6.8 4.6 3.2 4.8C-1 5 -1 10 3.2 10C7.4 10 7.4 5 3.2 4.8'],
+        9: [6, 'M5.9 3.4C5.2 -1 0 -1 0 3.2C0 6.8 5 6.6 5.9 3.4L5.9 6C5.9 9 4 10.2 0.8 9.8'],
+        '!': [1.2, 'M0.6 0L0.6 6.6M0.6 9.5L0.6 10'],
+        '?': [5.4, 'M0.2 2C0.6 -0.8 5.4 -0.6 5.2 2.4C5 4.4 2.7 4.6 2.7 6.8M2.7 9.5L2.7 10'],
+        ':': [1.2, 'M0.6 3.6L0.6 4.1M0.6 9.2L0.6 9.7'],
+        '.': [1.2, 'M0.6 9.5L0.6 10'],
+        ',': [1.4, 'M1 9.3L0.2 11.4'],
+        '%': [7, 'M6.4 0L0.6 10M1.6 0.3C-0.1 0.3 -0.1 3.5 1.6 3.5C3.3 3.5 3.3 0.3 1.6 0.3M5.4 6.5C3.7 6.5 3.7 9.7 5.4 9.7C7.1 9.7 7.1 6.5 5.4 6.5'],
+        '+': [5, 'M0 5.4L5 5.4M2.5 2.9L2.5 7.9'],
+        '-': [4.4, 'M0 5.4L4.4 5.4'],
+        '×': [4.6, 'M0.2 3.2L4.4 7.6M4.4 3.2L0.2 7.6'],
+        "'": [1, 'M0.6 0L0.3 2.4'],
+      };
+      const glyphs = new Map();
+      for (const [char, [width, path]] of Object.entries(raw)) {
+        const commands = [...path.matchAll(/([MLQC])([^MLQC]*)/g)].map(([, letter, rest]) => [letter, rest.match(/-?\d*\.?\d+/g).map(Number)]);
+        glyphs.set(char, { width, commands });
+      }
+      return glyphs;
+    })();
+    const LETTER_GAP = 2.3;
+    const SPACE = 4.4;
+
+    /** The characters of a text as the lettering can write them. */
+    const spell = (text) => [...String(text).toLocaleUpperCase('hr').replace(/−/g, '-')].map((char) => {
+      if (char === ' ' || GLYPHS.has(char)) return char;
+      const bare = char.normalize('NFD')[0];
+      return GLYPHS.has(bare) ? bare : '?';
+    });
+
+    /** Whether a text can be written without a letter being replaced. */
+    const covers = (text) => [...String(text).toLocaleUpperCase('hr')].every((char) => char === ' ' || char === '−' || GLYPHS.has(char));
+
+    const measure = (text, height = 10) => {
+      const chars = spell(text);
+      const units = chars.reduce((sum, char) => sum + (char === ' ' ? SPACE : GLYPHS.get(char).width + LETTER_GAP), 0);
+      return Math.max(0, units - (chars.at(-1) === ' ' ? 0 : LETTER_GAP)) * (height / 10);
+    };
+
+    /**
+     * Writes a text with its top left corner at (x, y). `sway` is the
+     * unsteadiness of the hand and `bounce` how much letters hop and lean;
+     * `again` draws the same word once more, a little differently.
+     * Returns the path, its width and where every letter sits.
+     */
+    const write = (text, { x = 0, y = 0, height = 10, seed = 1, sway = 0.3, bounce = 0, again = 0 } = {}) => {
+      const place = hand(seed);                    // where the letters sit
+      const r = again ? hand(seed * 31 + again) : place; // how the pen wobbles; `again` redraws the same word
+      const scale = height / 10;
+      const spots = [];
+      let d = '';
+      let cursor = x;
+      for (const char of spell(text)) {
+        if (char === ' ') { cursor += SPACE * scale; continue; }
+        const { width, commands } = GLYPHS.get(char);
+        const cx = cursor + (width * scale) / 2;
+        const cy = y + 5 * scale + place() * bounce * scale;
+        const lean = place() * bounce * 0.07;
+        const cos = Math.cos(lean);
+        const sin = Math.sin(lean);
+        for (const [letter, numbers] of commands) {
+          d += letter;
+          for (let k = 0; k < numbers.length; k += 2) {
+            const px = (numbers[k] - width / 2) * scale + r() * sway * scale;
+            const py = (numbers[k + 1] - 5) * scale + r() * sway * scale;
+            d += `${f(cx + px * cos - py * sin)} ${f(cy + px * sin + py * cos)} `;
+          }
+        }
+        spots.push({ char, x: cx, y: cy });
+        cursor += (width + LETTER_GAP) * scale;
+      }
+      return { d, width: measure(text, height), spots };
+    };
+
+    return { hand, stroke, polygon, loop, scribble, write, measure, covers };
+  })();
+
   /* ── pictures ───────────────────────────────────────────────────── */
 
   /** One-colour icons on a 24 x 24 grid, used both in the page and on the canvas. */
@@ -2990,64 +3380,99 @@ dialog p { font-weight: 500; }
     cannon: 'M10.5 7a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm3-1.8l2.3-2.3 2.8 2.8-2.3 2.3zM20 1.5l.6 1.9 1.9.6-1.9.6-.6 1.9-.6-1.9-1.9-.6 1.9-.6z',
     lucky: 'M6 3h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3zm2 3.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-4 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-4 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z',
     wind: 'M12 4a8 8 0 0 1 7.7 5.9l-2.4.6A5.5 5.5 0 0 0 7.3 8.5l2.2 2.2h-6v-6l2 2A8 8 0 0 1 12 4zm8.5 9.3v6l-2-2a8 8 0 0 1-14.2-3.2l2.4-.6a5.5 5.5 0 0 0 10 2l-2.2-2.2z',
-    lock: 'M7 10V7.5a5 5 0 0 1 10 0V10h1.5v11h-13V10zm2.5 0h5V7.5a2.5 2.5 0 0 0-5 0z',
     ship: 'M11 2.5v11H4.5zM13 5l6 8.5h-6zM2.5 15.5h19L18.7 21H5.3z',
+    lock: 'M7 10V7.5a5 5 0 0 1 10 0V10h1.5v11h-13V10zm2.5 0h5V7.5a2.5 2.5 0 0 0-5 0z',
     medal: 'M7 2h4l1 4.2L13 2h4l-2.3 6.3a6.5 6.5 0 1 1-5.4 0zm5 8.5a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6z',
   };
 
   const icon = (name) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="${ICONS[name]}"/></svg>`;
+
+  /*
+   * Doodles are made of two layers, the way a child draws: outlines in
+   * ballpoint pen, and felt-tip colour that misses them by a little. The
+   * "boil" filter redraws the lines a few times a second (see the app).
+   */
+  const PEN = '#26329f';
+  const doodle = (viewBox, inner) => `<svg viewBox="${viewBox}" aria-hidden="true"><g filter="url(#boil)">${inner}</g></svg>`;
+  const felt = (color, shapes) => `<g transform="translate(2.6 2.2)" fill="${color}" opacity="0.92">${shapes}</g>`;
+  const pen = (shapes, width = 3.2) => `<g fill="none" stroke="${PEN}" stroke-width="${width}" stroke-linejoin="round" stroke-linecap="round">${shapes}</g>`;
+  const eyeballs = (shapes) => `<g fill="#fff" stroke="${PEN}" stroke-width="3">${shapes}</g>`;
+  /** Pupils follow the pointer and blink (see the stylesheet). */
+  const pupils = (y, left, right, r) => `<g class="pupils" fill="${PEN}"><circle cx="${left}" cy="${y}" r="${r}"/><circle cx="${right}" cy="${y}" r="${r}"/></g>`;
 
   /**
    * The three rivals. Each face has two mouths (or brows); the stylesheet
    * shows the glad one, or the sour one while the portrait has class "sour".
    */
   const PORTRAITS = (() => {
-    const INK = '#16324f';
-    const frame = (inner) => `<svg viewBox="0 0 100 100" aria-hidden="true">${inner}</svg>`;
-    const outlined = (inner) => `<g stroke="${INK}" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">${inner}</g>`;
-    const lines = (inner) => `<g fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round">${inner}</g>`;
-    const eyes = (y, left, right, r) => `<circle cx="${left}" cy="${y}" r="${r}" fill="${INK}"/><circle cx="${right}" cy="${y}" r="${r}" fill="${INK}"/>`;
+    const claws = '<path d="M24 58c-12-2-18-14-12-24 2 6 6 8 10 7-2-7 3-13 10-12 4 8 1 20-8 29z"/><path d="M76 58c12-2 18-14 12-24-2 6-6 8-10 7 2-7-3-13-10-12-4 8-1 20 8 29z"/>';
+    const shell = '<ellipse cx="50" cy="66" rx="28" ry="21"/>';
+    const crab = doodle('0 0 100 100',
+      felt('#ff6157', claws + shell)
+      + felt('#ffb3a8', '<ellipse cx="31" cy="70" rx="4.5" ry="2.8"/><ellipse cx="67" cy="70" rx="4.5" ry="2.8"/>')
+      + pen(`<path d="M28 80l-8 7M37 85l-4 9M72 80l8 7M63 85l4 9M41 50V38M59 50V38"/>${claws}${shell}`)
+      + eyeballs('<circle cx="41" cy="32" r="8.5"/><circle cx="59" cy="32" r="8.5"/>')
+      + pupils(33, 42, 60, 3.6)
+      + pen('<path class="glad" d="M40 68q10 10 20 0"/><path class="sour" d="M40 75q10-9 20 0"/>'));
 
-    const crab = frame(
-      outlined(`
-        <path d="M24 58c-12-2-18-14-12-24 2 6 6 8 10 7-2-7 3-13 10-12 4 8 1 20-8 29z" fill="#ef4b4b"/>
-        <path d="M76 58c12-2 18-14 12-24-2 6-6 8-10 7 2-7-3-13-10-12-4 8-1 20 8 29z" fill="#ef4b4b"/>
-        <path d="M28 80l-8 7M37 85l-4 9M72 80l8 7M63 85l4 9" fill="none"/>
-        <ellipse cx="50" cy="66" rx="28" ry="21" fill="#ef4b4b"/>
-        <path d="M41 50V38M59 50V38" fill="none"/>
-        <circle cx="41" cy="32" r="8.5" fill="#fff"/>
-        <circle cx="59" cy="32" r="8.5" fill="#fff"/>`)
-      + eyes(33, 42.5, 60.5, 3.6)
-      + '<ellipse cx="32" cy="69" rx="4.5" ry="2.8" fill="#ff9a8a"/><ellipse cx="68" cy="69" rx="4.5" ry="2.8" fill="#ff9a8a"/>'
-      + lines('<path class="glad" d="M40 68q10 10 20 0"/><path class="sour" d="M40 75q10-9 20 0"/>'),
-    );
+    const body = '<path d="M22 97c0-21 12-33 28-33s28 12 28 33z"/>';
+    const wing = '<path d="M27 95c1-11 6-18 13-21-1 9-5 16-13 21z"/>';
+    const head = '<circle cx="50" cy="46" r="25"/>';
+    const scarf = '<path d="M26 41c4-20 44-20 48 0-15-7-33-7-48 0z"/><path d="M73 38l12-7-2 13z"/>';
+    const beak = '<path d="M42 55h16l-8 15z"/>';
+    const gull = doodle('0 0 100 100',
+      felt('#dfe7f2', wing)
+      + felt('#ff62b8', scarf)
+      + felt('#ffc531', beak)
+      + pen(body + wing + head + scarf + beak)
+      + pupils(49, 40, 60, 4.2)
+      + pen('<path class="glad" d="M34 43q6-4 11 0M55 43q5-4 11 0"/><path class="sour" d="M34 40l11 4M66 40l-11 4"/>'));
 
-    const gull = frame(
-      outlined(`
-        <path d="M22 97c0-21 12-33 28-33s28 12 28 33z" fill="#fff"/>
-        <path d="M27 95c1-11 6-18 13-21-1 9-5 16-13 21z" fill="#c9d6e2"/>
-        <circle cx="50" cy="46" r="25" fill="#fff"/>
-        <path d="M26 41c4-20 44-20 48 0-15-7-33-7-48 0z" fill="#e2409a"/>
-        <path d="M73 38l12-7-2 13z" fill="#e2409a"/>
-        <path d="M42 55h16l-8 15z" fill="#ffb81c"/>`)
-      + '<circle cx="38" cy="31" r="2.2" fill="#fff"/><circle cx="50" cy="28" r="2.2" fill="#fff"/><circle cx="62" cy="31" r="2.2" fill="#fff"/>'
-      + eyes(49, 40, 60, 4.2)
-      + lines('<path class="glad" d="M34 43q6-4 11 0M55 43q5-4 11 0"/><path class="sour" d="M34 40l11 4M66 40l-11 4"/>'),
-    );
-
-    const octopus = frame(
-      outlined(`
-        <path d="M20 62c0-24 13-40 30-40s30 16 30 40c0 8 3 13 8 17-5 5-12 3-14-3-1 9-5 14-11 15 1-7 0-12-3-16-2 9-5 15-10 17-5-2-8-8-10-17-3 4-4 9-3 16-6-1-10-6-11-15-2 6-9 8-14 3 5-4 8-9 8-17z" fill="#8250e6"/>
-        <path d="M38 23l3-11 9 7 9-7 3 11z" fill="#ffc531"/>
-        <circle cx="39" cy="50" r="9.5" fill="#fff"/>
-        <circle cx="61" cy="50" r="9.5" fill="#fff"/>`)
-      + '<circle cx="29" cy="36" r="3" fill="#b392ff"/><circle cx="72" cy="39" r="2.4" fill="#b392ff"/>'
-      + eyes(51, 40.5, 59.5, 4)
-      + lines('<path class="glad" d="M43 66q7 6 14 0"/><path class="sour" d="M43 71q7-6 14 0"/>'),
-    );
+    const arms = '<path d="M20 62c0-24 13-40 30-40s30 16 30 40c0 8 3 13 8 17-5 5-12 3-14-3-1 9-5 14-11 15 1-7 0-12-3-16-2 9-5 15-10 17-5-2-8-8-10-17-3 4-4 9-3 16-6-1-10-6-11-15-2 6-9 8-14 3 5-4 8-9 8-17z"/>';
+    const tiara = '<path d="M38 23l3-11 9 7 9-7 3 11z"/>';
+    const octopus = doodle('0 0 100 100',
+      felt('#a877ff', arms)
+      + felt('#ffc531', tiara)
+      + felt('#d3bdff', '<circle cx="29" cy="37" r="3"/><circle cx="72" cy="40" r="2.4"/>')
+      + pen(arms + tiara)
+      + eyeballs('<circle cx="39" cy="50" r="9.5"/><circle cx="61" cy="50" r="9.5"/>')
+      + pupils(51, 40, 60, 4)
+      + pen('<path class="glad" d="M43 66q7 6 14 0"/><path class="sour" d="M43 71q7-6 14 0"/>'));
 
     return { easy: crab, normal: gull, hard: octopus };
   })();
+
+  /**
+   * The player's ship, which grows with the level: a raft, then a boat
+   * with ever more sail, a flag from level 5 and gun ports from level 6.
+   * The sails take the colour of the side (--sail in the stylesheet).
+   */
+  const shipPicture = (level) => {
+    const rig = [
+      [],
+      [[52, 30, 17]],
+      [[50, 42, 25]],
+      [[44, 40, -20], [50, 46, 27]],
+      [[36, 34, -18], [42, 46, 20], [66, 36, 18]],
+      [[28, 30, -14], [34, 38, 15], [54, 50, 18], [76, 34, 13]],
+      [[26, 32, -14], [32, 42, 16], [53, 54, 19], [77, 38, 14]],
+    ][Math.min(level, 7) - 1];
+    const sails = rig.map(([x, height, width]) => `<path d="M${x} 62V${62 - height}L${x + width} 62z"/>`).join('');
+    const masts = rig.map(([x, height]) => `<path d="M${x} 64V${60 - height}"/>`).join('');
+    const top = rig.reduce((best, sail) => (sail[1] > best[1] ? sail : best), [50, 0]);
+    const flag = level >= 5 ? `<path d="M${top[0]} ${60 - top[1]}l11 4-11 4z"/>` : '';
+    const hull = level === 1
+      ? '<path d="M14 66h72v7H14zM14 73h72v7H14z"/>'
+      : '<path d="M12 64h76l-11 19H25z"/>';
+    const extras = level === 1
+      ? '<path d="M50 66V30M50 32l17 7-17 7"/>'
+      : level >= 6 ? '<path d="M34 72h.1M50 72h.1M66 72h.1"/>' : '';
+    const waves = '<path d="M6 92q7-6 14 0t14 0 14 0 14 0 14 0 14 0" stroke="#55b6ee"/>';
+    return doodle('0 0 100 100',
+      felt('#ffb26b', hull)
+      + `<g transform="translate(2.6 2.2)" style="fill:var(--sail)" opacity="0.92">${sails}${flag}${level === 1 ? '<path d="M50 32l17 7-17 7z"/>' : ''}</g>`
+      + pen(hull + masts + sails + flag + extras + waves));
+  };
 
   /* ── animator ───────────────────────────────────────────────────── */
 
@@ -3183,6 +3608,13 @@ dialog p { font-weight: 500; }
         tone(mine ? 990 : 660, 0.4, { type: 'sine', gain: 0.06, delay: 0.02 });
       },
       star: (index = 0) => tone(784 * 2 ** (index / 6), 0.3, { type: 'sine', gain: 0.2 }),
+      /** A felt-tip colouring in a conquered tile. */
+      scribble: () => [0, 1, 2, 3].forEach((k) => noise(k % 2 ? 2300 : 1600, 0.06, { gain: 0.08, delay: 0.03 + k * 0.055, slide: 1.5, q: 1.4 })),
+      /** The rubber stamp of the result. */
+      stamp: () => {
+        tone(92, 0.18, { type: 'sine', gain: 0.3, delay: 0.3 });
+        noise(520, 0.09, { gain: 0.16, delay: 0.3, q: 0.7 });
+      },
       levelUp: () => run([523, 659, 784, 1047, 1319], { step: 0.09, length: 0.16, gain: 0.2 }),
       win: () => run([523, 659, 784, 1047], { step: 0.14, length: 0.2, gain: 0.22 }),
       lose: () => run([392, 330, 262, 196], { step: 0.18, length: 0.24, gain: 0.2 }),
@@ -3203,34 +3635,35 @@ dialog p { font-weight: 500; }
   const readPalette = (root) => {
     const styles = window.getComputedStyle(root);
     const value = (name) => styles.getPropertyValue(`--${name}`).trim();
-    const side = (name, text) => ({ base: value(name), hi: value(`${name}-hi`), lo: value(`${name}-lo`), text });
-    const ink = value('ink');
+    const side = (name) => ({ base: value(name), hi: value(`${name}-hi`), lo: value(`${name}-lo`) });
     return {
-      ink,
-      white: '#ffffff',
-      inkSoft: value('ink-soft'),
-      rule: value('rule'),
-      water: value('water'),
-      foam: value('foam'),
-      shallows: value('shallows'),
-      glow: value('glow'),
-      gold: value('sun'),
-      sides: [side('sun', ink), side('rival', '#ffffff')],
-      neutral: side('sand', ink),
+      ink: value('ink'),         // ballpoint pen: outlines
+      text: value('text'),       // the same pen pressed harder: numbers
+      pencil: value('pencil'),   // graphite: whatever belongs to nobody
+      marker: value('marker'),   // black felt-tip: what the player points at
+      paper: value('scrap'),
+      sea: value('sea'),
+      seaSoft: value('sea-soft'),
+      gold: value('gold'),
+      sides: [side('sun'), side('rival')],
+      neutral: { base: value('pencil'), hi: value('well'), lo: value('pencil') },
       font: value('font'),
     };
   };
 
   /**
-   * Draws a scene: the board as the player should currently see it, plus
-   * selection, hints and running effects. A scene is plain data:
+   * Draws a scene the way a child would draw it in a notebook: pencil for
+   * unclaimed land, ballpoint outlines and felt-tip colour for the two
+   * sides, a black marker for whatever the player is pointing at. A scene
+   * is plain data:
    *
    *   map, owner, units, locked, shield, loot, current, phase   what is on the board
-   *   placing, selected, hover, targets, order, aim             interaction hints (aim: { trick, tiles })
+   *   placing, selected, hover, targets, order, aim, nudge      interaction hints (aim: { trick, tiles })
    *   bump, jolt, flips, fx                                     animation state
    */
   const createPainter = (canvas, initialPalette) => {
     const ctx = canvas.getContext('2d');
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const CORNERS = Array.from({ length: 6 }, (_, k) => {
       const angle = (Math.PI / 180) * (60 * k - 30);
       return [Math.cos(angle), Math.sin(angle)];
@@ -3244,13 +3677,63 @@ dialog p { font-weight: 500; }
       6: [[-1, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [1, 1]],
     };
     const LANDMARK_ICONS = { [FEATURE.tower]: 'tower', [FEATURE.lighthouse]: 'lighthouse', [FEATURE.chest]: 'chest', [FEATURE.harbor]: 'anchor' };
-    const shapes = new Map();    // icon name -> Path2D
-    const digitDrop = new Map(); // font size -> offset that centres digits vertically
-    let palette = initialPalette;
     const LANE_MARGIN = 1.8;     // extra room around the island, in tile sizes, where lanes exist
-    let geo = { map: null, size: 1, width: 1, height: 1, dpr: 1, points: [], bends: new Map() };
+    const BOIL = 3;              // every living line exists in this many drawings, shown in turn
+    const FELT = 0.88;           // how well a felt-tip covers the paper
+    const frameOf = (now) => (calm ? 0 : Math.floor(now / UI.boilMs) % BOIL);
+    const several = (make) => Array.from({ length: BOIL }, (_, v) => new Path2D(make(Sketch.hand(977 + v * 131))));
 
-    /** Sizes the canvas to its box and lays the map out in it. */
+    /* Shapes of unit size, drawn once (in a few variants) and scaled where needed. */
+    const UNIT = {
+      ring: several((r) => Sketch.loop(0, 0, 1, 1, r, 0.07)),
+      blob: several((r) => Sketch.loop(0, 0, 1, 1, r, 0.09, true)),
+      box: several((r) => Sketch.polygon([[-1, -1], [1, -1], [1, 1], [-1, 1]], r, 0.07)),
+      tag: several((r) => Sketch.polygon([[-1, -1], [1, -1], [1, 1], [-1, 1]], r, 0.05, 0.03)),
+      burst: several((r) => {
+        const spikes = 11;
+        const points = Array.from({ length: spikes * 2 }, (_, k) => {
+          const reach = (k % 2 ? 0.66 : 1) * (1 + r() * 0.1);
+          const angle = (k / (spikes * 2)) * TAU + r() * 0.05;
+          return `${(Math.cos(angle) * reach * 1.25).toFixed(2)} ${(Math.sin(angle) * reach * 0.86).toFixed(2)}`;
+        });
+        return `M${points.join('L')}Z`;
+      }),
+      square: new Path2D('M-1-1H1V1H-1Z'), // what a hand-drawn box is filled with
+      crown: new Path2D('M-1 .62L-1-.42L-.46.1L0-.78L.46.1L1-.42L1 .62Z'),
+      boat: new Path2D('M-.6.1H.6L.38.5H-.38ZM0 .1V-.62L.44-.02'),
+      bomb: new Path2D('M.38-.62Q.5-1.05.86-.98'),
+    };
+    /* Things that turn up in the sea for a moment (see the app); a unit is one tile. */
+    const GAGS = {
+      fin: 'M-.5.2L0-.62Q.3-.2.46.2M-.95.3q.16-.14.32 0t.32 0M.32.3q.16-.14.32 0t.32 0',
+      tentacle: 'M-.12.5C-.6.1-.4-.55.05-.72C.5-.86.66-.3.3-.34M-.2.02l.12-.06M-.12-.3l.12-.02M-.8.5q.14-.12.28 0M.3.5q.14-.12.28 0t.28 0',
+      whale: 'M-.8.3Q-.7-.3 0-.3T.8.3M.8.3q.2-.3.42-.34M.8.3q.3-.08.46.1M-.42-.02l.02 0M-.1-.34V-.62M-.1-.64q-.2-.22-.36-.02M-.1-.64q.2-.22.36-.02',
+      periscope: 'M0 .45V-.5H.42V-.24M.3-.24H.54M-.6.5q.15-.13.3 0t.3 0 .3 0 .3 0',
+      bottle: 'M-.5.05L.2-.3Q.42-.3.5-.12L-.2.38Q-.5.4-.5.05M.34-.24L.6-.44M-.1-.08L.2.04M-.9.52q.15-.13.3 0t.3 0M.3.52q.15-.13.3 0t.3 0',
+      fish: 'M-.7.4Q0-1 .7.4M-.14-.34Q.12-.56.38-.34Q.12-.12-.14-.34L-.3-.5V-.18ZM.26-.38l.02 0',
+    };
+    const gags = new Map(Object.entries(GAGS).map(([name, d]) => [name, new Path2D(d)]));
+
+    const shapes = new Map();    // icon name -> Path2D
+    const words = new Map();     // lettering -> { path, width } ten units tall
+    let palette = initialPalette;
+    let geo = { map: null, size: 1, width: 1, height: 1, dpr: 1, points: [], bends: new Map(), art: [], swells: [] };
+
+    /** True when a point lies outside the hexagon of the board, in open sea. */
+    const atSea = ({ x, y }) => {
+      const { q, r } = Hex.fromPoint((x - geo.width / 2) / geo.size, (y - geo.height / 2) / geo.size);
+      return Hex.distance(q, r, 0, 0) > geo.map.radius;
+    };
+
+    /** Two short waves, as a child draws water. */
+    const waves = (x, y, size, r) => [[-0.18, -0.2], [0.14, 0.2]].map(([dx, dy]) => {
+      const w = size * 0.24;
+      const left = x + dx * size - w + r() * size * 0.08;
+      const base = y + dy * size + r() * size * 0.05;
+      return `M${left} ${base}q${w / 2} ${-size * 0.16} ${w} 0t${w} 0`;
+    }).join('');
+
+    /** Sizes the canvas to its box, lays the map out in it and draws every tile's lines. */
     const fit = (map) => {
       const box = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 3);
@@ -3266,7 +3749,31 @@ dialog p { font-weight: 500; }
         const p = Hex.toPoint(map.q[i], map.r[i]);
         return { x: box.width / 2 + p.x * size, y: box.height / 2 + p.y * size };
       });
-      geo = { map, size, width: box.width, height: box.height, dpr, points, bends: new Map() };
+      geo = { map, size, width: box.width, height: box.height, dpr, points, bends: new Map(), art: [], swells: [] };
+
+      const base = [...map.seed].reduce((sum, char) => (sum * 31 + char.charCodeAt(0)) | 0, 7);
+      geo.art = points.map(({ x, y }, i) => {
+        const r = Sketch.hand(base + i * 7919);
+        const hexagon = (radius) => CORNERS.map(([cx, cy]) => [x + cx * size * radius, y + cy * size * radius]);
+        const fill = Sketch.scribble(hexagon(0.9), -0.95 + r() * 0.3, size * 0.3, r, size * 0.09);
+        return {
+          outlines: Array.from({ length: BOIL }, (_, v) => new Path2D(Sketch.polygon(hexagon(0.93), Sketch.hand(base + i * 7919 + v * 104729), size * 0.04))),
+          fill: new Path2D(fill.d),
+          length: fill.length,
+          waves: map.water[i] ? new Path2D(waves(x, y, size, r)) : null,
+          tilt: r() * 0.16,
+          hand: i % 5,
+        };
+      });
+
+      // Loose waves around the island, wherever there is open sea inside the canvas.
+      const r = Sketch.hand(base + 5);
+      for (let tries = 0; tries < 160 && geo.swells.length < 14; tries++) {
+        const spot = { x: box.width * (0.5 + r() * 0.47), y: box.height * (0.5 + r() * 0.46) };
+        const clear = atSea(spot) && atSea({ x: spot.x, y: spot.y - size }) && atSea({ x: spot.x, y: spot.y + size })
+          && geo.swells.every((other) => Math.hypot(other.x - spot.x, other.y - spot.y) > size * 2.2);
+        if (clear) geo.swells.push({ ...spot, path: new Path2D(waves(spot.x, spot.y, size * 0.9, r)) });
+      }
     };
 
     /** The land tile under a viewport position, or -1. */
@@ -3284,12 +3791,6 @@ dialog p { font-weight: 500; }
       x: (1 - t) ** 2 * a.x + 2 * t * (1 - t) * c.x + t * t * b.x,
       y: (1 - t) ** 2 * a.y + 2 * t * (1 - t) * c.y + t * t * b.y,
     });
-
-    /** True when a point lies outside the hexagon of the board, in open sea. */
-    const atSea = ({ x, y }) => {
-      const { q, r } = Hex.fromPoint((x - geo.width / 2) / geo.size, (y - geo.height / 2) / geo.size);
-      return Hex.distance(q, r, 0, 0) > geo.map.radius;
-    };
 
     /**
      * The control point of the curve a sea lane follows. The curve is pushed
@@ -3324,90 +3825,102 @@ dialog p { font-weight: 500; }
       return (t) => curve(a, bend, b, t);
     };
 
+    /* ── tools of the trade ── */
+
     const sideOf = (owner) => (owner >= 0 ? palette.sides[owner] : palette.neutral);
 
-    /** A hexagon with softened corners. */
-    const traceHex = (x, y, radius) => {
-      const corner = (k) => [x + CORNERS[k % 6][0] * radius, y + CORNERS[k % 6][1] * radius];
-      const between = (k) => {
-        const [ax, ay] = corner(k);
-        const [bx, by] = corner(k + 1);
-        return [(ax + bx) / 2, (ay + by) / 2];
-      };
-      ctx.moveTo(...between(5));
-      for (let k = 0; k < 6; k++) ctx.arcTo(...corner(k), ...between(k), radius * 0.2);
-      ctx.closePath();
-    };
-    const hexPath = (x, y, radius) => {
-      ctx.beginPath();
-      traceHex(x, y, radius);
-    };
     const discPath = (x, y, radius) => {
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, TAU);
     };
-    const boxPath = (x, y, w, h, r = h / 2) => {
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.arcTo(x + w, y, x + w, y + h, r);
-      ctx.arcTo(x + w, y + h, x, y + h, r);
-      ctx.arcTo(x, y + h, x, y, r);
-      ctx.arcTo(x, y, x + w, y, r);
-      ctx.closePath();
-    };
 
-    /** A light line with a dark casing, legible on every tile colour. */
-    const strokeCased = (width, color = palette.white) => {
-      ctx.lineWidth = width * 1.9;
-      ctx.strokeStyle = palette.ink;
-      ctx.stroke();
-      ctx.lineWidth = width;
-      ctx.strokeStyle = color;
-      ctx.stroke();
-    };
-
-    /** Prints text centred on (x, y), optionally with a dark halo. */
-    const print = (text, x, y, px, color, halo = false) => {
-      const size = Math.max(7, Math.round(px));
-      ctx.font = `800 ${size}px ${palette.font}`;
-      if (!digitDrop.has(size)) {
-        const m = ctx.measureText('0');
-        digitDrop.set(size, (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2);
+    /** Draws one of the unit shapes at (x, y), `rx` by `ry` large; fill and stroke are optional. */
+    const place = (shape, x, y, rx, ry, { fill, stroke, width = 2, tilt = 0 }) => {
+      ctx.save();
+      ctx.translate(x, y);
+      if (tilt) ctx.rotate(tilt);
+      ctx.scale(rx, ry);
+      if (fill) {
+        ctx.fillStyle = fill;
+        ctx.fill(shape);
       }
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'alphabetic';
+      if (stroke) {
+        ctx.lineWidth = width / Math.min(rx, ry);
+        ctx.strokeStyle = stroke;
+        ctx.stroke(shape);
+      }
+      ctx.restore();
+    };
+
+    /**
+     * Writes in the game's lettering, centred on (x, y) and `height` tall.
+     * `variant` picks one of several handwritings of the same text; `halo`
+     * puts paper behind the letters.
+     */
+    const write = (text, x, y, height, color, { weight = height * 0.16, variant = 0, halo = null } = {}) => {
+      const key = `${text}|${variant}`;
+      if (!words.has(key)) {
+        const word = Sketch.write(text, { seed: 31 + variant * 97 + text.length, sway: 0.26 });
+        words.set(key, { path: new Path2D(word.d), width: word.width });
+      }
+      const word = words.get(key);
+      const scale = height / 10;
+      ctx.save();
+      ctx.translate(x - (word.width * scale) / 2, y - height / 2);
+      ctx.scale(scale, scale);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
       if (halo) {
-        ctx.lineJoin = 'round';
-        ctx.lineWidth = Math.max(3, size * 0.26);
-        ctx.strokeStyle = palette.ink;
-        ctx.strokeText(text, x, y + digitDrop.get(size));
+        ctx.lineWidth = (weight * 2.8) / scale;
+        ctx.strokeStyle = halo;
+        ctx.stroke(word.path);
       }
-      ctx.fillStyle = color;
-      ctx.fillText(text, x, y + digitDrop.get(size));
+      ctx.lineWidth = weight / scale;
+      ctx.strokeStyle = color;
+      ctx.stroke(word.path);
+      ctx.restore();
     };
 
-    /** Draws an icon from ICONS centred on (x, y). */
-    const stamp = (name, x, y, px, color) => {
+    /** Draws an icon from ICONS centred on (x, y), as if filled in with the pen. */
+    const stamp = (name, x, y, px, color, tilt = 0) => {
       if (!shapes.has(name)) shapes.set(name, new Path2D(ICONS[name]));
       ctx.save();
-      ctx.translate(x - px / 2, y - px / 2);
+      ctx.translate(x, y);
+      ctx.rotate(tilt);
       ctx.scale(px / 24, px / 24);
+      ctx.translate(-12, -12);
       ctx.fillStyle = color;
       ctx.fill(shapes.get(name), 'evenodd');
       ctx.restore();
     };
 
     const pearl = (x, y, radius) => {
-      const shine = ctx.createRadialGradient(x - radius * 0.35, y - radius * 0.4, radius * 0.1, x, y, radius);
-      shine.addColorStop(0, '#ffffff');
-      shine.addColorStop(0.5, '#ffe6f4');
-      shine.addColorStop(1, '#f2a7d6');
       discPath(x, y, radius);
-      ctx.fillStyle = shine;
+      ctx.fillStyle = palette.paper;
       ctx.fill();
-      ctx.lineWidth = Math.max(1.5, radius * 0.24);
-      ctx.strokeStyle = palette.ink;
+      ctx.lineWidth = Math.max(1.5, radius * 0.26);
+      ctx.strokeStyle = palette.marker;
       ctx.stroke();
+      discPath(x - radius * 0.28, y - radius * 0.28, radius * 0.24);
+      ctx.fillStyle = '#ff9ed2';
+      ctx.fill();
+    };
+
+    /** A pair of eyes on top of a blob of `radius` at (x, y), looking along (lookX, lookY). */
+    const eyes = (x, y, radius, lookX = 0.3, lookY = 0.3) => {
+      for (const turn of [-1, 1]) {
+        const ex = x + turn * radius * 0.4;
+        const ey = y - radius * 0.88;
+        discPath(ex, ey, radius * 0.28);
+        ctx.fillStyle = palette.paper;
+        ctx.fill();
+        ctx.lineWidth = Math.max(1.2, radius * 0.11);
+        ctx.strokeStyle = palette.marker;
+        ctx.stroke();
+        discPath(ex + lookX * radius * 0.12, ey + lookY * radius * 0.12, radius * 0.12);
+        ctx.fillStyle = palette.marker;
+        ctx.fill();
+      }
     };
 
     const isActive = (scene, i) => scene.phase === 'action'
@@ -3424,246 +3937,246 @@ dialog p { font-weight: 500; }
     };
 
     /** The selected tile is raised a little. */
-    const lift = (scene, i) => (scene.selected === i ? geo.size * 0.12 : 0);
+    const lift = (scene, i) => (scene.selected === i ? geo.size * 0.1 : 0);
+
+    /* ── the board ── */
 
     const drawSea = (now) => {
-      const { map, points, size } = geo;
-      // A pale shelf under the whole island.
-      ctx.beginPath();
-      for (let i = 0; i < map.count; i++) {
-        if (!map.water[i]) traceHex(points[i].x, points[i].y, size * 1.22);
-      }
-      ctx.fillStyle = palette.shallows;
-      ctx.fill();
-
-      // Lakes and bays: deeper water with ripples that drift.
-      ctx.lineWidth = Math.max(1.5, size * 0.06);
+      const { map, size, art, swells } = geo;
       ctx.lineCap = 'round';
-      ctx.strokeStyle = palette.foam;
+      ctx.lineJoin = 'round';
+
+      // Lakes and bays: scribbled light blue, with waves on top.
+      ctx.globalAlpha = 0.6;
+      ctx.lineWidth = size * 0.36;
+      ctx.strokeStyle = palette.seaSoft;
+      for (let i = 0; i < map.count; i++) if (map.water[i]) ctx.stroke(art[i].fill);
+      ctx.globalAlpha = 1;
+
+      ctx.lineWidth = Math.max(1.6, size * 0.085);
+      ctx.strokeStyle = palette.sea;
+      const drift = (k) => (calm ? 0 : Math.sin(now / 900 + k * 1.7) * size * 0.07);
       for (let i = 0; i < map.count; i++) {
         if (!map.water[i]) continue;
-        const { x, y } = points[i];
-        hexPath(x, y, size * 0.93);
-        ctx.fillStyle = palette.water;
-        ctx.fill();
-        const drift = Math.sin(now / 900 + i) * size * 0.08;
-        for (const [dx, dy] of [[-0.14, -0.16], [0.12, 0.18]]) {
-          const w = size * 0.2;
-          const left = x + dx * size - w + drift * (dy < 0 ? 1 : -1);
-          const base = y + dy * size;
-          ctx.beginPath();
-          ctx.moveTo(left, base);
-          ctx.quadraticCurveTo(left + w / 2, base - size * 0.1, left + w, base);
-          ctx.quadraticCurveTo(left + w * 1.5, base + size * 0.1, left + w * 2, base);
-          ctx.stroke();
-        }
-      }
-    };
-
-    const drawTile = (scene, i) => {
-      const { size, points } = geo;
-      const { x } = points[i];
-      const y = points[i].y - lift(scene, i);
-      const radius = size * 0.94;
-      const side = sideOf(scene.owner[i]);
-
-      // The slab's edge, then its top face.
-      hexPath(x, points[i].y + size * 0.13, radius);
-      ctx.fillStyle = side.lo;
-      ctx.fill();
-      hexPath(x, y, radius);
-      const sheen = ctx.createLinearGradient(x, y - radius, x, y + radius);
-      sheen.addColorStop(0, side.hi);
-      sheen.addColorStop(0.55, side.base);
-      ctx.fillStyle = sheen;
-      ctx.fill();
-
-      const flip = scene.flips.get(i);
-      if (flip || scene.locked[i]) {
         ctx.save();
-        ctx.clip();
-        if (flip) { // a conquest washes over the tile from its centre
-          discPath(x, y, radius * 1.05 * flip.t);
-          ctx.fillStyle = sideOf(flip.to).base;
-          ctx.fill();
-        }
-        if (scene.locked[i]) { // hatching: resting until the next turn
-          ctx.globalAlpha = 0.22;
-          ctx.strokeStyle = side.text;
-          ctx.lineWidth = Math.max(1, size * 0.08);
-          ctx.beginPath();
-          for (let k = -3; k <= 3; k++) {
-            ctx.moveTo(x + k * size * 0.32 - radius, y + radius);
-            ctx.lineTo(x + k * size * 0.32 + radius, y - radius);
-          }
-          ctx.stroke();
-          ctx.globalAlpha = 1;
-        }
+        ctx.translate(drift(i), 0);
+        ctx.stroke(art[i].waves);
         ctx.restore();
       }
-
-      hexPath(x, y, radius);
-      ctx.lineWidth = Math.max(1, size * 0.05);
-      ctx.strokeStyle = side.lo;
-      ctx.stroke();
+      swells.forEach((swell, k) => {
+        ctx.save();
+        ctx.translate(drift(k + 3), drift(k) * 0.5);
+        ctx.stroke(swell.path);
+        ctx.restore();
+      });
     };
 
-    /** Sea lanes: dotted curves between harbours, with dots that travel. */
+    /** Sea lanes: dashed pen lines between harbours, each with a paper boat going back and forth. */
     const drawLanes = (scene, now) => {
       const { size, points } = geo;
-      ctx.setLineDash([size * 0.02, size * 0.3]);
-      ctx.lineDashOffset = -now / 60;
       ctx.lineCap = 'round';
-      for (const [a, b] of scene.map.lanes) {
+      scene.map.lanes.forEach(([a, b], k) => {
         const bend = laneBend(a, b);
+        ctx.setLineDash([size * 0.22, size * 0.24]);
         ctx.beginPath();
         ctx.moveTo(points[a].x, points[a].y);
         ctx.quadraticCurveTo(bend.x, bend.y, points[b].x, points[b].y);
-        ctx.lineWidth = size * 0.2;
+        ctx.lineWidth = Math.max(1.6, size * 0.075);
         ctx.strokeStyle = palette.ink;
         ctx.stroke();
-        ctx.lineWidth = size * 0.11;
-        ctx.strokeStyle = palette.white;
-        ctx.stroke();
-      }
-      ctx.setLineDash([]);
+        ctx.setLineDash([]);
+
+        const there = calm ? 0.5 : 0.5 - 0.5 * Math.cos(now / 5200 + k * 2);
+        const at = curve(points[a], bend, points[b], 0.12 + 0.76 * there);
+        const rock = calm ? 0 : Math.sin(now / 420 + k) * 0.14;
+        place(UNIT.boat, at.x, at.y, size * 0.42, size * 0.42, { fill: palette.paper, stroke: palette.ink, width: Math.max(1.5, size * 0.07), tilt: rock });
+      });
     };
 
-    const drawUnits = (scene, i) => {
-      const { size, points } = geo;
-      const side = sideOf(scene.owner[i]);
+    const drawTile = (scene, i, now) => {
+      const { size, art } = geo;
+      const tile = art[i];
+      const owner = scene.owner[i];
+      const flip = scene.flips.get(i);
+      const up = lift(scene, i);
+      ctx.save();
+      if (up) ctx.translate(0, -up);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      ctx.lineWidth = size * 0.36;
+      if (owner >= 0) { // coloured in with the owner's felt-tip
+        ctx.globalAlpha = FELT * (flip ? 1 - flip.t : 1);
+        ctx.strokeStyle = palette.sides[owner].base;
+        ctx.stroke(tile.fill);
+      }
+      if (flip) { // the conqueror colours the tile in, stroke by stroke
+        ctx.globalAlpha = FELT;
+        ctx.strokeStyle = palette.sides[flip.to].base;
+        ctx.setLineDash([tile.length * flip.t, tile.length]);
+        ctx.stroke(tile.fill);
+        ctx.setLineDash([]);
+      }
+      ctx.globalAlpha = 1;
+
+      // Tiles that can act are alive: their outline is redrawn all the time.
+      const frame = isActive(scene, i) || scene.selected === i ? frameOf(now) : 0;
+      ctx.strokeStyle = owner >= 0 ? palette.ink : palette.pencil;
+      ctx.lineWidth = owner >= 0 ? Math.max(1.7, size * 0.075) : Math.max(1.2, size * 0.05);
+      ctx.stroke(tile.outlines[frame]);
+      if (scene.map.capitals.includes(i)) ctx.stroke(tile.outlines[(frame + 1) % BOIL]); // drawn twice: a capital
+      ctx.restore();
+    };
+
+    const drawUnits = (scene, i, now) => {
+      const { size, points, art } = geo;
+      const owned = scene.owner[i] >= 0;
       const top = points[i].y - lift(scene, i);
       const picture = emblem(scene, i);
-      if (picture) stamp(picture, points[i].x, top - size * 0.38, size * 0.62, side.text);
+      if (picture === 'crown') {
+        place(UNIT.crown, points[i].x, top - size * 0.4, size * 0.3, size * 0.24, { fill: palette.gold, stroke: palette.marker, width: Math.max(1.4, size * 0.06), tilt: art[i].tilt });
+      } else if (picture) { // a landmark: a dab of highlighter with the picture on it
+        ctx.globalAlpha = 0.75;
+        place(UNIT.blob[i % BOIL], points[i].x, top - size * 0.38, size * 0.36, size * 0.27, { fill: palette.gold, tilt: art[i].tilt * 3 });
+        ctx.globalAlpha = 1;
+        stamp(picture, points[i].x, top - size * 0.38, size * 0.56, palette.text, art[i].tilt);
+      }
 
       const count = scene.units[i];
       if (!count) return;
       const x = points[i].x + scene.jolt[i] * size;
-      const y = top + (picture ? size * 0.2 : 0);
+      const y = top + (picture ? size * 0.22 : 0.02 * size);
       const scale = 1 + 0.4 * scene.bump[i];
       const active = isActive(scene, i);
-      if (active) { // a white token: this tile can still act
-        discPath(x, y + size * 0.07, size * 0.4 * scale);
-        ctx.fillStyle = side.lo;
-        ctx.fill();
-        discPath(x, y, size * 0.4 * scale);
-        ctx.fillStyle = palette.white;
-        ctx.fill();
+      if (active) { // awake: a blob with eyes, which watches the tile the player is busy with
+        const radius = size * 0.42 * scale;
+        const focus = points[scene.order ? scene.order.to : scene.hover >= 0 ? scene.hover : scene.selected] ?? null;
+        const away = focus ? Math.hypot(focus.x - x, focus.y - y) : 0;
+        place(UNIT.blob[0], x, y, radius, radius, { fill: palette.paper });
+        place(UNIT.ring[frameOf(now)], x, y, radius, radius, { stroke: palette.marker, width: Math.max(1.5, size * 0.065) });
+        if (away > 1) eyes(x, y, radius, (focus.x - x) / away, (focus.y - y) / away);
+        else eyes(x, y, radius);
       }
-      ctx.globalAlpha = active ? 1 : scene.locked[i] ? 0.6 : 0.92;
-      print(String(count), x, y, size * (picture ? 0.56 : 0.66) * scale, active ? palette.ink : side.text);
+      const height = size * (picture ? 0.44 : 0.56) * scale;
+      ctx.globalAlpha = scene.locked[i] ? 0.5 : 1;
+      write(String(count), x, y, height, owned ? palette.text : palette.pencil, {
+        weight: Math.max(1.5, height * (owned ? 0.17 : 0.13)),
+        variant: art[i].hand,
+      });
       ctx.globalAlpha = 1;
+      if (scene.locked[i]) { // asleep until the next turn
+        write('Z', points[i].x + size * 0.46, top - size * 0.3, size * 0.2, palette.text, { weight: Math.max(1.2, size * 0.045) });
+        write('Z', points[i].x + size * 0.62, top - size * 0.52, size * 0.14, palette.text, { weight: Math.max(1, size * 0.04), variant: 1 });
+      }
     };
 
-    /** A shimmering rim and a badge on every shielded tile. */
+    /** A blue ring drawn round every shielded tile, and a badge on it. */
     const drawShields = (scene, now) => {
       const { size, points } = geo;
       for (let i = 0; i < scene.map.count; i++) {
         if (!scene.shield[i]) continue;
         const { x, y } = points[i];
-        ctx.globalAlpha = 0.75 + 0.25 * Math.sin(now / 300 + i);
-        hexPath(x, y, size * 0.98);
-        ctx.lineWidth = size * 0.13;
-        ctx.strokeStyle = palette.glow;
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-        discPath(x + size * 0.56, y - size * 0.5, size * 0.27);
-        ctx.fillStyle = palette.ink;
-        ctx.fill();
-        stamp('shield', x + size * 0.56, y - size * 0.5, size * 0.34, palette.glow);
+        place(UNIT.ring[(frameOf(now) + i) % BOIL], x, y, size * 1.02, size * 1.02, { stroke: palette.sea, width: size * 0.13 });
+        place(UNIT.blob[1], x + size * 0.58, y - size * 0.52, size * 0.3, size * 0.3, { fill: palette.paper, stroke: palette.marker, width: Math.max(1.4, size * 0.05) });
+        stamp('shield', x + size * 0.58, y - size * 0.52, size * 0.36, palette.sea);
       }
     };
 
     const drawHighlights = (scene, now) => {
-      const { size, points } = geo;
-      const outline = (i, radius) => hexPath(points[i].x, points[i].y - lift(scene, i), size * radius);
-      const breath = 0.6 + 0.4 * Math.sin(now / 260);
+      const { size, points, art } = geo;
+      const frame = frameOf(now);
+      const breath = calm ? 0.8 : 0.55 + 0.45 * Math.sin(now / 260);
+      const around = (i, color, width, reach = 1.04) => place(
+        UNIT.ring[(frame + i) % BOIL], points[i].x, points[i].y - lift(scene, i), size * reach, size * reach, { stroke: color, width },
+      );
 
       if (scene.placing) { // every tile that can take a reinforcement breathes
         const max = CONFIG.rules.maxUnits;
         ctx.globalAlpha = breath;
+        ctx.lineWidth = size * 0.1;
+        ctx.strokeStyle = palette.marker;
         for (let i = 0; i < scene.map.count; i++) {
-          if (scene.owner[i] !== scene.current || scene.units[i] >= max) continue;
-          outline(i, 0.9);
-          strokeCased(size * 0.07);
+          if (scene.owner[i] === scene.current && scene.units[i] < max) ctx.stroke(art[i].outlines[frame]);
         }
         ctx.globalAlpha = 1;
       }
 
       if (scene.aim) { // tiles the armed trick can be played on
         ctx.globalAlpha = breath;
-        for (const tile of scene.aim.tiles) {
-          outline(tile, 0.9);
-          strokeCased(size * 0.1);
-        }
+        for (const tile of scene.aim.tiles) around(tile, palette.marker, size * 0.09);
         ctx.globalAlpha = 1;
       }
 
-      ctx.setLineDash([size * 0.24, size * 0.18]);
-      ctx.lineDashOffset = -now / 45;
+      // Where the selected tile can send its units: dashed, in the black marker.
+      ctx.lineCap = 'butt';
       for (const target of scene.targets) {
         if (scene.order && scene.order.to === target.tile) continue;
-        outline(target.tile, 0.88);
-        ctx.lineWidth = size * 0.17;
-        ctx.strokeStyle = palette.ink;
-        ctx.stroke();
-        ctx.lineWidth = size * 0.09;
-        ctx.strokeStyle = palette.white;
-        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.lineWidth = size * 0.18;
+        ctx.strokeStyle = palette.paper;
+        ctx.stroke(art[target.tile].outlines[0]);
+        ctx.setLineDash([size * 0.24, size * 0.2]);
+        ctx.lineDashOffset = calm ? 0 : -now / 45;
+        ctx.lineWidth = size * 0.1;
+        ctx.strokeStyle = palette.marker;
+        ctx.stroke(art[target.tile].outlines[0]);
       }
       ctx.setLineDash([]);
+      ctx.lineCap = 'round';
 
-      if (scene.hover >= 0 && scene.hover !== scene.selected) {
-        outline(scene.hover, 0.93);
-        strokeCased(size * 0.05);
-      }
-      if (scene.selected >= 0) {
-        outline(scene.selected, 0.93);
-        strokeCased(size * 0.1);
-      }
+      if (scene.hover >= 0 && scene.hover !== scene.selected) around(scene.hover, palette.pencil, Math.max(1.5, size * 0.05));
+      if (scene.selected >= 0) around(scene.selected, palette.marker, Math.max(2, size * 0.09));
       if (scene.order) {
-        outline(scene.order.to, 0.9);
-        strokeCased(size * 0.1, palette.gold);
+        around(scene.order.to, palette.gold, size * 0.2);
+        around(scene.order.to, palette.marker, Math.max(2, size * 0.09));
       }
     };
 
-    /** An arrowhead between the two tiles of a pending order. */
+    /** A hand-drawn arrow between the two tiles of a pending order. */
     const drawOrderArrow = (scene) => {
       const { size } = geo;
       const path = route(scene.order.from, scene.order.to);
       const lane = isLane(scene.order.from, scene.order.to);
-      const tip = path(lane ? 0.8 : 0.62);
-      const back = path(lane ? 0.7 : 0.4);
-      const length = Math.hypot(tip.x - back.x, tip.y - back.y);
-      const ux = (tip.x - back.x) / length;
-      const uy = (tip.y - back.y) / length;
-      const half = size * 0.26;
+      const [start, end] = lane ? [0.1, 0.88] : [0.3, 0.7];
+      const tip = path(end);
+      const before = path(end - 0.06);
+      const heading = Math.atan2(tip.y - before.y, tip.x - before.x);
       ctx.beginPath();
-      ctx.moveTo(back.x + ux * size * 0.4, back.y + uy * size * 0.4);
-      ctx.lineTo(back.x - uy * half, back.y + ux * half);
-      ctx.lineTo(back.x + uy * half, back.y - ux * half);
-      ctx.closePath();
+      for (let k = 0; k <= 10; k++) {
+        const at = path(start + ((end - start) * k) / 10);
+        ctx.lineTo(at.x, at.y);
+      }
+      for (const turn of [-0.55, 0.55]) {
+        ctx.moveTo(tip.x - Math.cos(heading + turn) * size * 0.34, tip.y - Math.sin(heading + turn) * size * 0.34);
+        ctx.lineTo(tip.x, tip.y);
+      }
+      ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      ctx.lineWidth = size * 0.1;
-      ctx.strokeStyle = palette.ink;
+      ctx.lineWidth = size * 0.22;
+      ctx.strokeStyle = palette.paper;
       ctx.stroke();
-      ctx.fillStyle = palette.gold;
-      ctx.fill();
+      ctx.lineWidth = size * 0.11;
+      ctx.strokeStyle = palette.marker;
+      ctx.stroke();
     };
 
-    /** A small label above a tile: the odds of an attack or the size of a move. */
+    /** A paper tag above a tile: the odds of an attack or the size of a move. */
     const drawChip = (i, label, strong) => {
       const { size, points } = geo;
       const text = label.replace(' %', '%'); // no room for the space on a tile
-      const px = Math.max(10, size * 0.4);   // stays legible on a phone
-      const w = px * (1 + 0.58 * text.length);
-      const h = px * 1.4;
+      const height = Math.max(9, size * 0.36);   // stays legible on a phone
+      const w = Sketch.measure(text, height) + height * 1.3;
+      const h = height * 2.1;
       const x = points[i].x;
-      const y = points[i].y - size * 0.74;
-      boxPath(x - w / 2, y - h / 2, w, h);
-      ctx.fillStyle = strong ? palette.gold : palette.ink;
-      ctx.fill();
-      print(text, x, y, px, strong ? palette.ink : palette.white);
+      const y = points[i].y - size * 0.78;
+      const tilt = ((i % 3) - 1) * 0.06;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(tilt);
+      place(UNIT.square, 0, 0, w / 2, h / 2, { fill: strong ? palette.gold : palette.paper });
+      place(UNIT.tag[i % BOIL], 0, 0, w / 2, h / 2, { stroke: palette.marker, width: Math.max(1.5, size * 0.055) });
+      write(text, 0, 0, height, palette.marker, { weight: Math.max(1.4, height * 0.17), variant: i % 5 });
+      ctx.restore();
     };
 
     /** The armed trick's icon, bobbing above a tile it can be played on. */
@@ -3671,14 +4184,32 @@ dialog p { font-weight: 500; }
       const { size, points } = geo;
       const radius = Math.max(11, size * 0.36);
       const x = points[i].x;
-      const y = points[i].y - size * 0.8 + Math.sin(now / 220 + i) * size * 0.06;
-      discPath(x, y, radius);
-      ctx.fillStyle = palette.gold;
-      ctx.fill();
-      ctx.lineWidth = Math.max(2, size * 0.07);
-      ctx.strokeStyle = palette.ink;
+      const y = points[i].y - size * 0.8 + (calm ? 0 : Math.sin(now / 220 + i) * size * 0.06);
+      place(UNIT.blob[i % BOIL], x, y, radius, radius, { fill: palette.gold, stroke: palette.marker, width: Math.max(1.6, size * 0.06) });
+      stamp(picture, x, y, radius * 1.25, palette.marker);
+    };
+
+    /** For a player who hesitates: an arrow hopping above a tile worth a look. */
+    const drawNudge = (i, now) => {
+      const { size, points } = geo;
+      const hop = calm ? 0 : Math.abs(Math.sin(now / 260)) * size * 0.3;
+      const x = points[i].x;
+      const tip = points[i].y - size * 0.8 - hop;
+      ctx.beginPath();
+      ctx.moveTo(x + size * 0.22, tip - size * 1.05);
+      ctx.quadraticCurveTo(x - size * 0.14, tip - size * 0.6, x, tip);
+      ctx.moveTo(x - size * 0.32, tip - size * 0.3);
+      ctx.lineTo(x, tip);
+      ctx.lineTo(x + size * 0.34, tip - size * 0.24);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = size * 0.26;
+      ctx.strokeStyle = palette.paper;
       ctx.stroke();
-      stamp(picture, x, y, radius * 1.25, palette.ink);
+      ctx.lineWidth = size * 0.12;
+      ctx.strokeStyle = palette.marker;
+      ctx.stroke();
+      write('Tu!', x + size * 0.3, tip - size * 1.42, size * 0.5, palette.marker, { halo: palette.paper });
     };
 
     const drawChips = (scene, now) => {
@@ -3689,89 +4220,121 @@ dialog p { font-weight: 500; }
       if (scene.order) drawChip(scene.order.to, scene.order.label, true);
     };
 
+    /* ── effects ── */
+
     const drawFx = {
-      /** Units on the move. */
-      token(fx) {
+      /** Units on the move: a felt-tip blob with eyes that hops along. */
+      token(fx, now) {
         const { size } = geo;
-        const side = sideOf(fx.owner);
+        const frame = frameOf(now);
+        const radius = size * 0.47 * fx.scale;
+        const hop = calm || fx.alpha < 1 ? 0 : Math.abs(Math.sin(now / 95)) * size * 0.1;
         const x = fx.x + fx.shake * size;
-        const radius = size * 0.44 * fx.scale;
+        const y = fx.y - hop;
         ctx.globalAlpha = fx.alpha;
-        discPath(x, fx.y + size * 0.08, radius);
-        ctx.fillStyle = palette.ink;
-        ctx.fill();
-        discPath(x, fx.y, radius);
-        ctx.fillStyle = side.base;
-        ctx.fill();
-        ctx.lineWidth = Math.max(2, size * 0.07);
-        ctx.strokeStyle = palette.white;
-        ctx.stroke();
-        print(String(fx.count), x, fx.y, size * 0.6 * fx.scale, side.text);
+        place(UNIT.blob[frame], x, y, radius, radius * (1 + hop / size), { fill: sideOf(fx.owner).base, stroke: palette.ink, width: Math.max(1.7, size * 0.075) });
+        eyes(x, y, radius);
+        write(String(Math.max(0, fx.count)), x, y + radius * 0.14, radius * 0.92, palette.text, { variant: 2 });
         ctx.globalAlpha = 1;
       },
-      die(fx) {
+      die(fx, now) {
         const { size } = geo;
-        const side = sideOf(fx.owner);
-        const edge = size * 0.7 * fx.scale;
+        const half = size * 0.36 * fx.scale;
         ctx.save();
-        ctx.globalAlpha = fx.alpha * (fx.dim ? 0.6 : 1);
+        ctx.globalAlpha = fx.alpha * (fx.dim ? 0.55 : 1);
         ctx.translate(fx.x, fx.y);
         ctx.rotate(fx.tilt);
-        boxPath(-edge / 2, -edge / 2, edge, edge, edge * 0.24);
-        ctx.fillStyle = side.base;
-        ctx.fill();
-        ctx.lineWidth = Math.max(2, size * 0.07);
-        ctx.strokeStyle = palette.ink;
-        ctx.stroke();
-        ctx.fillStyle = side.text;
+        ctx.lineJoin = 'round';
+        place(UNIT.square, 0, 0, half, half, { fill: palette.paper });
+        place(UNIT.square, half * 0.12, half * 0.1, half * 0.96, half * 0.96, { fill: sideOf(fx.owner).hi });
+        place(UNIT.box[frameOf(now)], 0, 0, half, half, { stroke: palette.ink, width: Math.max(1.7, size * 0.075) });
+        ctx.fillStyle = palette.marker;
         for (const [px, py] of PIPS[fx.face]) {
-          discPath(px * edge * 0.26, py * edge * 0.26, edge * 0.1);
+          discPath(px * half * 0.52, py * half * 0.52, half * 0.19);
           ctx.fill();
         }
         ctx.restore();
         ctx.globalAlpha = fx.alpha;
-        if (fx.bonus) print(`+${fx.bonus}`, fx.x, fx.y - edge * 0.95, size * 0.46, palette.gold, true);
+        if (fx.bonus) write(`+${fx.bonus}`, fx.x, fx.y - half * 1.9, size * 0.4, palette.marker, { halo: palette.gold });
         ctx.globalAlpha = 1;
       },
       /** Rising text; with `pearl` a pearl is drawn before it. */
       text(fx) {
-        const px = geo.size * (fx.big ? 0.8 : 0.6);
+        const height = geo.size * 0.52;
         ctx.globalAlpha = fx.alpha;
-        if (fx.pearl) pearl(fx.x - px * 0.75, fx.y, px * 0.36);
-        print(fx.text, fx.x + (fx.pearl ? px * 0.25 : 0), fx.y, px, fx.color ?? palette.white, true);
+        if (fx.pearl) pearl(fx.x - height * 0.95, fx.y, height * 0.4);
+        write(fx.text, fx.x + (fx.pearl ? height * 0.3 : 0), fx.y, height, fx.color ?? palette.marker, { halo: palette.paper });
         ctx.globalAlpha = 1;
       },
-      ring(fx) {
+      /** A comic burst with a word in it: BUM! */
+      burst(fx, now) {
+        const { size } = geo;
+        const reach = size * fx.scale * Math.max(1.1, 0.2 * fx.text.length + 0.5);
+        ctx.globalAlpha = fx.alpha;
+        place(UNIT.burst[frameOf(now)], fx.x, fx.y, reach, reach, { fill: fx.color ?? palette.gold, stroke: palette.marker, width: Math.max(2, size * 0.08), tilt: fx.tilt });
+        ctx.save();
+        ctx.translate(fx.x, fx.y);
+        ctx.rotate(fx.tilt);
+        write(fx.text, 0, 0, size * 0.56 * fx.scale, palette.marker, { weight: Math.max(2, size * 0.1 * fx.scale) });
+        ctx.restore();
+        ctx.globalAlpha = 1;
+      },
+      ring(fx, now) {
+        const radius = geo.size * (0.45 + 0.8 * fx.t);
         ctx.globalAlpha = 1 - fx.t;
-        discPath(fx.x, fx.y, geo.size * (0.45 + 0.8 * fx.t));
-        ctx.lineWidth = geo.size * 0.14 * (1 - fx.t) + 1;
-        ctx.strokeStyle = fx.color ?? palette.white;
-        ctx.stroke();
+        place(UNIT.ring[frameOf(now)], fx.x, fx.y, radius, radius, { stroke: fx.color ?? palette.marker, width: geo.size * 0.12 * (1 - fx.t) + 1 });
         ctx.globalAlpha = 1;
       },
-      /** Shards that fly out and, as confetti, fall. */
+      /** Pen dashes that fly out of a hit and, as confetti, little stars that fall. */
       sparks(fx) {
         const { size } = geo;
         ctx.globalAlpha = Math.min(1, 2 * (1 - fx.t));
+        ctx.lineCap = 'round';
+        ctx.lineWidth = Math.max(1.5, size * 0.07);
         fx.parts.forEach(([angle, reach], n) => {
           const distance = reach * fx.t * size * fx.spread;
           const x = fx.x + Math.cos(angle) * distance;
           const y = fx.y + Math.sin(angle) * distance + fx.fall * fx.t * fx.t * size;
-          ctx.fillStyle = fx.colors[n % fx.colors.length];
-          hexPath(x, y, size * 0.1 * (1.4 - fx.t));
-          ctx.fill();
+          const length = size * 0.13 * (1.4 - fx.t);
+          ctx.strokeStyle = fx.colors[n % fx.colors.length];
+          ctx.beginPath();
+          const spokes = fx.fall && n % 2 ? [0, TAU / 6, TAU / 3] : [angle];
+          for (const spoke of spokes) {
+            const turn = spoke + (fx.fall ? fx.t * 3 + n : 0);
+            ctx.moveTo(x - Math.cos(turn) * length, y - Math.sin(turn) * length);
+            ctx.lineTo(x + Math.cos(turn) * length, y + Math.sin(turn) * length);
+          }
+          ctx.stroke();
         });
         ctx.globalAlpha = 1;
       },
-      /** A cannonball. */
-      ball(fx) {
-        const radius = geo.size * 0.2;
+      /** A bomb with a lit fuse. */
+      ball(fx, now) {
+        const radius = geo.size * 0.24;
         discPath(fx.x, fx.y, radius);
-        ctx.fillStyle = palette.ink;
+        ctx.fillStyle = palette.marker;
         ctx.fill();
-        discPath(fx.x - radius * 0.3, fx.y - radius * 0.3, radius * 0.3);
-        ctx.fillStyle = palette.white;
+        discPath(fx.x - radius * 0.32, fx.y - radius * 0.32, radius * 0.26);
+        ctx.fillStyle = palette.paper;
         ctx.fill();
+        place(UNIT.bomb, fx.x, fx.y, radius, radius, { stroke: palette.marker, width: Math.max(1.5, radius * 0.24) });
+        write('×', fx.x + radius, fx.y - radius * 1.1, radius * 0.9, frameOf(now) % 2 ? palette.gold : palette.sides[0].lo, { weight: Math.max(1.5, radius * 0.22) });
+      },
+      /** Something that turns up in the sea: drawn stroke by stroke, then rubbed out. */
+      gag(fx, now) {
+        const { size } = geo;
+        ctx.save();
+        ctx.globalAlpha = fx.alpha;
+        ctx.translate(fx.x, fx.y + (calm ? 0 : Math.sin(now / 500) * size * 0.05));
+        ctx.scale(size * 0.9, size * 0.9);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.lineWidth = Math.max(1.6, size * 0.075) / (size * 0.9);
+        ctx.strokeStyle = palette.ink;
+        ctx.setLineDash([fx.t * 5, 9]);
+        ctx.stroke(gags.get(fx.shape));
+        ctx.setLineDash([]);
+        ctx.restore();
       },
     };
 
@@ -3780,17 +4343,17 @@ dialog p { font-weight: 500; }
       const { map, dpr, width, height } = geo;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, width, height);
-      ctx.lineJoin = 'round';
 
       drawSea(now);
       drawLanes(scene, now);
-      for (let i = 0; i < map.count; i++) if (!map.water[i]) drawTile(scene, i);
+      for (let i = 0; i < map.count; i++) if (!map.water[i]) drawTile(scene, i, now);
       drawHighlights(scene, now);
-      for (let i = 0; i < map.count; i++) if (!map.water[i]) drawUnits(scene, i);
+      for (let i = 0; i < map.count; i++) if (!map.water[i]) drawUnits(scene, i, now);
       drawShields(scene, now);
       if (scene.order) drawOrderArrow(scene);
-      for (const fx of scene.fx) drawFx[fx.kind](fx);
+      for (const fx of scene.fx) drawFx[fx.kind](fx, now);
       drawChips(scene, now);
+      if (scene.nudge >= 0) drawNudge(scene.nudge, now);
     };
 
     return {
@@ -3800,6 +4363,12 @@ dialog p { font-weight: 500; }
       route,
       isLane,
       point: (tile) => geo.points[tile],
+      /** Places in the sea where something may turn up: lakes and open water. */
+      seaSpots: () => [
+        ...geo.points.filter((_, i) => geo.map.water[i]),
+        ...geo.swells.map(({ x, y }) => ({ x, y })),
+      ],
+      gagNames: Object.keys(GAGS),
       setPalette: (next) => { palette = next; },
       get size() { return geo.size; },
     };
@@ -3821,18 +4390,17 @@ dialog p { font-weight: 500; }
     const last = Math.max(1, history.length - 1);
     const px = (round) => pad.left + (width * round) / last;
     const py = (tiles) => pad.top + height * (1 - tiles / peak);
+    const r = Sketch.hand(history.length);
 
-    ctx.strokeStyle = palette.rule;
+    ctx.strokeStyle = palette.pencil;
     ctx.lineWidth = 1.5;
+    ctx.lineCap = 'round';
     ctx.font = `600 13px ${palette.font}`;
-    ctx.fillStyle = palette.inkSoft;
+    ctx.fillStyle = palette.pencil;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'right';
     for (const tiles of [0, peak]) {
-      ctx.beginPath();
-      ctx.moveTo(pad.left, py(tiles));
-      ctx.lineTo(pad.left + width, py(tiles));
-      ctx.stroke();
+      ctx.stroke(new Path2D(Sketch.stroke(pad.left, py(tiles), pad.left + width, py(tiles), r, 1.6)));
       ctx.fillText(String(tiles), pad.left - 8, py(tiles));
     }
     ctx.textBaseline = 'alphabetic';
@@ -3841,22 +4409,27 @@ dialog p { font-weight: 500; }
     ctx.textAlign = 'right';
     ctx.fillText(`${last}. krug`, pad.left + width, box.height - 3);
 
-    ctx.lineWidth = 4;
     ctx.lineJoin = 'round';
-    ctx.lineCap = 'round';
     [AWAY, HOME].forEach((side) => {
-      const color = side === HOME ? palette.sides[side].lo : palette.sides[side].base;
-      ctx.beginPath();
-      history.forEach((row, round) => {
-        if (round) ctx.lineTo(px(round), py(row[side]));
-        else ctx.moveTo(px(round), py(row[side]));
-      });
-      ctx.strokeStyle = color;
+      const trace = () => {
+        ctx.beginPath();
+        history.forEach((row, round) => {
+          if (round) ctx.lineTo(px(round), py(row[side]));
+          else ctx.moveTo(px(round), py(row[side]));
+        });
+      };
+      trace(); // a felt-tip line with a pen line on top
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = palette.sides[side].base;
+      ctx.stroke();
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = palette.sides[side].lo;
       ctx.stroke();
       ctx.beginPath();
       ctx.arc(px(last), py(history[last][side]), 5, 0, TAU);
-      ctx.fillStyle = color;
+      ctx.fillStyle = palette.sides[side].base;
       ctx.fill();
+      ctx.stroke();
     });
   };
 
@@ -3929,6 +4502,10 @@ dialog p { font-weight: 500; }
     let bubbleTimer = 0;
     let lastRemark = 0;
     let duelCount = 0;       // duels started in this visit; the first move alternates
+    let gagTimer = 0;
+    let nudgeTimer = 0;
+    const BOIL_FRAMES = 3;   // living lines exist in this many drawings, shown in turn
+    const boilers = [];      // called with the number of the drawing to show
 
     /** A duel: two players share this device and nobody plays for the computer. */
     const duel = () => settings.rival === FRIEND;
@@ -3964,6 +4541,7 @@ dialog p { font-weight: 500; }
       targets: [],
       order: null,
       aim: null,
+      nudge: -1,
       bump: new Float32Array(source.map.count),
       jolt: new Float32Array(source.map.count),
       flips: new Map(),
@@ -4044,7 +4622,7 @@ dialog p { font-weight: 500; }
       if (scene.selected >= 0) return 'Odaberi susjedno polje: tuđe napadaš, a na svoje premještaš jedinice.';
       const canMove = state.owner.some((owner, tile) => owner === me() && Rules.canAct(state, tile));
       return canMove
-        ? 'Odaberi polje s bijelim žetonom i pošalji jedinice na susjedno polje.'
+        ? 'Odaberi polje s budnim žetonom i pošalji jedinice na susjedno polje.'
         : 'Nijedno polje više ne može djelovati. Završi potez.';
     };
 
@@ -4098,6 +4676,24 @@ dialog p { font-weight: 500; }
       renderPanel();
     };
 
+    /**
+     * A player who does nothing for a while is shown a sensible move: the
+     * one the normal rival would make in their place.
+     */
+    const armNudge = () => {
+      window.clearTimeout(nudgeTimer);
+      $('endTurnBtn').classList.remove('nudge');
+      scene.nudge = -1;
+      if (!myTurn()) return;
+      nudgeTimer = window.setTimeout(() => {
+        if (!myTurn() || order || aim || scene.selected >= 0) return;
+        const advice = AI.chooseAction(state, 'normal');
+        if (advice.type === 'reinforce') scene.nudge = advice.tile;
+        else if (advice.type === 'move') scene.nudge = advice.from;
+        else if (advice.type === 'endTurn') $('endTurnBtn').classList.add('nudge');
+      }, UI.nudgeAfter);
+    };
+
     /** Recomputes the interaction hints on the board after any change. */
     const refresh = () => {
       const acting = myTurn() && state.phase === 'action';
@@ -4120,7 +4716,72 @@ dialog p { font-weight: 500; }
           : `+${order.count}`,
       };
       if (!myTurn()) scene.hover = -1;
+      armNudge();
       renderPanel();
+    };
+
+    /**
+     * Writes a text into an element in the game's own lettering, one line
+     * per item of `lines`. A text with a letter the lettering lacks (a
+     * player may be called anything) stays ordinary text. With `alive`
+     * the line is drawn a few times over, for the boil.
+     */
+    const letter = (element, lines, { seed = 3, weight = 1.5, bounce = 0, alive = false } = {}) => {
+      const texts = [].concat(lines);
+      const whole = texts.join(' ');
+      element.setAttribute('aria-label', whole);
+      if (!Sketch.covers(whole)) {
+        element.textContent = whole;
+        return [];
+      }
+      const NS = 'http://www.w3.org/2000/svg';
+      const drawings = texts.map((text, row) => {
+        const first = Sketch.write(text, { seed: seed + row, bounce });
+        const svg = document.createElementNS(NS, 'svg');
+        svg.setAttribute('class', 'lettering');
+        svg.setAttribute('aria-hidden', 'true');
+        svg.setAttribute('viewBox', `-2 -5 ${Math.ceil(first.width + 4)} 19`);
+        const versions = alive && !calm ? BOIL_FRAMES : 1;
+        const paths = Array.from({ length: versions }, (_, again) => {
+          const path = document.createElementNS(NS, 'path');
+          path.setAttribute('d', again ? Sketch.write(text, { seed: seed + row, bounce, again }).d : first.d);
+          path.setAttribute('stroke-width', weight);
+          svg.append(path);
+          return path;
+        });
+        if (versions > 1) boilers.push((frame) => paths.forEach((path, k) => { path.style.display = k === frame ? '' : 'none'; }));
+        return { svg, ...first };
+      });
+      element.replaceChildren(...drawings.map((drawing) => drawing.svg));
+      return drawings;
+    };
+
+    /** The logo: the name with a stroke of highlighter under it; its two O's are a pair of eyes. */
+    const drawLogo = () => {
+      const NS = 'http://www.w3.org/2000/svg';
+      const [{ svg, spots, width }] = letter($('title'), 'Otokrati', { seed: 11, weight: 2, bounce: 0.9, alive: true });
+      const swash = document.createElementNS(NS, 'path');
+      swash.setAttribute('class', 'swash');
+      swash.setAttribute('d', Sketch.stroke(-1, 8.6, width + 1, 7.2, Sketch.hand(4), 1.2));
+      swash.setAttribute('stroke-width', 7.5);
+      svg.prepend(swash);
+      const eyes = document.createElementNS(NS, 'g');
+      eyes.setAttribute('class', 'pupils');
+      eyes.setAttribute('fill', 'currentColor');
+      for (const spot of spots.filter(({ char }) => char === 'O')) {
+        const white = document.createElementNS(NS, 'circle');
+        Object.entries({ class: 'eye', cx: spot.x, cy: spot.y, r: 3.4 }).forEach(([name, value]) => white.setAttribute(name, value));
+        svg.insertBefore(white, swash.nextSibling);
+        const pupil = document.createElementNS(NS, 'circle');
+        Object.entries({ cx: spot.x, cy: spot.y + 0.4, r: 1.7 }).forEach(([name, value]) => pupil.setAttribute(name, value));
+        eyes.append(pupil);
+      }
+      svg.append(eyes);
+    };
+
+    /** Every ship on the page is the player's ship at its current level. */
+    const renderShips = () => {
+      document.querySelectorAll('[data-ship]').forEach((slot) => { slot.innerHTML = shipPicture(level()); });
     };
 
     /** Replays a one-shot CSS animation on an element. */
@@ -4131,7 +4792,7 @@ dialog p { font-weight: 500; }
     };
 
     const showBanner = (title, note, side) => {
-      $('bannerTitle').textContent = title;
+      letter($('bannerTitle'), title, { seed: title.length, weight: 1.7 });
       $('bannerNote').textContent = note;
       $('banner').dataset.side = side;
       $('banner').style.setProperty('--banner-ms', `${T.banner / UI.speeds[settings.speed]}ms`);
@@ -4172,8 +4833,8 @@ dialog p { font-weight: 500; }
     const dropFx = (fx) => scene.fx.delete(fx);
     /** Confetti colours of a side. */
     const colorsOf = (owner) => {
-      const side = owner >= 0 ? palette.sides[owner] : palette.neutral;
-      return [side.hi, side.base, palette.white];
+      if (owner < 0) return [palette.pencil, palette.ink];
+      return [palette.sides[owner].base, palette.sides[owner].lo, palette.ink];
     };
 
     const bump = (tile) => animator.tween(T.place * 1.6, (t) => {
@@ -4198,6 +4859,33 @@ dialog p { font-weight: 500; }
     const ring = (tile, color) => {
       const fx = addFx({ kind: 'ring', ...board.point(tile), t: 0, color });
       animator.tween(T.settle * 1.3, (t) => { fx.t = t; }).then(() => dropFx(fx));
+    };
+
+    /** A comic burst over a tile, with a word in it. */
+    const burst = (tile, text, color) => {
+      const { x, y } = board.point(tile);
+      const fx = addFx({ kind: 'burst', x, y: y - board.size * 0.9, text, color, scale: 0.3, alpha: 1, tilt: (jitter.next() - 0.5) * 0.5 });
+      animator.tween(T.settle * 0.7, (t) => { fx.scale = 0.3 + 0.7 * t + 0.3 * Math.sin(Math.PI * t); }, Ease.linear)
+        .then(() => animator.wait(T.settle * 1.8))
+        .then(() => animator.tween(T.settle * 0.6, (t) => { fx.alpha = 1 - t; }))
+        .then(() => dropFx(fx));
+    };
+
+    /** Now and then something turns up in the sea, is drawn, looks about and is rubbed out. */
+    const scheduleGag = () => {
+      window.clearTimeout(gagTimer);
+      if (calm) return;
+      gagTimer = window.setTimeout(() => {
+        const spots = scene && document.visibilityState === 'visible' ? board.seaSpots() : [];
+        if (spots.length) {
+          const fx = addFx({ kind: 'gag', ...spots[jitter.int(spots.length)], shape: board.gagNames[jitter.int(board.gagNames.length)], t: 0, alpha: 1 });
+          animator.tween(1100, (t) => { fx.t = t; }, Ease.linear)
+            .then(() => animator.wait(2800))
+            .then(() => animator.tween(500, (t) => { fx.alpha = 1 - t; }))
+            .then(() => dropFx(fx));
+        }
+        scheduleGag();
+      }, UI.gagEvery[0] + jitter.next() * (UI.gagEvery[1] - UI.gagEvery[0]));
     };
 
     /** Shards from a hit; as `confetti` there are more, they fly further and fall. */
@@ -4310,6 +4998,7 @@ dialog p { font-weight: 500; }
         if (event.conquered) {
           streak = isHuman(event.player) ? streak + 1 : 0;
           sound.play('conquer', isHuman(event.player) ? streak : 1);
+          sound.play('scribble');
           const flip = { to: event.player, t: 0 };
           scene.flips.set(event.to, flip);
           await Promise.all([
@@ -4325,13 +5014,16 @@ dialog p { font-weight: 500; }
           scene.loot[event.to] = 0;
           ring(event.to);
           bump(event.to);
-          sparks(b.x, b.y, event.chest ? [palette.gold, palette.white] : colorsOf(event.player), true);
-          if (event.capital) shakeBoard();
+          sparks(b.x, b.y, event.chest ? [palette.gold, palette.marker] : colorsOf(event.player), true);
+          if (event.capital) {
+            shakeBoard();
+            burst(event.to, 'Tres!', palette.sides[event.player].base);
+          }
           if (event.chest) sound.play('chest');
           else if (state.tricks[event.player].length) sound.play('pearl');
           if (state.tricks[event.player].length) floatText(event.to, `+${event.pearls}`, { pearl: true });
           if (isHuman(event.player) && streak >= 3) {
-            floatText(event.from, `Niz ×${streak}!`, { big: true, color: palette.gold });
+            burst(event.to, `Niz ×${streak}!`);
           }
         } else {
           if (isHuman(event.player)) streak = 0;
@@ -4362,7 +5054,7 @@ dialog p { font-weight: 500; }
         } else if (event.trick === 'shield') {
           sound.play('shield');
           scene.shield[event.tile] = 1;
-          ring(event.tile, palette.glow);
+          ring(event.tile, palette.sea);
         } else if (event.trick === 'wind') {
           scene.locked[event.tile] = 0;
           ring(event.tile, palette.gold);
@@ -4378,7 +5070,8 @@ dialog p { font-weight: 500; }
           dropFx(ball);
           sound.play('cannon');
           scene.units[event.tile] -= event.amount;
-          sparks(to.x, to.y, [palette.ink, palette.gold, palette.white], true);
+          sparks(to.x, to.y, [palette.marker, palette.gold, palette.ink], true);
+          burst(event.tile, 'Bum!');
           floatText(event.tile, `−${event.amount}`);
           jolt(event.tile);
           shakeBoard();
@@ -4495,16 +5188,17 @@ dialog p { font-weight: 500; }
       const after = Career.levelOf(step.profile.xp);
       profile = step.profile;
       save();
+      renderShips();
 
       $('end').dataset.outcome = outcome;
-      $('endTitle').textContent = versus && winner !== null
-        ? `${nameOf(winner)} pobjeđuje!`
-        : { win: 'Pobjeda!', loss: 'Poraz', draw: 'Neriješeno' }[outcome];
+      letter($('endTitle'), versus && winner !== null
+        ? [nameOf(winner), 'pobjeđuje!']
+        : { win: 'Pobjeda!', loss: 'Poraz', draw: 'Neriješeno' }[outcome], { seed: 5, weight: 1.9, bounce: 0.5 });
       $('endDetail').textContent = resultDetail();
       const face = $('endPortrait');
       if (versus) {
         face.className = winner === AWAY ? 'avatar away' : 'avatar';
-        face.innerHTML = icon('ship');
+        face.innerHTML = shipPicture(level());
         $('endQuote').textContent = `${winner === null ? LORE.duel.drew : LORE.duel.won} U idućem dvoboju prvi potez ima ${nameOf(duelCount % 2)}.`;
       } else {
         face.className = 'portrait';
@@ -4536,6 +5230,7 @@ dialog p { font-weight: 500; }
       fill.style.transition = '';
       fill.style.width = `${100 * share(profile.xp, after)}%`;
 
+      sound.play('stamp');
       if (outcome === 'draw') sound.play('turn', true);
       else sound.play(versus || outcome === 'win' ? 'win' : 'lose');
       verdict.goals.forEach((won, i) => won && window.setTimeout(() => sound.play('star', i), 700 + i * 260));
@@ -4630,12 +5325,13 @@ dialog p { font-weight: 500; }
       $('name0').textContent = nameOf(HOME);
       $('name1').textContent = nameOf(AWAY, true);
       $('portrait1').className = versus ? 'avatar away' : 'portrait';
-      $('portrait1').innerHTML = versus ? icon('ship') : PORTRAITS[settings.rival];
+      $('portrait1').innerHTML = versus ? shipPicture(level()) : PORTRAITS[settings.rival];
       $('bubble').classList.remove('show');
       $('hint').textContent = '';
       buildTrickRow();
       board.fit(state.map);
       renderHud();
+      scheduleGag();
       await playAll(opening.events);
       remark('start', true);
       settle();
@@ -4661,7 +5357,11 @@ dialog p { font-weight: 500; }
       document.querySelectorAll('[data-stars]').forEach((row) => {
         row.innerHTML = starRow(profile.stars[row.dataset.stars]);
       });
-      document.querySelectorAll('input[name="rival"]').forEach((radio) => { radio.checked = radio.value === settings.rival; });
+      document.querySelectorAll('input[name="rival"]').forEach((radio) => {
+        radio.checked = radio.value === settings.rival;
+        if (radio.checked) $('rivalNote').textContent = radio.closest('.rival').querySelector('small').textContent;
+      });
+      renderShips();
       document.querySelectorAll('input[name="mode"]').forEach((radio) => { radio.checked = radio.value === settings.mode; });
       $('modeNote').textContent = LORE.modes[settings.mode];
       $('names').hidden = !duel();
@@ -4717,6 +5417,8 @@ dialog p { font-weight: 500; }
     const showMenu = () => {
       animator.clear();
       window.clearTimeout(bubbleTimer);
+      window.clearTimeout(gagTimer);
+      window.clearTimeout(nudgeTimer);
       state = null;
       scene = null;
       app.dataset.screen = 'menu';
@@ -4984,6 +5686,8 @@ dialog p { font-weight: 500; }
     const start = () => {
       document.querySelectorAll('[data-icon]').forEach((slot) => { slot.innerHTML = icon(slot.dataset.icon); });
       document.querySelectorAll('[data-portrait]').forEach((slot) => { slot.innerHTML = PORTRAITS[slot.dataset.portrait]; });
+      document.querySelectorAll('[data-lettering]').forEach((heading, k) => letter(heading, heading.textContent, { seed: 20 + k, weight: 1.6 }));
+      drawLogo();
       applySound();
       applySpeed();
       $('roundMax').textContent = R.maxRounds;
@@ -5002,9 +5706,33 @@ dialog p { font-weight: 500; }
       const frame = (now) => {
         animator.tick(now);
         if (scene) board.draw(scene, now);
+        else if (previewScene) preview.draw(previewScene, now);
         window.requestAnimationFrame(frame);
       };
       window.requestAnimationFrame(frame);
+
+      // Living lines: doodles on the page are redrawn a few times a second...
+      if (!calm) {
+        let drawing = 0;
+        window.setInterval(() => {
+          drawing = (drawing + 1) % BOIL_FRAMES;
+          $('boilNoise').setAttribute('seed', drawing + 1);
+          boilers.forEach((show) => show(drawing));
+        }, UI.boilMs);
+      }
+      // ...and every pair of eyes follows the pointer, or the last touch.
+      let looking = false;
+      const look = (event) => {
+        if (looking) return;
+        looking = true;
+        window.requestAnimationFrame(() => {
+          looking = false;
+          app.style.setProperty('--look-x', ((event.clientX / window.innerWidth) * 2 - 1).toFixed(2));
+          app.style.setProperty('--look-y', ((event.clientY / window.innerHeight) * 2 - 1).toFixed(2));
+        });
+      };
+      document.addEventListener('pointermove', look);
+      document.addEventListener('pointerdown', look);
     };
 
     return { start };
