@@ -1053,7 +1053,7 @@ dialog .menu-actions { margin-top: 20px; }
       <section>
         <h3>Tvoj potez</h3>
         <p>Prvo rasporedi pojačanja: dobivaš 2 jedinice i još jednu za svaka 3 svoja polja. Na polje stane najviše 12 jedinica.</p>
-        <p>Zatim šalji jedinice. Polje s 2 ili više jedinica može ih poslati na susjedno polje, a barem 1 uvijek ostaje. Na svoje ih polje premještaš, a tuđe napadaš. Polje koje u potezu primi jedinice miruje do sljedećeg poteza.</p>
+        <p>Zatim šalji jedinice. Polje s 2 ili više jedinica može ih poslati na susjedno polje, a barem 1 uvijek ostaje. Na svoje ih polje premještaš, a tuđe napadaš. Polje koje u potezu primi jedinice miruje do sljedećeg poteza. Kad više ništa ne možeš odigrati, potez se završava sam.</p>
       </section>
       <section>
         <h3>Borba</h3>
@@ -1307,6 +1307,7 @@ dialog .menu-actions { margin-top: 20px; }
         trick: 520,
         banner: 1000,
         gameOver: 900,
+        pass: 1100,              // a turn with no moves left ends by itself after this
       },
     },
   });
@@ -1819,6 +1820,16 @@ dialog .menu-actions { margin-top: 20px; }
 
     const canPlay = (state, trick) => trickBlock(state, trick) === null;
 
+    /**
+     * Whether the player to move has nothing left but to end the turn: no
+     * tile can send units anywhere, and no trick that could still change
+     * something can be played. A lucky die alone does not count, because
+     * without an attack it changes nothing.
+     */
+    const outOfMoves = (state) => state.phase === 'action' && !state.result
+      && !state.owner.some((owner, tile) => owner === state.current && targets(state, tile).length > 0)
+      && !state.tricks[state.current].some((trick) => trick !== 'lucky' && canPlay(state, trick));
+
     /** Returns the reason an action is illegal, or null when it is legal. */
     const validate = (state, action) => {
       const { owner, units, map } = state;
@@ -2097,7 +2108,7 @@ dialog .menu-actions { margin-top: 20px; }
     return {
       createGame, applyAction, validate,
       canAct, targets, maxSend, winOdds, isFortified, defenseBonus, attackBonus,
-      trickTargets, trickBlock, canPlay,
+      trickTargets, trickBlock, canPlay, outOfMoves,
       tileCount, unitCount, landmarkCount, income, incomeFor,
     };
   })();
@@ -5257,6 +5268,16 @@ dialog .menu-actions { margin-top: 20px; }
       renderHud();
       if (state.result) showResult();
       else if (!isHuman(state.current)) computerTurn();
+      else if (Rules.outOfMoves(state)) pass();
+    };
+
+    /** Nothing is left to do, so the turn ends by itself, after a moment to take that in. */
+    const pass = async () => {
+      busy = true;
+      refresh();
+      $('hint').textContent = 'Nema više poteza, pa se potez završava sam.';
+      await animator.wait(T.pass);
+      run({ type: 'endTurn' });
     };
 
     /** Applies a move, a trick or the end of the player's turn and plays what happens. */
@@ -5449,7 +5470,9 @@ dialog .menu-actions { margin-top: 20px; }
       players.reinforce(event); // plays without blocking the next tap
       scene.phase = state.phase;
       refresh();
-      return renderScores();
+      renderScores();
+      if (Rules.outOfMoves(state)) pass();
+      return undefined;
     };
 
     const undo = () => {

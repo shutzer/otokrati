@@ -476,6 +476,35 @@ test('career: a stored profile is repaired before use', () => {
   assert.deepEqual(repaired, { xp: 123, games: 0, wins: 0, duels: 3, stars: { easy: 3, normal: 0, hard: 2 }, badges: ['firstGame', 'beatEasy'] });
 });
 
+test('turns: a player is out of moves once no tile can send units and no useful trick is left', () => {
+  const start = adventure('KRAJ', { pearls: [0, 0] });
+  const capital = start.map.capitals[0];
+  assert.equal(Rules.outOfMoves(start), false, 'the capital can still attack');
+  assert.equal(Rules.outOfMoves({ ...start, phase: 'reinforce', reinforcements: 2 }), false, 'reinforcements come first');
+
+  // One unit on the only tile: nothing can be sent anywhere.
+  const stuck = withBoard(start, { [capital]: [0, 1] });
+  assert.equal(Rules.outOfMoves(stuck), true);
+  assert.equal(Rules.outOfMoves({ ...stuck, current: 1 }), false, 'the other side still has its five units');
+
+  // A tile that received units this turn rests, however many it holds.
+  const locked = start.locked.slice();
+  locked[capital] = 1;
+  const resting = { ...start, locked };
+  assert.equal(Rules.outOfMoves(resting), true);
+
+  // A trick that can still change something keeps the turn open ...
+  assert.equal(Rules.outOfMoves({ ...stuck, pearls: [TRICKS.recruit.cost, 0] }), false, 'a recruit would wake the tile');
+  assert.equal(Rules.outOfMoves({ ...resting, pearls: [TRICKS.wind.cost, 0] }), false, 'a second wind would wake the tile');
+  // ... but not once the turn's trick is spent, and not a lucky die with nobody to attack.
+  assert.equal(Rules.outOfMoves({ ...stuck, pearls: [20, 0], tricksPlayed: R.tricksPerTurn }), true);
+  assert.equal(Rules.outOfMoves({ ...stuck, pearls: [20, 0], tricks: [['lucky'], []] }), true);
+
+  // Whenever a player is out of moves, ending the turn is the only legal thing left, and the AI does it.
+  for (const level of AI.LEVELS) assert.deepEqual(AI.chooseAction(stuck, level), { type: 'endTurn' });
+  assert.equal(Rules.outOfMoves({ ...stuck, result: { winner: 1, reason: 'capital' } }), false, 'a finished game has no turn to end');
+});
+
 test('duel: a game between two players earns experience, but no stars, wins or badges', () => {
   const start = { ...Career.fresh(), xp: 70, games: 4, wins: 2, stars: { easy: 2, normal: 1, hard: 0 }, badges: ['firstGame'] };
   const verdict = Career.judgeDuel();

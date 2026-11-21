@@ -54,6 +54,7 @@ async () => {
   };
 
   try {
+    if ($('end').open) $('end').close(); // the result of an earlier game would look like the end of this one
     $('setup').requestSubmit();
     await wait(50);
 
@@ -80,6 +81,12 @@ async () => {
       await idle();
       if (state.current === 1 && !duel) { // mirror the rival's whole turn; the interface plays it on its own
         while (!state.result && state.current === 1) state = Rules.applyAction(state, AI.chooseAction(state, rival)).state;
+        await wait(60);
+        continue;
+      }
+
+      if (Rules.outOfMoves(state)) { // a turn that starts with nothing to do also ends by itself
+        state = Rules.applyAction(state, { type: 'endTurn' }).state;
         await wait(60);
         continue;
       }
@@ -119,6 +126,8 @@ async () => {
         $('endTurnBtn').click();
       }
       state = Rules.applyAction(state, action).state;
+      // With nothing left to do, the interface ends the turn by itself; so does the shadow game.
+      if (Rules.outOfMoves(state)) state = Rules.applyAction(state, { type: 'endTurn' }).state;
       status.actions++;
       status.round = state.round;
       await wait(30);
