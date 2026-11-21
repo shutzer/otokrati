@@ -8,14 +8,14 @@ const MAX_ACTIONS_PER_TURN = 400; // far above anything legal play needs; trips 
  * Plays one full game.
  * @param core       the object returned by loadCore()
  * @param levels     AI level of player 0 and player 1
- * @param adventure  landmarks on the map and each level's own tricks in hand;
+ * @param adventure  landmarks on the map, each level's own tricks in hand and powers to earn;
  *                   false plays the classic rules
  * @returns {{ winner: 0|1|null, reason: string, rounds: number, actions: number, state: object }}
  */
 function playGame(core, { seed, levels, firstPlayer = 0, adventure = false }) {
   const { Rules, AI, CONFIG } = core;
   const tricks = adventure ? levels.map(AI.tricksOf) : [[], []];
-  let { state } = Rules.createGame({ seed, firstPlayer, landmarks: adventure, tricks });
+  let { state } = Rules.createGame({ seed, firstPlayer, landmarks: adventure, tricks, perks: adventure });
   let actions = 0;
   let actionsThisTurn = 0;
 

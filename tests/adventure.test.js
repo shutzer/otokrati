@@ -476,6 +476,147 @@ test('career: a stored profile is repaired before use', () => {
   assert.deepEqual(repaired, { xp: 123, games: 0, wins: 0, duels: 3, stars: { easy: 3, normal: 0, hard: 2 }, badges: ['firstGame', 'beatEasy'] });
 });
 
+/** An adventure game with powers switched on, in player 0's action phase. */
+function withPowers(seed = 'MOCI', fields = {}) {
+  const { state } = Rules.createGame({ seed, landmarks: true, tricks: [ALL_TRICKS, ALL_TRICKS], perks: true });
+  return { ...state, phase: 'action', reinforcements: 0, pearls: [20, 20], ...fields };
+}
+const holding = (state, player, ...perks) => ({ ...state, perks: state.perks.map((own, side) => (side === player ? perks : own)) });
+/** The state after player 0 conquers a plain neighbour of its capital with ten units. */
+function conquest(state) {
+  const capital = state.map.capitals[0];
+  const to = plainNeighbor(state, capital);
+  const before = withBoard(state, { [capital]: [0, 12], [to]: [NEUTRAL, 1] });
+  const action = { type: 'move', from: capital, to, count: 10 };
+  const result = Rules.applyAction(withDiceFor(before, action, true), action);
+  return { ...result, to, fight: result.events.find((event) => event.type === 'combat') };
+}
+
+test('powers: the conquest that reaches a mark brings an offer of three, and nothing else may happen first', () => {
+  const [first, second] = CONFIG.perks.at;
+  const start = withPowers();
+  assert.equal(Rules.perkDue(start, 0), first);
+  assert.equal(Rules.perkDue(adventure(), 0), null, 'no powers unless the game has them');
+
+  const early = conquest(start);
+  assert.equal(early.state.pending, null, 'one conquest is not enough');
+  assert.equal(Rules.perkDue(early.state, 0), first - 1);
+
+  const almost = { ...start, stats: start.stats.map((stats, side) => (side === 0 ? { ...stats, conquests: first - 1 } : stats)) };
+  const { state, events } = conquest(almost);
+  const offer = events.at(-1);
+  assert.equal(offer.type, 'offer');
+  assert.deepEqual(state.pending, { player: 0, options: offer.options });
+  assert.equal(offer.options.length, CONFIG.perks.choices);
+  assert.equal(new Set(offer.options).size, offer.options.length, 'three different powers');
+  for (const perk of offer.options) assert.ok(Rules.PERK_NAMES.includes(perk));
+  assert.deepEqual(conquest(almost).state.pending, state.pending, 'the same game offers the same powers');
+
+  illegal(state, { type: 'endTurn' }, /power must be chosen/);
+  illegal(state, { type: 'trick', trick: 'lucky' }, /power must be chosen/);
+  illegal(state, { type: 'perk', perk: Rules.PERK_NAMES.find((perk) => !offer.options.includes(perk)) }, /not on offer/);
+  assert.equal(Rules.outOfMoves(state), false, 'a turn never ends by itself over an open offer');
+
+  const taken = Rules.applyAction(state, { type: 'perk', perk: offer.options[1] });
+  assert.equal(taken.state.pending, null);
+  assert.deepEqual(taken.state.perks, [[offer.options[1]], []]);
+  assert.equal(taken.events[0].type, 'perk');
+  assert.equal(Rules.perkDue(taken.state, 0), second - first, 'the next mark is further away');
+  illegal(taken.state, { type: 'perk', perk: offer.options[0] }, /unknown action|not the|power/);
+
+  // A power already held is never offered again, and after the last mark there is nothing to come.
+  const most = holding(almost, 0, ...Rules.PERK_NAMES.slice(0, -2));
+  const last = { ...most, stats: most.stats.map((stats, side) => (side === 0 ? { ...stats, conquests: 999 } : stats)) };
+  assert.equal(Rules.perkDue(last, 0), null);
+  const rich = holding(almost, 0, 'muster');
+  const again = conquest({ ...rich, stats: rich.stats.map((stats, side) => (side === 0 ? { ...stats, conquests: CONFIG.perks.at[1] - 1 } : stats)) });
+  assert.ok(!again.state.pending.options.includes('muster'));
+});
+
+test('powers: each one does what it says, for its owner only', () => {
+  const K = CONFIG.perks.kinds;
+  const start = withPowers();
+  const [mine, theirs] = start.map.capitals;
+  const beside = start.map.adj[mine][0];
+
+  // muster: more reinforcements
+  assert.equal(Rules.income(holding(start, 0, 'muster'), 0), Rules.income(start, 0) + K.muster.income);
+  assert.equal(Rules.income(holding(start, 0, 'muster'), 1), Rules.income(start, 1));
+
+  // charge: the first attack of a turn rolls with a bonus, the second does not
+  const eager = holding(start, 0, 'charge');
+  assert.equal(Rules.attackBonus(start), 0);
+  assert.equal(Rules.attackBonus(eager), K.charge.bonus);
+  assert.equal(Rules.attackBonus({ ...eager, lucky: true }), K.charge.bonus + TRICKS.lucky.bonus, 'luck adds to it');
+  const charged = conquest(eager);
+  assert.equal(charged.fight.attackBonus, K.charge.bonus);
+  assert.equal(Rules.attackBonus(charged.state), 0);
+  const theirTurn = { ...apply(charged.state, { type: 'endTurn' }), phase: 'action', reinforcements: 0 };
+  assert.equal(Rules.attackBonus(theirTurn), 0, 'the other side has no such power');
+  assert.equal(Rules.attackBonus(apply(theirTurn, { type: 'endTurn' })), K.charge.bonus, 'and again in the next turn');
+
+  // rampart and bulwark: the capital and the tiles beside it
+  assert.equal(Rules.defenseBonus(holding(start, 1, 'rampart'), theirs), R.fortifiedBonus + K.rampart.bonus);
+  assert.equal(Rules.defenseBonus(holding(start, 1, 'rampart'), mine), R.fortifiedBonus);
+  assert.ok(Combat.winProbability(8, 5, R.fortifiedBonus + K.rampart.bonus) < Combat.winProbability(8, 5, R.fortifiedBonus));
+  assert.ok(Combat.winProbability(8, 5, -K.charge.bonus - TRICKS.lucky.bonus) > Combat.winProbability(8, 5, -K.charge.bonus));
+  const guarded = holding(withBoard(start, { [beside]: [0, 3] }), 0, 'bulwark');
+  assert.equal(Rules.isFortified(guarded, beside), true);
+  assert.equal(Rules.isFortified(withBoard(start, { [beside]: [0, 3] }), beside), false);
+  assert.equal(Rules.isFortified(holding(withBoard(start, { [beside]: [1, 3] }), 0, 'bulwark'), beside), false, 'only own tiles');
+
+  // hoard and veterans: more out of every conquest
+  const plain = conquest(start);
+  const greedy = conquest(holding(start, 0, 'hoard'));
+  assert.equal(greedy.fight.pearls, plain.fight.pearls + K.hoard.pearls);
+  assert.equal(greedy.state.pearls[0], plain.state.pearls[0] + K.hoard.pearls);
+  const proud = conquest(holding(start, 0, 'veterans'));
+  assert.equal(proud.state.units[proud.to], Math.min(R.maxUnits, plain.state.units[plain.to] + K.veterans.units));
+  assert.equal(proud.fight.survivors, proud.state.units[proud.to]);
+
+  // bargain and encore: cheaper tricks, and more of them
+  const thrifty = holding(start, 0, 'bargain');
+  assert.equal(Rules.trickCost(thrifty, 'cannon'), TRICKS.cannon.cost - K.bargain.discount);
+  assert.equal(Rules.trickCost(thrifty, 'cannon', 1), TRICKS.cannon.cost);
+  assert.equal(apply(thrifty, { type: 'trick', trick: 'lucky' }).pearls[0], 20 - TRICKS.lucky.cost + K.bargain.discount);
+  assert.equal(Rules.canPlay({ ...thrifty, pearls: [TRICKS.lucky.cost - K.bargain.discount, 0] }, 'lucky'), true);
+  assert.equal(Rules.trickLimit(holding(start, 0, 'encore')), R.tricksPerTurn + K.encore.tricks);
+  const once = apply(holding(start, 0, 'encore'), { type: 'trick', trick: 'lucky' });
+  assert.equal(Rules.canPlay(once, 'recruit'), true);
+  assert.equal(Rules.canPlay(apply(start, { type: 'trick', trick: 'lucky' }), 'recruit'), false);
+
+  // dowry and levy: at once
+  const offer = (perk) => ({ ...start, pending: { player: 0, options: [perk] } });
+  const paid = Rules.applyAction(offer('dowry'), { type: 'perk', perk: 'dowry' });
+  assert.equal(paid.state.pearls[0], 20 + K.dowry.pearls);
+  assert.equal(paid.events[0].amount, K.dowry.pearls);
+  const manned = Rules.applyAction(offer('levy'), { type: 'perk', perk: 'levy' });
+  assert.equal(manned.state.units[mine], start.units[mine] + K.levy.units);
+  assert.deepEqual([manned.events[0].tile, manned.events[0].amount], [mine, K.levy.units]);
+  const full = Rules.applyAction(withBoard(offer('levy'), { [mine]: [0, R.maxUnits - 1] }), { type: 'perk', perk: 'levy' });
+  assert.equal(full.state.units[mine], R.maxUnits, 'never above the limit of a tile');
+});
+
+test('powers: every AI level takes one of the powers on offer, and adventure games earn them', () => {
+  const options = ['dowry', 'bulwark', 'muster'];
+  const state = { ...withPowers(), pending: { player: 0, options } };
+  for (const level of AI.LEVELS) {
+    const action = AI.chooseAction(state, level);
+    assert.equal(action.type, 'perk');
+    assert.ok(options.includes(action.perk));
+    assert.equal(Rules.validate(state, action), null);
+  }
+  assert.equal(AI.chooseAction(state, 'hard').perk, 'muster', 'hard goes by its list of favourites');
+  for (const level of ['normal', 'hard']) {
+    assert.deepEqual([...CONFIG.ai[level].perks].sort(), [...Rules.PERK_NAMES].sort(), `${level} ranks every power`);
+  }
+
+  const game = playGame(core, { seed: 'MOCI7', levels: ['hard', 'normal'], adventure: true });
+  assert.ok(game.state.perks[0].length + game.state.perks[1].length > 0, 'somebody earned a power');
+  for (const own of game.state.perks) assert.equal(new Set(own).size, own.length, 'no power twice');
+  assert.equal(playGame(core, { seed: 'MOCI7', levels: ['hard', 'normal'], adventure: false }).state.perks.flat().length, 0, 'none in a classic game');
+});
+
 test('turns: a player is out of moves once no tile can send units and no useful trick is left', () => {
   const start = adventure('KRAJ', { pearls: [0, 0] });
   const capital = start.map.capitals[0];

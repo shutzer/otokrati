@@ -73,6 +73,7 @@ async () => {
       landmarks: adventure,
       tricks: [hand, duel ? hand : adventure ? AI.tricksOf(rival) : []],
       pearls: [purse, duel ? purse : 0],
+      perks: adventure,
     });
     status.first = state.firstPlayer;
 
@@ -117,6 +118,12 @@ async () => {
           }
         }
         $('goBtn').click();
+      } else if (action.type === 'perk') { // one of the three cards on offer
+        for (let i = 0; i < 200 && !$('pick').open; i++) await wait(25);
+        const shown = [...document.querySelectorAll('.pick-card')].map((card) => card.dataset.perk);
+        if (String(shown) !== String(state.pending.options)) status.errors.push(`powers: page offers ${shown}, expected ${state.pending.options}`);
+        document.querySelector(`.pick-card[data-perk="${action.perk}"]`).click();
+        status.perks = (status.perks ?? 0) + 1;
       } else if (action.type === 'trick') {
         document.querySelector(`.trick[data-trick="${action.trick}"]`).click();
         await wait(20);
@@ -136,13 +143,14 @@ async () => {
       // With a player at the controls, the interface must agree with the shadow game.
       if ((duel || state.current === 0) && !state.result) {
         const shown = [$('tiles0'), $('tiles1'), $('purse'), $('pearls0'), $('pearls1')].map((node) => Number(node.textContent));
-        shown.push(Number(app.dataset.turn));
+        shown.push(Number(app.dataset.turn), $('perks0').children.length, $('perks1').children.length);
         const expected = [
           Rules.tileCount(state, 0), Rules.tileCount(state, 1),
           state.pearls[state.current], state.pearls[0], state.pearls[1], state.current,
+          state.perks[0].length, state.perks[1].length,
         ];
         if (String(shown) !== String(expected)) {
-          status.errors.push(`round ${state.round}: page shows ${shown}, expected ${expected} (tiles, tiles, purse, pearls, pearls, turn)`);
+          status.errors.push(`round ${state.round}: page shows ${shown}, expected ${expected} (tiles, tiles, purse, pearls, pearls, turn, powers, powers)`);
         }
       }
     }

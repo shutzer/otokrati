@@ -460,6 +460,30 @@ b, strong { font-weight: 700; }
 .share i.share-n { background: repeating-linear-gradient(-60deg, transparent 0 5px, var(--rule) 5px 6.5px); border-block: 2px dashed var(--pencil); border-radius: 0; }
 .share-1 { background: repeating-linear-gradient(-60deg, var(--rival) 0 6px, var(--rival-hi) 6px 8px); border: 2px solid var(--ink); }
 
+/* Powers earned in this game: stickers on each side, and how far the next one is. */
+.powers { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 3px 8px; min-width: 0; }
+#app[data-mode='classic'] .powers { display: none; }
+.power-row { display: flex; flex: none; gap: 4px; }
+.power-row:empty { display: none; }
+/* How far the next power is: a line of its own under the stickers. */
+.power-next { order: 3; flex: 1 0 100%; font-size: 0.88rem; text-align: center; color: var(--text-soft); }
+.power-next:empty { display: none; }
+.power {
+  width: 29px;
+  height: 29px;
+  border: 2px solid var(--ink);
+  border-radius: var(--blot);
+  padding: 4px;
+  background: var(--sun);
+  box-shadow: 1px 2px 0 var(--shade);
+  color: var(--marker);
+  rotate: -7deg;
+  animation: star 0.45s cubic-bezier(0.3, 1.8, 0.5, 1) both;
+}
+.power:nth-child(2n) { rotate: 6deg; }
+#perks1 .power { background: var(--rival); }
+.power:hover { scale: 1.15; }
+
 /* The rival speaks: a comic bubble hanging from its card. */
 .bubble {
   position: absolute;
@@ -678,7 +702,10 @@ b, strong { font-weight: 700; }
   .side .stat.minor { display: none; }
   .stat.tiles b { font-size: 1.4rem; }
   .side-1 { grid-template-areas: 'name face' 'tiles face'; grid-template-columns: 1fr auto; text-align: right; }
-  .share { grid-column: 1 / -1; height: 10px; }
+  .share, .powers { grid-column: 1 / -1; }
+  .share { height: 10px; }
+  .power { width: 25px; height: 25px; padding: 3px; }
+  .power-next { font-size: 0.82rem; line-height: 1.15; }
   .bubble { left: auto; right: 10px; transform-origin: calc(100% - 20px) top; }
   .bubble::before { left: auto; right: 16px; }
   .tricks { gap: 8px; }
@@ -711,7 +738,10 @@ b, strong { font-weight: 700; }
   .side .avatar, .side .portrait { width: 34px; height: 34px; }
   .side-name { font-size: 0.8rem; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .stat.tiles b { font-size: 1.2rem; }
-  .share { grid-column: 1 / -1; height: 8px; }
+  .share { display: none; }
+  .powers { grid-column: 1 / -1; }
+  .power { width: 22px; height: 22px; padding: 3px; }
+  .power-next { display: none; }
   .trick { flex-basis: 38px; min-width: 34px; padding: 5px 5px 8px; }
   .tricks > .purse { font-size: 1.1rem; }
   .hint { min-height: 0; font-size: 0.88rem; line-height: 1.25; }
@@ -756,6 +786,44 @@ dialog .menu-actions { margin-top: 20px; }
 .swatch { flex: none; display: grid; place-items: center; width: 36px; height: 36px; padding: 6px; border: 2px solid var(--ink); border-radius: var(--wob-1); background: repeating-linear-gradient(-60deg, var(--sun) 0 7px, var(--sun-hi) 7px 9px); color: var(--text); font-weight: 700; line-height: 1; }
 .swatch.token::after { content: '3'; display: grid; place-items: center; width: 22px; height: 22px; border: 2.5px solid var(--marker); border-radius: var(--blot); background: var(--scrap); font-size: 0.85rem; }
 .swatch.resting::after { content: 'z z'; font-size: 0.8rem; opacity: 0.75; }
+
+/* A new power: three cards taped to the sheet, one of which the player keeps. */
+.pick { width: min(760px, calc(100vw - 20px)); text-align: center; }
+.pick p:focus { outline: none; }
+.pick h2 { display: inline-block; margin-bottom: 6px; color: var(--red); rotate: -2deg; }
+.pick-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 22px; padding-bottom: 6px; }
+.pick-card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 7px;
+  border: var(--line) solid var(--ink);
+  border-radius: var(--wob-1);
+  padding: 20px 12px 14px;
+  background: var(--sun-soft);
+  box-shadow: 3px 4px 0 var(--shade);
+  rotate: -2deg;
+  transition: transform 0.12s, box-shadow 0.12s;
+  animation: deal 0.42s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+  animation-delay: calc(0.15s + var(--order) * 0.12s);
+}
+.pick-card:nth-child(2) { border-radius: var(--wob-2); background: #dff1ff; rotate: 1.5deg; }
+.pick-card:nth-child(3) { border-radius: var(--wob-3); background: #e3f7e9; rotate: -1deg; }
+.pick-card::before { content: ''; position: absolute; left: 50%; top: -11px; width: 62px; height: 20px; translate: -50% 0; rotate: 3deg; background: var(--tape); border-inline: 2px dotted rgba(255, 255, 255, 0.85); }
+.pick-card:hover, .pick-card:focus-visible { transform: translateY(-7px) rotate(2deg) scale(1.04); box-shadow: 5px 9px 0 var(--shade); }
+.pick-card:active { transform: translate(2px, 3px); box-shadow: 0 0 0 var(--shade); }
+.pick-card .sticker { width: 66px; height: 66px; padding: 13px; border: var(--line) solid var(--ink); border-radius: var(--blot); background: var(--scrap); box-shadow: 2px 3px 0 var(--shade); color: var(--marker); rotate: 5deg; }
+.pick-card b { font-size: 1.18rem; line-height: 1.15; }
+.pick-card small { font-size: 0.94rem; line-height: 1.3; }
+@keyframes deal { from { opacity: 0; transform: translateY(-46px) rotate(-16deg) scale(0.7); } }
+@media (max-width: 620px) {
+  .pick-row { grid-template-columns: minmax(0, 1fr); gap: 14px; margin-top: 18px; }
+  .pick-card { grid-template-columns: auto 1fr; grid-template-areas: 'sticker name' 'sticker text'; justify-items: start; align-items: center; gap: 2px 12px; padding: 14px 12px 10px; text-align: left; }
+  .pick-card .sticker { grid-area: sticker; width: 52px; height: 52px; padding: 10px; }
+  .pick-card b { grid-area: name; align-self: end; }
+  .pick-card small { grid-area: text; align-self: start; }
+}
 
 /* The result: a rubber stamp, sticker stars and what the game earned. */
 .verdict { text-align: center; }
@@ -845,7 +913,7 @@ dialog .menu-actions { margin-top: 20px; }
 #logTotals { margin-top: 14px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .pupils, .trick.glowing, .btn.nudge, dialog[open], .verdict[open] h2, .goals li.won svg { animation: none; }
+  .pupils, .trick.glowing, .btn.nudge, .power, .pick-card, dialog[open], .verdict[open] h2, .goals li.won svg { animation: none; }
   .banner.show, .toast.show { animation-name: fade; }
   @keyframes fade { 0%, 100% { opacity: 0; } 16%, 72% { opacity: 1; } }
   .btn, .share i, .round-track i, .xp-bar i, .bubble, .rival-card, .profile, .tool, .trick { transition: none; }
@@ -991,6 +1059,11 @@ dialog .menu-actions { margin-top: 20px; }
         <span class="stat minor"><b id="units1"></b> <span id="unitsNoun1"></span>, <b id="income1"></b> po potezu<span class="purse side-purse"><i class="pearl"></i><b id="pearls1"></b></span></span>
       </div>
       <div class="share" id="share" aria-hidden="true"><i class="share-0"></i><i class="share-n"></i><i class="share-1"></i></div>
+      <div class="powers" id="powers">
+        <span class="power-row" id="perks0"></span>
+        <span class="power-next" id="perkNext"></span>
+        <span class="power-row" id="perks1"></span>
+      </div>
       <p class="bubble" id="bubble" role="status"></p>
     </div>
 
@@ -1073,6 +1146,7 @@ dialog .menu-actions { margin-top: 20px; }
           <li><span class="swatch" data-icon="anchor"></span>Luke spaja morska linija: iz jedne ploviš ravno u drugu.</li>
         </ul>
         <p>Za svako osvojeno polje dobivaš biser. Biserima plaćaš trikove, jedan po potezu. Nove trikove otključavaš kako tvoj brod raste, a popis je u brodskom dnevniku.</p>
+        <p id="helpPerks"></p>
       </section>
       <section>
         <h3>Dva igrača</h3>
@@ -1081,6 +1155,13 @@ dialog .menu-actions { margin-top: 20px; }
       <p>Polje biraš dodirom ili klikom. Ponovni dodir na metu potvrđuje nalog, Enter također, a Esc poništava odabir.</p>
     </div>
     <div class="menu-actions"><button class="btn primary" type="button" data-close>Jasno!</button></div>
+  </dialog>
+
+  <!-- A new power: one of three -->
+  <dialog id="pick" class="pick" aria-labelledby="pickTitle">
+    <h2 id="pickTitle" data-lettering>Nova moć!</h2>
+    <p id="pickDetail" tabindex="-1" autofocus></p>
+    <div class="pick-row" id="pickRow"></div>
   </dialog>
 
   <!-- Leave the game -->
@@ -1211,12 +1292,35 @@ dialog .menu-actions { margin-top: 20px; }
       lucky: { cost: 3, bonus: 1 },    // the next attack of this turn adds to its rolls
       wind: { cost: 2 },               // a resting own tile may act again this turn
     },
+    /*
+     * Powers: in an adventure, a side that has conquered `at[n]` tiles is
+     * offered `choices` powers it does not have yet and keeps one of them
+     * until the game ends.
+     */
+    perks: {
+      at: [3, 7, 12, 18, 25],
+      choices: 3,
+      kinds: {
+        muster: { income: 1 },     // more reinforcements every turn
+        charge: { bonus: 1 },      // added to the rolls of the first attack of every turn
+        rampart: { bonus: 1 },     // added to the capital's defence, on top of being fortified
+        bulwark: {},               // own tiles next to the own capital are fortified
+        hoard: { pearls: 1 },      // more pearls for every tile conquered
+        bargain: { discount: 1 },  // off the price of every trick, which stays at least 1
+        encore: { tricks: 1 },     // more tricks per turn
+        veterans: { units: 1 },    // more units on every tile conquered
+        dowry: { pearls: 4 },      // at once, and only once
+        levy: { units: 4 },        // on the capital, at once, and only once
+      },
+    },
     ai: {
       easy: {
         tricks: ['recruit'],
+        perks: null,           // takes any power on offer
       },
       normal: {
         tricks: ['recruit', 'shield', 'cannon'],
+        perks: ['levy', 'muster', 'veterans', 'charge', 'rampart', 'dowry', 'hoard', 'bulwark', 'bargain', 'encore'], // first on offer wins
         neutralValue: 4,
         enemyValue: 6,
         capitalValue: 60,
@@ -1232,6 +1336,7 @@ dialog .menu-actions { margin-top: 20px; }
       },
       hard: {
         tricks: ['recruit', 'shield', 'cannon', 'lucky', 'wind'],
+        perks: ['muster', 'veterans', 'charge', 'hoard', 'encore', 'bargain', 'levy', 'rampart', 'bulwark', 'dowry'],
         winValue: 150,
         tileBase: 2,           // worth of a tile in units when the game is about to end
         tileGrowth: 0.35,      // extra worth per remaining round (future income)
@@ -1628,8 +1733,8 @@ dialog .menu-actions { margin-top: 20px; }
 
   const Combat = (() => {
     const { dieSides, fortifiedBonus, maxUnits } = CONFIG.rules;
-    const MIN_EDGE = -CONFIG.tricks.lucky.bonus;
-    const MAX_EDGE = fortifiedBonus;
+    const MIN_EDGE = -(CONFIG.tricks.lucky.bonus + CONFIG.perks.kinds.charge.bonus);
+    const MAX_EDGE = fortifiedBonus + CONFIG.perks.kinds.rampart.bonus;
     const MAX_ATTACKERS = 6 * maxUnits; // enough for a joint assault from every neighbour
     const WIDTH = maxUnits + 1;
 
@@ -1721,6 +1826,7 @@ dialog .menu-actions { margin-top: 20px; }
    *    Actions:  { type: 'reinforce', tile, count }
    *              { type: 'move', from, to, count }   merge or attack
    *              { type: 'trick', trick, tile }      tile only where the trick needs one
+   *              { type: 'perk', perk }              takes one of the powers on offer
    *              { type: 'endTurn' }
    *
    *    A classic game is an adventure game with nothing to find on the
@@ -1730,6 +1836,11 @@ dialog .menu-actions { margin-top: 20px; }
   const Rules = (() => {
     const R = CONFIG.rules;
     const TRICKS = CONFIG.tricks;
+    const PERKS = CONFIG.perks.kinds;
+    const PERK_NAMES = Object.freeze(Object.keys(PERKS));
+
+    /** Whether a player holds a power. */
+    const has = (state, player, perk) => player >= 0 && state.perks[player].includes(perk);
 
     const tileCount = ({ owner }, player) => {
       let total = 0;
@@ -1752,15 +1863,42 @@ dialog .menu-actions { margin-top: 20px; }
 
     const incomeFor = (tiles) => R.incomeBase + Math.floor(tiles / R.tilesPerIncome);
     const income = (state, player) => incomeFor(tileCount(state, player))
-      + R.lighthouseIncome * landmarkCount(state, player, FEATURE.lighthouse);
+      + R.lighthouseIncome * landmarkCount(state, player, FEATURE.lighthouse)
+      + (has(state, player, 'muster') ? PERKS.muster.income : 0);
 
-    /** A capital held by its original owner, a tower, or a tile under a shield. */
-    const isFortified = ({ map, owner, shield }, tile) => map.capitals[owner[tile]] === tile
-      || map.feature[tile] === FEATURE.tower
-      || shield[tile] === 1;
+    /**
+     * A capital held by its original owner, a tower, a tile under a shield,
+     * or a tile beside the capital of an owner with the bulwark power.
+     */
+    const isFortified = (state, tile) => {
+      const { map, owner, shield } = state;
+      const capital = map.capitals[owner[tile]];
+      return capital === tile
+        || map.feature[tile] === FEATURE.tower
+        || shield[tile] === 1
+        || (has(state, owner[tile], 'bulwark') && map.adj[capital].includes(tile));
+    };
 
-    const defenseBonus = (state, tile) => (isFortified(state, tile) ? R.fortifiedBonus : 0);
-    const attackBonus = (state) => (state.lucky ? TRICKS.lucky.bonus : 0);
+    const defenseBonus = (state, tile) => {
+      const owner = state.owner[tile];
+      const rampart = has(state, owner, 'rampart') && state.map.capitals[owner] === tile ? PERKS.rampart.bonus : 0;
+      return (isFortified(state, tile) ? R.fortifiedBonus : 0) + rampart;
+    };
+    /** What the current player's next attack adds to its rolls. */
+    const attackBonus = (state) => (state.lucky ? TRICKS.lucky.bonus : 0)
+      + (!state.attacked && has(state, state.current, 'charge') ? PERKS.charge.bonus : 0);
+
+    /** What a trick costs a player, and how many tricks a player may play in a turn. */
+    const trickCost = (state, trick, player = state.current) =>
+      Math.max(1, TRICKS[trick].cost - (has(state, player, 'bargain') ? PERKS.bargain.discount : 0));
+    const trickLimit = (state, player = state.current) =>
+      R.tricksPerTurn + (has(state, player, 'encore') ? PERKS.encore.tricks : 0);
+
+    /** How many more tiles a player must conquer for the next power; null when there is none to come. */
+    const perkDue = (state, player) => {
+      const at = state.perksOn ? CONFIG.perks.at[state.perks[player].length] : undefined;
+      return at === undefined ? null : Math.max(0, at - state.stats[player].conquests);
+    };
 
     /** Chance that an attack by the current player with `count` units takes `to`. */
     const winOdds = (state, to, count) =>
@@ -1811,8 +1949,8 @@ dialog .menu-actions { margin-top: 20px; }
     const trickBlock = (state, trick) => {
       if (state.phase !== 'action') return 'not the action phase';
       if (!state.tricks[state.current].includes(trick)) return 'trick not in hand';
-      if (state.tricksPlayed >= R.tricksPerTurn) return 'a trick was already played this turn';
-      if (state.pearls[state.current] < TRICKS[trick].cost) return 'not enough pearls';
+      if (state.tricksPlayed >= trickLimit(state)) return 'a trick was already played this turn';
+      if (state.pearls[state.current] < trickCost(state, trick)) return 'not enough pearls';
       if (trick === 'lucky' && state.lucky) return 'the next attack is lucky already';
       if (trickTargets(state, trick)?.length === 0) return 'no tile to play it on';
       return null;
@@ -1826,7 +1964,7 @@ dialog .menu-actions { margin-top: 20px; }
      * something can be played. A lucky die alone does not count, because
      * without an attack it changes nothing.
      */
-    const outOfMoves = (state) => state.phase === 'action' && !state.result
+    const outOfMoves = (state) => state.phase === 'action' && !state.result && !state.pending
       && !state.owner.some((owner, tile) => owner === state.current && targets(state, tile).length > 0)
       && !state.tricks[state.current].some((trick) => trick !== 'lucky' && canPlay(state, trick));
 
@@ -1835,6 +1973,10 @@ dialog .menu-actions { margin-top: 20px; }
       const { owner, units, map } = state;
       const wholeAtLeastOne = (n) => Number.isInteger(n) && n >= 1;
       if (state.phase === 'over') return 'game is over';
+      if (state.pending) { // nothing else happens until a power is chosen
+        if (action?.type !== 'perk') return 'a power must be chosen first';
+        return state.pending.options.includes(action.perk) ? null : 'that power is not on offer';
+      }
       switch (action?.type) {
         case 'reinforce':
           if (state.phase !== 'reinforce') return 'not the reinforcement phase';
@@ -1891,6 +2033,7 @@ dialog .menu-actions { margin-top: 20px; }
       draft.locked = new Uint8Array(draft.owner.length);
       draft.tricksPlayed = 0;
       draft.lucky = false;
+      draft.attacked = false;
       draft.reinforcements = Math.min(income(draft, player), room); // surplus beyond full tiles is lost
       draft.phase = draft.reinforcements > 0 ? 'reinforce' : 'action';
       events.push({ type: 'turn', player, round: draft.round, reinforcements: draft.reinforcements });
@@ -1944,15 +2087,18 @@ dialog .menu-actions { margin-top: 20px; }
       const conquered = fight.attackersLeft > 0;
       draft.rng = rng.state;
       draft.lucky = false; // luck covers a single attack
+      draft.attacked = true;
 
       let pearls = 0;
       let chest = false;
+      let settled = fight.attackersLeft;
       draft.units[from] -= count;
       if (conquered) {
         chest = draft.loot[to] === 1;
-        pearls = R.pearlsPerConquest + (chest ? R.chestPearls : 0);
+        pearls = R.pearlsPerConquest + (chest ? R.chestPearls : 0) + (has(draft, attacker, 'hoard') ? PERKS.hoard.pearls : 0);
+        if (has(draft, attacker, 'veterans')) settled = Math.min(R.maxUnits, settled + PERKS.veterans.units);
         draft.owner[to] = attacker;
-        draft.units[to] = fight.attackersLeft;
+        draft.units[to] = settled;
         draft.locked[to] = 1;
         draft.shield[to] = 0;
         draft.loot[to] = 0;
@@ -1975,21 +2121,51 @@ dialog .menu-actions { margin-top: 20px; }
       events.push({
         type: 'combat', player: attacker, defender, from, to, count, defenders, capital, odds,
         ...bonuses, rounds: fight.rounds, conquered, pearls, chest,
-        survivors: conquered ? fight.attackersLeft : fight.defendersLeft,
+        survivors: conquered ? settled : fight.defendersLeft, // units on the tile once the fight is over
       });
 
-      if (!conquered || defender < 0) return;
-      const reason = capital ? 'capital' : tileCount(draft, defender) === 0 ? 'elimination' : null;
+      if (!conquered) return;
+      const reason = defender < 0 ? null : capital ? 'capital' : tileCount(draft, defender) === 0 ? 'elimination' : null;
       if (reason) {
         recordTerritory(draft); // the round is cut short; keep the final position
         finish(draft, events, attacker, reason);
+      } else {
+        offerPerks(draft, events, attacker);
       }
+    };
+
+    /** A player whose conquests have reached the next mark is offered a choice of powers. */
+    const offerPerks = (draft, events, player) => {
+      if (perkDue(draft, player) !== 0) return;
+      const pool = PERK_NAMES.filter((perk) => !draft.perks[player].includes(perk));
+      const rng = Prng.create(draft.rng);
+      const options = [];
+      while (options.length < CONFIG.perks.choices && pool.length) options.push(pool.splice(rng.int(pool.length), 1)[0]);
+      draft.rng = rng.state;
+      draft.pending = Object.freeze({ player, options: Object.freeze(options) });
+      events.push({ type: 'offer', player, options });
+    };
+
+    const applyPerk = (draft, events, { perk }) => {
+      const player = draft.current;
+      const event = { type: 'perk', player, perk, tile: -1, amount: 0 };
+      draft.perks = Object.freeze(draft.perks.map((own, side) => (side === player ? Object.freeze([...own, perk]) : own)));
+      draft.pending = null;
+      if (perk === 'dowry') {
+        event.amount = PERKS.dowry.pearls;
+        earnPearls(draft, player, event.amount);
+      } else if (perk === 'levy') {
+        event.tile = draft.map.capitals[player];
+        event.amount = Math.min(PERKS.levy.units, R.maxUnits - draft.units[event.tile]);
+        draft.units[event.tile] += event.amount;
+      }
+      events.push(event);
     };
 
     const applyTrick = (draft, events, { trick, tile }) => {
       const player = draft.current;
       const event = { type: 'trick', player, trick, tile: tile ?? -1, amount: 0 };
-      draft.pearls[player] -= TRICKS[trick].cost;
+      draft.pearls[player] -= trickCost(draft, trick);
       draft.tricksPlayed++;
       draft.stats[player].tricks++;
 
@@ -2056,6 +2232,7 @@ dialog .menu-actions { margin-top: 20px; }
       const events = [];
       if (action.type === 'reinforce') applyReinforce(draft, events, action);
       else if (action.type === 'trick') applyTrick(draft, events, action);
+      else if (action.type === 'perk') applyPerk(draft, events, action);
       else if (action.type === 'endTurn') applyEndTurn(draft, events);
       else if (draft.owner[action.to] === draft.current) applyMerge(draft, events, action);
       else applyAttack(draft, events, action);
@@ -2066,9 +2243,10 @@ dialog .menu-actions { margin-top: 20px; }
     /**
      * Sets up a new game. Returns the state and the events of the opening turn.
      * `landmarks` puts towers, lighthouses, chests and harbours on the map;
-     * `tricks` and `pearls` give each player a hand of tricks and a first purse.
+     * `tricks` and `pearls` give each player a hand of tricks and a first purse;
+     * with `perks` both players earn powers as they conquer.
      */
-    const createGame = ({ seed, firstPlayer = 0, landmarks = false, tricks = [[], []], pearls = [0, 0] }) => {
+    const createGame = ({ seed, firstPlayer = 0, landmarks = false, tricks = [[], []], pearls = [0, 0], perks = false }) => {
       const map = MapGen.generate(seed, { landmarks });
       const owner = new Int8Array(map.count);
       const units = Uint8Array.from(map.garrison);
@@ -2089,6 +2267,10 @@ dialog .menu-actions { margin-top: 20px; }
         tricks: Object.freeze(tricks.map((hand) => Object.freeze([...hand]))),
         tricksPlayed: 0,   // by the current player in this turn
         lucky: false,      // the current player's next attack rolls with a bonus
+        attacked: false,   // the current player has attacked in this turn
+        perksOn: perks,
+        perks: Object.freeze([Object.freeze([]), Object.freeze([])]), // powers each player holds
+        pending: null,     // { player, options }: powers on offer, one of which must be taken
         current: firstPlayer,
         firstPlayer,
         phase: 'reinforce',
@@ -2109,6 +2291,7 @@ dialog .menu-actions { margin-top: 20px; }
       createGame, applyAction, validate,
       canAct, targets, maxSend, winOdds, isFortified, defenseBonus, attackBonus,
       trickTargets, trickBlock, canPlay, outOfMoves,
+      trickCost, trickLimit, perkDue, PERK_NAMES,
       tileCount, unitCount, landmarkCount, income, incomeFor,
     };
   })();
@@ -2811,6 +2994,11 @@ dialog .menu-actions { margin-top: 20px; }
       if (!brain) throw new Error(`Unknown AI level: ${level}`);
       if (state.phase === 'over') throw new Error('The game is over');
       const rng = Prng.create(Prng.mix(state.rng, state.step));
+      if (state.pending) { // a power is on offer: take the favourite, or any where there is none
+        const { options } = state.pending;
+        const wish = CONFIG.ai[level].perks?.find((perk) => options.includes(perk));
+        return { type: 'perk', perk: wish ?? options[rng.int(options.length)] };
+      }
       return state.phase === 'reinforce' ? brain.reinforce(state, rng) : brain.act(state, rng);
     };
 
@@ -3077,6 +3265,19 @@ dialog .menu-actions { margin-top: 20px; }
         aim: 'Drugi dah: odaberi svoje polje koje miruje.',
         none: 'Nijedno tvoje polje s 2 ili više jedinica ne miruje.',
       },
+    },
+    /** Powers earned by conquering: one of three is kept until the game ends. */
+    perks: {
+      muster: ['Regruti', `Pojačanja u svakom potezu: +${CONFIG.perks.kinds.muster.income}.`],
+      charge: ['Juriš', `Tvoj prvi napad u svakom potezu baca s +${CONFIG.perks.kinds.charge.bonus} na kocki.`],
+      rampart: ['Bedem', `Tvoja se prijestolnica brani s +${CONFIG.rules.fortifiedBonus + CONFIG.perks.kinds.rampart.bonus} na kocki umjesto +${CONFIG.rules.fortifiedBonus}.`],
+      bulwark: ['Straža', `Tvoja polja do prijestolnice brane se s +${CONFIG.rules.fortifiedBonus} na kocki.`],
+      hoard: ['Školjkar', `Biseri za svako osvojeno polje: +${CONFIG.perks.kinds.hoard.pearls}.`],
+      bargain: ['Cjenkanje', `Svaki trik stoji ${Lang.counted('pearl', CONFIG.perks.kinds.bargain.discount)} manje.`],
+      encore: ['Dvije ruke', `Trikovi koje smiješ odigrati u potezu: +${CONFIG.perks.kinds.encore.tricks}.`],
+      veterans: ['Zastava', `Jedinice na svakom polju koje osvojiš: +${CONFIG.perks.kinds.veterans.units}.`],
+      dowry: ['Zakopano blago', `Odmah dobivaš ${Lang.counted('pearl', CONFIG.perks.kinds.dowry.pearls)}.`],
+      levy: ['Novi brod', `Odmah stižu ${Lang.counted('unit', CONFIG.perks.kinds.levy.units)} na tvoju prijestolnicu.`],
     },
     rivals: {
       easy: {
@@ -3394,6 +3595,16 @@ dialog .menu-actions { margin-top: 20px; }
     ship: 'M11 2.5v11H4.5zM13 5l6 8.5h-6zM2.5 15.5h19L18.7 21H5.3z',
     lock: 'M7 10V7.5a5 5 0 0 1 10 0V10h1.5v11h-13V10zm2.5 0h5V7.5a2.5 2.5 0 0 0-5 0z',
     medal: 'M7 2h4l1 4.2L13 2h4l-2.3 6.3a6.5 6.5 0 1 1-5.4 0zm5 8.5a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6z',
+    bolt: 'M13.5 2L4.5 13.5H10L8.5 22 18 10h-5.5z',
+    shell: 'M12 4a9.5 9.5 0 0 1 9.5 9.5c0 .9-.5 1.7-1.3 2.1L15 18v2.5H9V18l-5.2-2.4a2.3 2.3 0 0 1-1.3-2.1A9.5 9.5 0 0 1 12 4zm-.6 2.8V16h1.2V6.8zM6.3 8.8l3.5 7.6 1.1-.5-3.6-7.8zm11.4 0l-1-.7-3.6 7.8 1.1.5z',
+    tag: 'M3 3h8.5L21 12.5 12.5 21 3 11.5zm4.5 2.8a1.7 1.7 0 1 0 0 3.4 1.7 1.7 0 0 0 0-3.4z',
+    cards: 'M8 2h11a2 2 0 0 1 2 2v11h-2.5V4.5H8zM4 7h11a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z',
+    flag: 'M5 2h2.2v20H5zM8.5 3H20l-3 4.5 3 4.5H8.5z',
+  };
+  /** The picture of every power. */
+  const PERK_ICONS = {
+    muster: 'recruit', charge: 'bolt', rampart: 'crown', bulwark: 'shield', hoard: 'shell',
+    bargain: 'tag', encore: 'cards', veterans: 'flag', dowry: 'chest', levy: 'ship',
   };
 
   const icon = (name) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="${ICONS[name]}"/></svg>`;
@@ -4593,12 +4804,56 @@ dialog .menu-actions { margin-top: 20px; }
       theirs.style.flexGrow = tiles[AWAY];
       unclaimed.style.flexGrow = state.map.landCount - tiles[HOME] - tiles[AWAY];
       renderPurses();
+      renderPerks();
+    };
+
+    /** The powers each side holds, as stickers, and how far the next one is for whoever is at the controls. */
+    const renderPerks = () => {
+      SIDES.forEach((side) => {
+        const row = $(`perks${side}`);
+        const held = state.perks[side];
+        if (row.dataset.held === held.join(',')) return; // unchanged: keep the stickers where they are
+        row.dataset.held = held.join(',');
+        row.replaceChildren(...held.map((perk) => {
+          const [name, text] = LORE.perks[perk];
+          const sticker = make('button', 'power', icon(PERK_ICONS[perk]));
+          sticker.type = 'button';
+          sticker.dataset.perk = perk;
+          sticker.title = `${name}: ${text}`;
+          sticker.setAttribute('aria-label', `${name}. ${text}`);
+          return sticker;
+        }));
+      });
+      const left = Rules.perkDue(state, me());
+      const next = left === null
+        ? (state.perksOn ? 'Sve su moći skupljene.' : '')
+        : left === 0 ? 'Nova moć čeka!' : `Nova moć za još ${Lang.counted('tile', left)}`;
+      if ($('perkNext').textContent !== next) $('perkNext').textContent = next;
+    };
+
+    /** A power is on offer: three cards, one of which the player keeps. */
+    const openPick = () => {
+      $('pickDetail').textContent = duel()
+        ? `Bira ${nameOf(state.current)}. Moć vrijedi do kraja ove partije.`
+        : 'Odaberi jednu. Vrijedi do kraja ove partije.';
+      $('pickRow').replaceChildren(...state.pending.options.map((perk, order) => {
+        const [name, text] = LORE.perks[perk];
+        const card = make('button', 'pick-card', `<span class="sticker">${icon(PERK_ICONS[perk])}</span><b></b><small></small>`);
+        card.type = 'button';
+        card.dataset.perk = perk;
+        card.style.setProperty('--order', order);
+        card.querySelector('b').textContent = name;
+        card.querySelector('small').textContent = text;
+        return card;
+      }));
+      $('pick').showModal();
+      sound.play('chest');
     };
 
     /** Why the player cannot play a trick right now, in their words; null when they can. */
     const trickTrouble = (trick) => {
       const { name, none } = LORE.tricks[trick];
-      const { cost } = CONFIG.tricks[trick];
+      const cost = Rules.trickCost(state, trick, me());
       if (!state.tricks[me()].includes(trick)) {
         return duel()
           ? `U dvoboju vrijede trikovi iz brodskog dnevnika. ${name} se otključava na razini ${Career.levelFor(trick)}.`
@@ -4606,7 +4861,7 @@ dialog .menu-actions { margin-top: 20px; }
       }
       if (!myTurn()) return 'Trikove igraš kad si na potezu.';
       if (state.phase !== 'action') return 'Prvo rasporedi pojačanja, a onda dolaze trikovi.';
-      if (state.tricksPlayed >= R.tricksPerTurn) return 'Jedan trik po potezu. Sljedeći čeka idući potez.';
+      if (state.tricksPlayed >= Rules.trickLimit(state)) return 'U ovom potezu više nema trikova. Sljedeći čeka idući potez.';
       if (state.pearls[me()] < cost) return `${name} stoji ${Lang.counted('pearl', cost)}. Biser dobivaš za svako osvojeno polje.`;
       return Rules.canPlay(state, trick) ? null : none;
     };
@@ -4619,6 +4874,7 @@ dialog .menu-actions { margin-top: 20px; }
         button.classList.toggle('off', inHand && trickTrouble(trick) !== null);
         button.classList.toggle('armed', aim === trick);
         button.classList.toggle('glowing', trick === 'lucky' && state.lucky && isHuman(state.current));
+        button.querySelector('.cost b').textContent = Rules.trickCost(state, trick, me());
       }
     };
 
@@ -4649,8 +4905,10 @@ dialog .menu-actions { margin-top: 20px; }
       if (!attack) return;
       const odds = Rules.winOdds(state, order.to, order.count);
       const notes = [`Obrana: ${Lang.counted('unit', state.units[order.to])}`];
-      if (Rules.isFortified(state, order.to)) notes.push(`utvrđeno, +${R.fortifiedBonus} na kocki`);
-      if (state.lucky) notes.push(`tvoja sretna kocka, +${CONFIG.tricks.lucky.bonus}`);
+      const shelter = Rules.defenseBonus(state, order.to);
+      const drive = Rules.attackBonus(state);
+      if (shelter) notes.push(`utvrđeno, +${shelter} na kocki`);
+      if (drive) notes.push(`tvoj napad baca s +${drive}`);
       $('orderDefense').textContent = notes.join(', ');
       $('orderOdds').textContent = Lang.percent(odds);
       $('orderOddsBar').style.width = `${odds * 100}%`;
@@ -5090,6 +5348,28 @@ dialog .menu-actions { margin-top: 20px; }
         await animator.wait(T.trick);
       },
 
+      /** Powers are on offer; the cards open once the board has settled. */
+      async offer() {
+        await animator.wait(T.place);
+      },
+
+      async perk(event) {
+        const [name] = LORE.perks[event.perk];
+        showToast(isHuman(event.player) ? `Nova moć: ${name}!` : `${rival().short} ima novu moć: ${name}!`, PERK_ICONS[event.perk], event.player);
+        sound.play('star', 2);
+        if (event.perk === 'levy') {
+          scene.units[event.tile] += event.amount;
+          floatText(event.tile, `+${event.amount}`);
+          ring(event.tile, palette.gold);
+          bump(event.tile);
+        } else if (event.perk === 'dowry') {
+          floatText(state.map.capitals[event.player], `+${event.amount}`, { pearl: true });
+        }
+        renderScores();
+        if (!isHuman(event.player)) remark('trick');
+        await animator.wait(T.trick);
+      },
+
       async turn(event) {
         scene.locked.fill(0);
         scene.shield.set(state.shield);
@@ -5152,7 +5432,11 @@ dialog .menu-actions { margin-top: 20px; }
         ['Primljena pojačanja', (side) => state.stats[side].reinforced],
       ];
       if (settings.mode === 'adventure') {
-        rows.push(['Skupljeni biseri', (side) => state.stats[side].pearls], ['Odigrani trikovi', (side) => state.stats[side].tricks]);
+        rows.push(
+          ['Skupljeni biseri', (side) => state.stats[side].pearls],
+          ['Odigrani trikovi', (side) => state.stats[side].tricks],
+          ['Skupljene moći', (side) => state.perks[side].length],
+        );
       }
       SIDES.forEach((side) => { $(`endName${side}`).textContent = nameOf(side); });
       $('endTally').replaceChildren(...rows.map(([label, value]) => {
@@ -5268,6 +5552,7 @@ dialog .menu-actions { margin-top: 20px; }
       renderHud();
       if (state.result) showResult();
       else if (!isHuman(state.current)) computerTurn();
+      else if (state.pending) openPick();
       else if (Rules.outOfMoves(state)) pass();
     };
 
@@ -5302,7 +5587,7 @@ dialog .menu-actions { margin-top: 20px; }
     const buildTrickRow = () => {
       $('trickRow').replaceChildren(...ALL_TRICKS.map((trick) => {
         const { name, text } = LORE.tricks[trick];
-        const button = make('button', 'trick', `${icon(trick)}<span class="cost"><i class="pearl"></i>${CONFIG.tricks[trick].cost}</span><span class="lock">${icon('lock')}</span>`);
+        const button = make('button', 'trick', `${icon(trick)}<span class="cost"><i class="pearl"></i><b></b></span><span class="lock">${icon('lock')}</span>`);
         button.type = 'button';
         button.dataset.trick = trick;
         button.title = `${name}: ${text}`;
@@ -5326,6 +5611,7 @@ dialog .menu-actions { margin-top: 20px; }
         landmarks: adventure,
         tricks: [hand, versus ? hand : adventure ? AI.tricksOf(settings.rival) : []],
         pearls: [purse, versus ? purse : 0],
+        perks: adventure,
       });
       animator.clear();
       window.clearTimeout(bubbleTimer);
@@ -5646,6 +5932,19 @@ dialog .menu-actions { margin-top: 20px; }
         sound.play('select');
         renderPanel();
       }));
+      // One of the three powers on offer is taken; nothing else can be done until then.
+      $('pick').addEventListener('cancel', (event) => event.preventDefault());
+      $('pickRow').addEventListener('click', (event) => {
+        const card = event.target.closest('.pick-card');
+        if (!card || !state?.pending) return;
+        $('pick').close();
+        run({ type: 'perk', perk: card.dataset.perk });
+      });
+      // A tap on a power's sticker says what it does.
+      $('powers').addEventListener('click', (event) => {
+        const sticker = event.target.closest('.power');
+        if (sticker) $('hint').textContent = sticker.title;
+      });
       $('trickRow').addEventListener('click', (event) => {
         const button = event.target.closest('.trick');
         if (button) pickTrick(button.dataset.trick);
@@ -5714,6 +6013,7 @@ dialog .menu-actions { margin-top: 20px; }
       applySound();
       applySpeed();
       $('roundMax').textContent = R.maxRounds;
+      $('helpPerks').textContent = `Osvajanjem zarađuješ i moći: nakon ${CONFIG.perks.at.slice(0, -1).join(', ')} i ${CONFIG.perks.at.at(-1)} osvojenih polja biraš jednu od tri. Moć vrijedi do kraja partije, a po istom ih pravilu zarađuje i protivnik.`;
       seedInput.value = MapGen.randomSeed(Math.random);
       bindBoard();
       bindControls();
