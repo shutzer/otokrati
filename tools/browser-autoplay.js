@@ -10,6 +10,7 @@
  * because a game is fully determined by its seed and the actions taken. The
  * shadow picks the human's moves with the hard AI, enters them as taps and
  * button clicks, and compares what the interface shows with what it expects.
+ * In a game for two players it plays both fleets that way.
  * Resolves to { done, actions, tricks, round, errors, result, title, detail }.
  */
 async () => {
@@ -57,22 +58,25 @@ async () => {
 
     // The shadow game is set up the way the app sets up its own.
     const rival = app.dataset.rival;
+    const duel = rival === 'friend';
     const adventure = app.dataset.mode === 'adventure';
     const stored = JSON.parse(window.localStorage.getItem(CONFIG.ui.storageKey) ?? 'null');
     const level = Career.levelOf(Career.restore(stored?.profile).xp).level;
     const hand = adventure ? Career.tricksAt(level) : [];
     if (hand.join(',') !== app.dataset.hand) status.errors.push(`hand: page has "${app.dataset.hand}", expected "${hand}"`);
+    const purse = adventure ? Career.pearlsAt(level) : 0;
     let { state } = Rules.createGame({
       seed: app.dataset.seed,
-      firstPlayer: 0,
+      firstPlayer: Number(app.dataset.first),
       landmarks: adventure,
-      tricks: [hand, adventure ? AI.tricksOf(rival) : []],
-      pearls: [adventure ? Career.pearlsAt(level) : 0, 0],
+      tricks: [hand, duel ? hand : adventure ? AI.tricksOf(rival) : []],
+      pearls: [purse, duel ? purse : 0],
     });
+    status.first = state.firstPlayer;
 
     while (!state.result) {
       await idle();
-      if (state.current === 1) { // mirror the rival's whole turn; the interface plays it on its own
+      if (state.current === 1 && !duel) { // mirror the rival's whole turn; the interface plays it on its own
         while (!state.result && state.current === 1) state = Rules.applyAction(state, AI.chooseAction(state, rival)).state;
         await wait(60);
         continue;
@@ -96,7 +100,7 @@ async () => {
         await wait(20);
         if ($('panel').dataset.mode !== 'order') throw new Error(`no order panel for ${JSON.stringify(action)}`);
         while (Number($('orderCount').textContent) > action.count) $('orderLess').click();
-        if (state.owner[action.to] !== 0) {
+        if (state.owner[action.to] !== state.current) {
           const expected = (Rules.winOdds(state, action.to, action.count) * 100).toFixed(1).replace('.', ',');
           const shown = $('orderOdds').textContent;
           if (!shown.startsWith(expected.slice(0, -1)) && !/^(100|99,9|0,1|0) %$/.test(shown)) {
@@ -118,12 +122,16 @@ async () => {
       await wait(30);
       await idle();
 
-      // Back on the player's turn, the interface must agree with the shadow game.
-      if (state.current === 0 && !state.result) {
-        const shown = [$('tiles0'), $('tiles1'), $('pearls0')].map((node) => Number(node.textContent));
-        const expected = [Rules.tileCount(state, 0), Rules.tileCount(state, 1), state.pearls[0]];
+      // With a player at the controls, the interface must agree with the shadow game.
+      if ((duel || state.current === 0) && !state.result) {
+        const shown = [$('tiles0'), $('tiles1'), $('purse'), $('pearls0'), $('pearls1')].map((node) => Number(node.textContent));
+        shown.push(Number(app.dataset.turn));
+        const expected = [
+          Rules.tileCount(state, 0), Rules.tileCount(state, 1),
+          state.pearls[state.current], state.pearls[0], state.pearls[1], state.current,
+        ];
         if (String(shown) !== String(expected)) {
-          status.errors.push(`round ${state.round}: page shows ${shown}, expected ${expected} (tiles, tiles, pearls)`);
+          status.errors.push(`round ${state.round}: page shows ${shown}, expected ${expected} (tiles, tiles, purse, pearls, pearls, turn)`);
         }
       }
     }

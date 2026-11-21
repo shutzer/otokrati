@@ -456,7 +456,7 @@ test('career: a game moves the profile forward and reports what it unlocked', ()
   const start = { ...Career.fresh(), xp: 70 };
   const verdict = { won: true, stars: 2, badges: ['firstGame', 'beatEasy'], xp: 150 };
   const step = Career.advance(start, verdict, 'easy');
-  assert.deepEqual(step.profile, { xp: 220, games: 1, wins: 1, stars: { easy: 2, normal: 0, hard: 0 }, badges: ['firstGame', 'beatEasy'] });
+  assert.deepEqual(step.profile, { xp: 220, games: 1, wins: 1, duels: 0, stars: { easy: 2, normal: 0, hard: 0 }, badges: ['firstGame', 'beatEasy'] });
   assert.equal(step.levelBefore, 1);
   assert.equal(step.levelAfter, 3);
   assert.deepEqual(step.unlocked, ['shield', 'cannon']);
@@ -472,6 +472,43 @@ test('career: a game moves the profile forward and reports what it unlocked', ()
 test('career: a stored profile is repaired before use', () => {
   assert.deepEqual(Career.restore(null), Career.fresh());
   assert.deepEqual(Career.restore('nonsense'), Career.fresh());
-  const repaired = Career.restore({ xp: 123.9, games: -4, wins: '2', stars: { easy: 9, hard: 2 }, badges: ['beatEasy', 'cheat', 'firstGame'] });
-  assert.deepEqual(repaired, { xp: 123, games: 0, wins: 0, stars: { easy: 3, normal: 0, hard: 2 }, badges: ['firstGame', 'beatEasy'] });
+  const repaired = Career.restore({ xp: 123.9, games: -4, wins: '2', duels: 3.5, stars: { easy: 9, hard: 2 }, badges: ['beatEasy', 'cheat', 'firstGame'] });
+  assert.deepEqual(repaired, { xp: 123, games: 0, wins: 0, duels: 3, stars: { easy: 3, normal: 0, hard: 2 }, badges: ['firstGame', 'beatEasy'] });
+});
+
+test('duel: a game between two players earns experience, but no stars, wins or badges', () => {
+  const start = { ...Career.fresh(), xp: 70, games: 4, wins: 2, stars: { easy: 2, normal: 1, hard: 0 }, badges: ['firstGame'] };
+  const verdict = Career.judgeDuel();
+  assert.equal(verdict.xp, CONFIG.career.xp.duel);
+  assert.equal(verdict.stars, 0);
+  assert.deepEqual(verdict.badges, []);
+
+  const step = Career.advance(start, verdict, null);
+  assert.deepEqual(step.profile, { ...start, xp: 70 + CONFIG.career.xp.duel, duels: 1 });
+  assert.deepEqual([step.levelBefore, step.levelAfter], [1, 2], 'duels can raise the level');
+  assert.deepEqual(step.unlocked, ['shield']);
+});
+
+test('duel: both fleets start level, either may move first, and the game plays out by the rules', () => {
+  const hand = Career.tricksAt(3);
+  for (const firstPlayer of [0, 1]) {
+    let { state, events } = Rules.createGame({ seed: 'DVOBOJ', firstPlayer, landmarks: true, tricks: [hand, hand], pearls: [2, 2] });
+    assert.deepEqual(events.at(-1).type, 'turn');
+    assert.equal(state.current, firstPlayer);
+    assert.deepEqual(state.tricks.map((own) => [...own]), [hand, hand]);
+    assert.deepEqual(state.pearls, [2, 2]);
+    assert.equal(Rules.unitCount(state, 0), Rules.unitCount(state, 1));
+    assert.equal(Rules.incomeFor(state, 0), Rules.incomeFor(state, 1));
+
+    // Two equal players (the hard AI on both sides) reach a result within the round limit.
+    let seen = 0;
+    while (!state.result) {
+      const action = AI.chooseAction(state, 'hard');
+      assert.equal(Rules.validate(state, action), null, `legal: ${JSON.stringify(action)}`);
+      state = Rules.applyAction(state, action).state;
+      assert.ok(++seen < 20000, 'the game ends');
+    }
+    assert.ok(state.round <= CONFIG.rules.maxRounds);
+    assert.equal(state.firstPlayer, firstPlayer);
+  }
 });

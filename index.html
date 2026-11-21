@@ -8,8 +8,9 @@
 /*
  * Visual direction: a sunny archipelago, made for players of 10 to 13.
  * The page is a bright sea; land tiles are chunky slabs floating in it.
- * The player is sun yellow, every rival brings a colour of its own, and
- * unclaimed land is sand. Controls are cream "stickers" with a thick lower
+ * The player is sun yellow, every rival brings a colour of its own (a
+ * second player at the same device sails under green), and unclaimed land
+ * is sand. Controls are cream "stickers" with a thick lower
  * edge that sinks when pressed. The canvas reads its colours and font from
  * the custom properties below, so they are defined only here.
  */
@@ -50,6 +51,7 @@
 [data-rival='easy'] { --rival: #ef4b4b; --rival-hi: #ff8f82; --rival-lo: #a51f2b; --rival-soft: #ffe2dd; }
 [data-rival='normal'] { --rival: #e2409a; --rival-hi: #ff86c6; --rival-lo: #98145f; --rival-soft: #ffe0f1; }
 [data-rival='hard'] { --rival: #8250e6; --rival-hi: #b796ff; --rival-lo: #4a249c; --rival-soft: #ece2ff; }
+[data-rival='friend'] { --rival: #27a152; --rival-hi: #7fdc9b; --rival-lo: #14693a; --rival-soft: #dbf5e2; }
 
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -132,6 +134,12 @@ svg { display: block; width: 100%; height: 100%; }
 }
 .avatar { padding: 11px; background: var(--sun); box-shadow: 0 0 0 3px var(--sun-lo) inset; }
 .avatar.big { width: 72px; height: 72px; padding: 15px; }
+/* The second player's ship, turned to face the first. */
+.avatar.away { background: var(--rival); box-shadow: 0 0 0 3px var(--rival-lo) inset; color: #fff; }
+.avatar.away svg { transform: scaleX(-1); }
+.duo { position: relative; flex: none; width: 52px; height: 52px; }
+.duo .avatar { position: absolute; left: 0; top: 0; width: 35px; height: 35px; padding: 7px; }
+.duo .avatar.away { left: auto; top: auto; right: 0; bottom: 0; box-shadow: 0 0 0 3px var(--rival-lo) inset, 0 0 0 2px #fff; }
 .portrait { background: var(--rival-soft); box-shadow: 0 0 0 3px var(--rival) inset; overflow: hidden; }
 .portrait .sour, .portrait.sour .glad { display: none; }
 .portrait.sour .sour { display: inline; }
@@ -211,13 +219,21 @@ svg { display: block; width: 100%; height: 100%; }
   box-shadow: 0 0 0 2px var(--paper-edge) inset;
   transition: transform 0.12s, box-shadow 0.12s, background-color 0.12s;
 }
-.rival-card .portrait { grid-area: face; }
+.rival-card .portrait, .rival-card .duo { grid-area: face; }
 .rival-card b { grid-area: name; font-size: 1.08rem; font-weight: 800; }
 .rival-card small { grid-area: blurb; font-size: 0.9rem; font-weight: 500; color: var(--ink-soft); }
 .rival-card .stars { grid-area: stars; }
 .rival:hover .rival-card { transform: translateX(3px); }
 .rival input:checked + .rival-card { background: var(--rival-soft); box-shadow: 0 0 0 4px var(--rival) inset; }
 .rival input:focus-visible + .rival-card { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+/* Names of the two fleets, asked for once a duel is chosen. */
+.names { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.names label { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 4px; border-radius: 14px; background: var(--well); box-shadow: 0 0 0 2px var(--paper-edge) inset; }
+.names label:focus-within { box-shadow: 0 0 0 3px var(--ink) inset; }
+.names .avatar { width: 34px; height: 34px; padding: 7px; }
+.name-input { flex: 1; min-width: 0; border: 0; padding: 0.3em 0.2em; background: none; font-weight: 800; outline: none; }
+.name-input::placeholder { color: var(--ink-soft); font-weight: 600; opacity: 1; }
 
 .options { display: grid; gap: 8px; }
 .mode { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 14px; background: var(--well); }
@@ -247,9 +263,16 @@ svg { display: block; width: 100%; height: 100%; }
 /* Upright phone: the map on top, the choices below. */
 @media (max-width: 820px) {
   .menu { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 4px; }
-  .menu-map { height: 26vh; min-height: 170px; }
+  .menu-map { height: 24vh; min-height: 170px; }
   .brand h1 { font-size: 2.6rem; }
   .brand p { display: none; }
+}
+/* Laptop screens: slimmer cards, so that all four choices fit without scrolling. */
+@media (min-width: 821px) and (max-height: 880px) {
+  .menu-card { gap: 12px; }
+  .rival-card { padding: 5px 12px 5px 6px; }
+  .rival-card .portrait, .duo { width: 46px; height: 46px; }
+  .duo .avatar { width: 31px; height: 31px; padding: 6px; }
 }
 /* Small screens: rivals side by side, the chosen one described below them. */
 @media (max-width: 820px), (max-height: 700px) {
@@ -260,6 +283,11 @@ svg { display: block; width: 100%; height: 100%; }
   .rival-card b { font-size: 0.88rem; line-height: 1.15; }
   .rival-card small { display: none; }
   .rival-card .stars i { width: 16px; height: 16px; }
+  .rival[data-rival='friend'], .names { grid-column: 1 / -1; }
+  .rival[data-rival='friend'] .rival-card { grid-template-columns: auto 1fr; grid-template-areas: 'face name' 'face blurb'; justify-items: start; gap: 0 10px; padding: 7px 10px 7px 9px; text-align: left; }
+  .rival[data-rival='friend'] .rival-card small { display: block; font-size: 0.82rem; line-height: 1.2; }
+  .duo { width: 40px; height: 40px; }
+  .duo .avatar { width: 27px; height: 27px; padding: 5px; }
   .btn.big { font-size: 1.2rem; }
 }
 /* Phone on its side: the map stays put while the choices scroll. */
@@ -293,7 +321,11 @@ svg { display: block; width: 100%; height: 100%; }
 .tricks { grid-area: tricks; }
 .panel { grid-area: panel; }
 .bar, .versus, .tricks, .panel { padding: 12px 14px; min-width: 0; }
-#app[data-mode='classic'] .tricks, #app[data-mode='classic'] .rival-purse { display: none; }
+#app[data-mode='classic'] .tricks, #app[data-mode='classic'] .side-purse { display: none; }
+/* Against the computer the player's own pearls are shown once, large, beside the tricks. */
+#app:not([data-rival='friend']) .side-0 .side-purse { display: none; }
+/* In a duel the controls take the colour of the fleet on the move. */
+#app[data-rival='friend'][data-turn='1'] :is(.tricks, .panel) { --sun: var(--rival); --sun-hi: var(--rival-hi); --sun-lo: var(--rival-lo); }
 
 .bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .round { position: relative; padding-bottom: 7px; color: var(--ink-soft); white-space: nowrap; }
@@ -325,6 +357,8 @@ svg { display: block; width: 100%; height: 100%; }
   gap: 0 10px;
 }
 .side .avatar, .side .portrait { grid-area: face; }
+/* A ring around the face of whoever is on the move. */
+#app[data-turn='0'] .side-0 .avatar, #app[data-turn='1'] .side-1 :is(.avatar, .portrait) { outline: 3px solid var(--ink); outline-offset: 2px; }
 .side-name { grid-area: name; font-weight: 800; }
 .stat { white-space: nowrap; }
 .stat.tiles { grid-area: tiles; }
@@ -332,7 +366,7 @@ svg { display: block; width: 100%; height: 100%; }
 .stat.minor { grid-area: minor; font-size: 0.92rem; font-weight: 500; color: var(--ink-soft); }
 .stat.minor b { color: var(--ink); font-weight: 800; }
 .purse { display: inline-flex; align-items: center; gap: 5px; font-weight: 900; }
-.rival-purse { margin-left: 10px; color: var(--ink); }
+.side-purse { margin-left: 10px; color: var(--ink); }
 .share { display: flex; height: 10px; gap: 2px; border-radius: 6px; overflow: hidden; }
 .share i { min-width: 0; transition: flex-grow 0.4s; }
 .share-0 { background: var(--sun); }
@@ -610,6 +644,7 @@ dialog p { font-weight: 500; }
 .verdict h2 { font-size: clamp(2.6rem, 9vw, 3.6rem); margin-bottom: 4px; }
 .verdict[data-outcome='win'] h2 { color: var(--sun-lo); }
 .verdict[data-outcome='loss'] h2 { color: var(--rival-lo); }
+#app[data-rival='friend'] .verdict h2 { font-size: clamp(2rem, 7vw, 2.8rem); margin-bottom: 8px; }
 .quote { display: flex; align-items: center; gap: 12px; margin: 14px 0; padding: 8px 14px 8px 8px; border-radius: 18px; background: var(--well); text-align: left; }
 .quote p { font-weight: 700; }
 .goals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -724,10 +759,22 @@ dialog p { font-weight: 500; }
             <span class="rival-card">
               <span class="portrait" data-portrait="hard"></span>
               <b>Hobotnica Oktavija</b>
-              <small>Osam krakova, osam planova. Misli potez unaprijed.</small>
+              <small>Osam krakova, osam planova. Misli unaprijed.</small>
               <span class="stars" data-stars="hard"></span>
             </span>
           </label>
+          <label class="rival" data-rival="friend">
+            <input type="radio" name="rival" value="friend">
+            <span class="rival-card">
+              <span class="duo"><span class="avatar" data-icon="ship"></span><span class="avatar away" data-icon="ship"></span></span>
+              <b>Dva igrača</b>
+              <small>Udvoje na istom uređaju, potez po potez.</small>
+            </span>
+          </label>
+          <div class="names" id="names" hidden>
+            <label><span class="avatar" data-icon="ship"></span><input class="name-input" id="playerName0" type="text" autocomplete="off" spellcheck="false" aria-label="Ime žute flote"></label>
+            <label><span class="avatar away" data-icon="ship"></span><input class="name-input" id="playerName1" type="text" autocomplete="off" spellcheck="false" aria-label="Ime zelene flote"></label>
+          </div>
         </fieldset>
 
         <div class="options">
@@ -783,22 +830,22 @@ dialog p { font-weight: 500; }
     <div class="card versus">
       <div class="side side-0">
         <span class="avatar" data-icon="ship"></span>
-        <span class="side-name">Ti</span>
+        <span class="side-name" id="name0"></span>
         <span class="stat tiles"><b id="tiles0"></b> <span id="tilesNoun0"></span></span>
-        <span class="stat minor"><b id="units0"></b> <span id="unitsNoun0"></span>, <b id="income0"></b> po potezu</span>
+        <span class="stat minor"><b id="units0"></b> <span id="unitsNoun0"></span>, <b id="income0"></b> po potezu<span class="purse side-purse"><i class="pearl"></i><b id="pearls0"></b></span></span>
       </div>
       <div class="side side-1">
         <span class="portrait" id="portrait1"></span>
         <span class="side-name" id="name1"></span>
         <span class="stat tiles"><b id="tiles1"></b> <span id="tilesNoun1"></span></span>
-        <span class="stat minor"><b id="units1"></b> <span id="unitsNoun1"></span>, <b id="income1"></b> po potezu<span class="purse rival-purse"><i class="pearl"></i><b id="pearls1"></b></span></span>
+        <span class="stat minor"><b id="units1"></b> <span id="unitsNoun1"></span>, <b id="income1"></b> po potezu<span class="purse side-purse"><i class="pearl"></i><b id="pearls1"></b></span></span>
       </div>
       <div class="share" id="share" aria-hidden="true"><i class="share-0"></i><i class="share-n"></i><i class="share-1"></i></div>
       <p class="bubble" id="bubble" role="status"></p>
     </div>
 
     <div class="card tricks" id="tricks">
-      <span class="purse" title="Biseri: 1 za svako osvojeno polje, 3 iz škrinje"><i class="pearl"></i><b id="pearls0"></b></span>
+      <span class="purse" title="Biseri: 1 za svako osvojeno polje, 3 iz škrinje"><i class="pearl"></i><b id="purse"></b></span>
       <div class="trick-row" id="trickRow" role="group" aria-label="Trikovi"></div>
     </div>
 
@@ -877,6 +924,10 @@ dialog p { font-weight: 500; }
         </ul>
         <p>Za svako osvojeno polje dobivaš biser. Biserima plaćaš trikove, jedan po potezu. Nove trikove otključavaš kako tvoj brod raste, a popis je u brodskom dnevniku.</p>
       </section>
+      <section>
+        <h3>Dva igrača</h3>
+        <p>Udvoje igrate na istom uređaju i izmjenjujete se potez po potez. Boja gumba pokazuje čija je flota na redu. U pustolovini obje flote imaju iste trikove, one otključane u brodskom dnevniku. Prvi potez u svakom novom dvoboju prelazi na drugu flotu.</p>
+      </section>
       <p>Polje biraš dodirom ili klikom. Ponovni dodir na metu potvrđuje nalog, Enter također, a Esc poništava odabir.</p>
     </div>
     <div class="menu-actions"><button class="btn primary" type="button" data-close>Jasno!</button></div>
@@ -906,7 +957,7 @@ dialog p { font-weight: 500; }
     <details class="more" id="endMore">
       <summary>Brojke iz partije</summary>
       <table class="tally">
-        <thead><tr><th></th><th class="col-0">Ti</th><th class="col-1" id="endRivalName"></th></tr></thead>
+        <thead><tr><th></th><th class="col-0" id="endName0"></th><th class="col-1" id="endName1"></th></tr></thead>
         <tbody id="endTally"></tbody>
       </table>
       <figure class="chart">
@@ -1068,6 +1119,7 @@ dialog p { font-weight: 500; }
         win: { easy: 30, normal: 60, hard: 100 },
         star: 15,
         badge: 20,
+        duel: 20,              // a finished game between two players, whoever wins
       },
       swiftRound: 25,          // third star: the capital falls by this round
       badges: {                // thresholds of the badges that have one
@@ -1086,6 +1138,7 @@ dialog p { font-weight: 500; }
       placeSteps: [1, 3, 0],     // reinforcements placed per tap; 0 = all that fit
       tapSlop: 12,               // px a pointer may travel and still count as a tap
       storageKey: 'otokrati:save',
+      nameLength: 12,            // longest name a player may give their fleet
       bubbleMs: 2600,            // how long a rival's remark stays up
       chatter: 0.55,             // chance that a rival remarks on an ordinary event
       timing: {                  // milliseconds at speed 1
@@ -2619,7 +2672,7 @@ dialog p { font-weight: 500; }
       'streak', 'rock', 'ruler', 'treasure', 'keeper', 'trickster',
     ]);
 
-    const fresh = () => ({ xp: 0, games: 0, wins: 0, stars: { easy: 0, normal: 0, hard: 0 }, badges: [] });
+    const fresh = () => ({ xp: 0, games: 0, wins: 0, duels: 0, stars: { easy: 0, normal: 0, hard: 0 }, badges: [] });
 
     /** Repairs a stored profile, so a damaged or older save cannot break the game. */
     const restore = (saved) => {
@@ -2629,6 +2682,7 @@ dialog p { font-weight: 500; }
       profile.xp = whole(saved.xp);
       profile.games = whole(saved.games);
       profile.wins = whole(saved.wins);
+      profile.duels = whole(saved.duels);
       for (const level of AI.LEVELS) profile.stars[level] = Math.min(3, whole(saved.stars?.[level]));
       profile.badges = BADGES.filter((badge) => Array.isArray(saved.badges) && saved.badges.includes(badge));
       return profile;
@@ -2701,14 +2755,28 @@ dialog p { font-weight: 500; }
       return { won, goals, stars, badges, parts, xp };
     };
 
-    /** The profile after a game, and what changed: level, tricks unlocked, best stars. */
+    /**
+     * The verdict on a game between two players at one device. It earns the
+     * profile a little experience whoever wins; stars and badges are only
+     * won against the computer.
+     */
+    const judgeDuel = () => {
+      const parts = { duel: C.xp.duel };
+      return { won: false, goals: [false, false, false], stars: 0, badges: [], parts, xp: parts.duel };
+    };
+
+    /**
+     * The profile after a game, and what changed: level, tricks unlocked, best
+     * stars. `level` is the rival that was played, or null after a duel.
+     */
     const advance = (profile, verdict, level) => {
       const before = levelOf(profile.xp).level;
       const next = {
         xp: profile.xp + verdict.xp,
-        games: profile.games + 1,
+        games: profile.games + (level ? 1 : 0),
         wins: profile.wins + (verdict.won ? 1 : 0),
-        stars: { ...profile.stars, [level]: Math.max(profile.stars[level], verdict.stars) },
+        duels: profile.duels + (level ? 0 : 1),
+        stars: level ? { ...profile.stars, [level]: Math.max(profile.stars[level], verdict.stars) } : profile.stars,
         badges: [...profile.badges, ...verdict.badges],
       };
       const after = levelOf(next.xp).level;
@@ -2721,7 +2789,7 @@ dialog p { font-weight: 500; }
       };
     };
 
-    return { BADGES, fresh, restore, levelOf, tricksAt, pearlsAt, levelFor, newFacts, observe, judge, advance };
+    return { BADGES, fresh, restore, levelOf, tricksAt, pearlsAt, levelFor, newFacts, observe, judge, judgeDuel, advance };
   })();
 
   /* ══════════════════════════════════════════════════════════════════
@@ -2785,8 +2853,9 @@ dialog p { font-weight: 500; }
    * ══════════════════════════════════════════════════════════════════ */
 
   const UI = CONFIG.ui;
-  const HUMAN = 0;
-  const COMPUTER = 1;
+  const HOME = 0;          // the side of the player this device belongs to
+  const AWAY = 1;          // the other side: the computer, or a friend in a duel
+  const FRIEND = 'friend'; // the choice of rival that turns a game into a duel
   const TAU = Math.PI * 2;
 
   const Ease = {
@@ -2808,6 +2877,9 @@ dialog p { font-weight: 500; }
       adventure: 'Kule, svjetionici, škrinje i luke na mapi, uz bisere i trikove.',
       classic: 'Samo polja, jedinice i kocka. Bez dodataka.',
     },
+    /** Two players at one device: what each side is called until it gets a name. */
+    fleets: ['Žuta flota', 'Zelena flota'],
+    duel: { won: 'Otočje ima novog vladara!', drew: 'Nitko nije popustio.' },
     goals: ['Pobjeda', 'Prijestolnica osvojena', `Do ${CONFIG.career.swiftRound}. kruga`],
     tricks: {
       recruit: {
@@ -3772,8 +3844,8 @@ dialog p { font-weight: 500; }
     ctx.lineWidth = 4;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
-    [COMPUTER, HUMAN].forEach((side) => {
-      const color = side === HUMAN ? palette.sides[side].lo : palette.sides[side].base;
+    [AWAY, HOME].forEach((side) => {
+      const color = side === HOME ? palette.sides[side].lo : palette.sides[side].base;
       ctx.beginPath();
       history.forEach((row, round) => {
         if (round) ctx.lineTo(px(round), py(row[side]));
@@ -3790,16 +3862,20 @@ dialog p { font-weight: 500; }
 
   /* ── what the browser remembers ─────────────────────────────────── */
 
+  /** A fleet's name as typed by a player, tidied; empty when there is none. */
+  const cleanName = (text) => (typeof text === 'string' ? text.replace(/\s+/g, ' ').trim().slice(0, UI.nameLength) : '');
+
   const Storage = {
     /** Settings and the career profile; anything missing or broken falls back to a fresh start. */
     load() {
-      const settings = { rival: 'easy', mode: 'adventure', muted: false, speed: 0 };
+      const settings = { rival: 'easy', mode: 'adventure', muted: false, speed: 0, names: ['', ''] };
       let saved = null;
       try {
         saved = JSON.parse(window.localStorage.getItem(UI.storageKey));
       } catch { /* no storage (some browsers on file://): a fresh start */ }
       Object.assign(settings, saved?.settings);
-      if (!AI.LEVELS.includes(settings.rival)) settings.rival = 'easy';
+      if (!AI.LEVELS.includes(settings.rival) && settings.rival !== FRIEND) settings.rival = 'easy';
+      settings.names = [HOME, AWAY].map((side) => cleanName(saved?.settings?.names?.[side]));
       if (!LORE.modes[settings.mode]) settings.mode = 'adventure';
       if (!UI.speeds[settings.speed]) settings.speed = 0;
       return { settings, profile: Career.restore(saved?.profile) };
@@ -3816,7 +3892,7 @@ dialog p { font-weight: 500; }
   const createApp = () => {
     const R = CONFIG.rules;
     const T = UI.timing;
-    const SIDES = [HUMAN, COMPUTER];
+    const SIDES = [HOME, AWAY];
     const ALL_TRICKS = Object.keys(CONFIG.tricks);
     const $ = (id) => document.getElementById(id);
     const make = (tag, className, html = '') => {
@@ -3852,9 +3928,21 @@ dialog p { font-weight: 500; }
     let streak = 0;          // conquests in a row, for the fanfare
     let bubbleTimer = 0;
     let lastRemark = 0;
+    let duelCount = 0;       // duels started in this visit; the first move alternates
 
-    const myTurn = () => Boolean(state) && !state.result && !busy && state.current === HUMAN;
+    /** A duel: two players share this device and nobody plays for the computer. */
+    const duel = () => settings.rival === FRIEND;
+    const isHuman = (side) => side === HOME || duel();
+    const myTurn = () => Boolean(state) && !state.result && !busy && isHuman(state.current);
+    /** The side the controls belong to at the moment. */
+    const me = () => (duel() ? state.current : HOME);
     const rival = () => LORE.rivals[settings.rival];
+    /** What a side is called; a rival also has a longer name for roomy places. */
+    const nameOf = (side, long = false) => {
+      if (duel()) return settings.names[side] || LORE.fleets[side];
+      if (side === HOME) return 'Ti';
+      return long ? rival().name : rival().short;
+    };
     const level = () => Career.levelOf(profile.xp).level;
     const rankName = (lvl) => `${LORE.ships[lvl - 1]}, razina ${lvl}`;
     const save = () => Storage.save(settings, profile);
@@ -3898,6 +3986,7 @@ dialog p { font-weight: 500; }
 
     const renderPurses = () => {
       SIDES.forEach((side) => { $(`pearls${side}`).textContent = state.pearls[side]; });
+      $('purse').textContent = state.pearls[me()];
     };
 
     const renderScores = () => {
@@ -3911,9 +4000,9 @@ dialog p { font-weight: 500; }
         $(`income${side}`).textContent = `+${Rules.income(state, side)}`;
       });
       const [mine, unclaimed, theirs] = $('share').children;
-      mine.style.flexGrow = tiles[HUMAN];
-      theirs.style.flexGrow = tiles[COMPUTER];
-      unclaimed.style.flexGrow = state.map.landCount - tiles[HUMAN] - tiles[COMPUTER];
+      mine.style.flexGrow = tiles[HOME];
+      theirs.style.flexGrow = tiles[AWAY];
+      unclaimed.style.flexGrow = state.map.landCount - tiles[HOME] - tiles[AWAY];
       renderPurses();
     };
 
@@ -3921,35 +4010,39 @@ dialog p { font-weight: 500; }
     const trickTrouble = (trick) => {
       const { name, none } = LORE.tricks[trick];
       const { cost } = CONFIG.tricks[trick];
-      if (!state.tricks[HUMAN].includes(trick)) return `${name} se otključava kad tvoj brod dosegne razinu ${Career.levelFor(trick)}.`;
+      if (!state.tricks[me()].includes(trick)) {
+        return duel()
+          ? `U dvoboju vrijede trikovi iz brodskog dnevnika. ${name} se otključava na razini ${Career.levelFor(trick)}.`
+          : `${name} se otključava kad tvoj brod dosegne razinu ${Career.levelFor(trick)}.`;
+      }
       if (!myTurn()) return 'Trikove igraš kad si na potezu.';
       if (state.phase !== 'action') return 'Prvo rasporedi pojačanja, a onda dolaze trikovi.';
       if (state.tricksPlayed >= R.tricksPerTurn) return 'Jedan trik po potezu. Sljedeći čeka idući potez.';
-      if (state.pearls[HUMAN] < cost) return `${name} stoji ${Lang.counted('pearl', cost)}. Biser dobivaš za svako osvojeno polje.`;
+      if (state.pearls[me()] < cost) return `${name} stoji ${Lang.counted('pearl', cost)}. Biser dobivaš za svako osvojeno polje.`;
       return Rules.canPlay(state, trick) ? null : none;
     };
 
     const renderTricks = () => {
       for (const button of $('trickRow').children) {
         const { trick } = button.dataset;
-        const inHand = state.tricks[HUMAN].includes(trick);
+        const inHand = state.tricks[me()].includes(trick);
         button.classList.toggle('locked', !inHand);
         button.classList.toggle('off', inHand && trickTrouble(trick) !== null);
         button.classList.toggle('armed', aim === trick);
-        button.classList.toggle('glowing', trick === 'lucky' && state.lucky && state.current === HUMAN);
+        button.classList.toggle('glowing', trick === 'lucky' && state.lucky && isHuman(state.current));
       }
     };
 
     /** What the player should do next; null keeps the current text while events play. */
     const hintText = () => {
       if (state.result) return 'Partija je završena.';
-      if (state.current === COMPUTER) return `${rival().short} je na potezu.`;
+      if (!isHuman(state.current)) return `${rival().short} je na potezu.`;
       if (busy) return null;
       if (state.phase === 'reinforce') return 'Dodirni svoje polje da na njega postaviš pojačanje.';
       if (aim) return LORE.tricks[aim].aim;
       if (order) return 'Namjesti broj jedinica i potvrdi. Nalog potvrđuje i ponovni dodir na metu.';
       if (scene.selected >= 0) return 'Odaberi susjedno polje: tuđe napadaš, a na svoje premještaš jedinice.';
-      const canMove = state.owner.some((owner, tile) => owner === HUMAN && Rules.canAct(state, tile));
+      const canMove = state.owner.some((owner, tile) => owner === me() && Rules.canAct(state, tile));
       return canMove
         ? 'Odaberi polje s bijelim žetonom i pošalji jedinice na susjedno polje.'
         : 'Nijedno polje više ne može djelovati. Završi potez.';
@@ -3980,7 +4073,7 @@ dialog p { font-weight: 500; }
       if (mine) mode = order ? 'order' : state.phase === 'reinforce' ? 'place' : 'pick';
       $('panel').dataset.mode = mode;
 
-      const stepClass = (on) => (on && !state.result ? `on${state.current === COMPUTER ? ' theirs' : ''}` : '');
+      const stepClass = (on) => (on && !state.result ? `on${isHuman(state.current) ? '' : ' theirs'}` : '');
       $('stepPlace').className = stepClass(state.phase === 'reinforce');
       $('stepAct').className = stepClass(state.phase === 'action');
 
@@ -4053,8 +4146,9 @@ dialog p { font-weight: 500; }
       replay($('toast'), 'show');
     };
 
-    /** The rival says something. Ordinary remarks are throttled; forced ones always appear. */
+    /** The computer's rival says something. Ordinary remarks are throttled; forced ones always appear. */
     const remark = (kind, forced = false) => {
+      if (duel()) return; // nobody to speak: the players do their own talking
       const now = window.performance.now();
       if (!forced && (now - lastRemark < UI.bubbleMs * 1.5 || jitter.next() > UI.chatter)) return;
       const lines = rival().lines[kind];
@@ -4144,10 +4238,10 @@ dialog p { font-weight: 500; }
 
     /** What the rival has to say about a fight. */
     const remarkOnFight = (event) => {
-      if (event.player === COMPUTER) {
+      if (event.player === AWAY) {
         if (!event.conquered) remark('flop');
-        else if (event.defender === HUMAN) remark('gain');
-      } else if (event.defender === COMPUTER) {
+        else if (event.defender === HOME) remark('gain');
+      } else if (event.defender === AWAY) {
         remark(event.conquered ? 'loss' : 'cheer');
       }
     };
@@ -4214,8 +4308,8 @@ dialog p { font-weight: 500; }
         dice.forEach(dropFx);
 
         if (event.conquered) {
-          streak = event.player === HUMAN ? streak + 1 : 0;
-          sound.play('conquer', event.player === HUMAN ? streak : 1);
+          streak = isHuman(event.player) ? streak + 1 : 0;
+          sound.play('conquer', isHuman(event.player) ? streak : 1);
           const flip = { to: event.player, t: 0 };
           scene.flips.set(event.to, flip);
           await Promise.all([
@@ -4236,11 +4330,11 @@ dialog p { font-weight: 500; }
           if (event.chest) sound.play('chest');
           else if (state.tricks[event.player].length) sound.play('pearl');
           if (state.tricks[event.player].length) floatText(event.to, `+${event.pearls}`, { pearl: true });
-          if (event.player === HUMAN && streak >= 3) {
+          if (isHuman(event.player) && streak >= 3) {
             floatText(event.from, `Niz ×${streak}!`, { big: true, color: palette.gold });
           }
         } else {
-          if (event.player === HUMAN) streak = 0;
+          if (isHuman(event.player)) streak = 0;
           sound.play('repel');
           bump(event.to);
           await animator.tween(T.settle * 0.7, (t) => {
@@ -4255,10 +4349,10 @@ dialog p { font-weight: 500; }
 
       async trick(event) {
         const { name } = LORE.tricks[event.trick];
-        showToast(event.player === HUMAN ? `${name}!` : `${rival().short}: ${name}!`, event.trick, event.player);
+        showToast(isHuman(event.player) ? `${name}!` : `${rival().short}: ${name}!`, event.trick, event.player);
         sound.play('trick');
         renderPurses();
-        if (event.player === COMPUTER) remark('trick');
+        if (!isHuman(event.player)) remark('trick');
 
         if (event.trick === 'recruit') {
           scene.units[event.tile] += event.amount;
@@ -4299,9 +4393,12 @@ dialog p { font-weight: 500; }
         scene.phase = event.reinforcements > 0 ? 'reinforce' : 'action';
         streak = 0;
         renderBar();
-        const title = event.player === HUMAN ? 'Tvoj potez' : `${rival().short} je na potezu`;
+        app.dataset.turn = event.player; // the page shows whose turn it is
+        const title = duel()
+          ? `Na potezu: ${nameOf(event.player)}`
+          : event.player === HOME ? 'Tvoj potez' : `${rival().short} je na potezu`;
         showBanner(title, `Krug ${event.round} od ${R.maxRounds}`, event.player);
-        sound.play('turn', event.player === HUMAN);
+        sound.play('turn', isHuman(event.player));
         await animator.wait(T.banner * 0.7);
       },
 
@@ -4318,21 +4415,24 @@ dialog p { font-weight: 500; }
     const commit = (action) => {
       const result = Rules.applyAction(state, action);
       state = result.state;
-      facts = result.events.reduce((sum, event) => Career.observe(sum, event, HUMAN), facts);
+      facts = result.events.reduce((sum, event) => Career.observe(sum, event, HOME), facts);
       return result.events;
     };
 
     const resultDetail = () => {
       const { winner, reason } = state.result;
       if (reason !== 'rounds') {
-        return `${winner === HUMAN ? 'Protivnička' : 'Tvoja'} prijestolnica pala je u ${state.round}. krugu.`;
+        return duel()
+          ? `${nameOf(winner)} osvaja protivničku prijestolnicu u ${state.round}. krugu.`
+          : `${winner === HOME ? 'Protivnička' : 'Tvoja'} prijestolnica pala je u ${state.round}. krugu.`;
       }
       const lead = `Odigran je i posljednji, ${R.maxRounds}. krug.`;
       if (winner === null) return `${lead} Obje strane drže jednako polja i jednako jedinica.`;
       const tiles = [winner, 1 - winner].map((side) => Rules.tileCount(state, side));
       const units = [winner, 1 - winner].map((side) => Rules.unitCount(state, side));
       if (tiles[0] !== tiles[1]) {
-        return `${lead} ${winner === HUMAN ? 'Držiš' : `${rival().short} drži`} više polja: ${tiles[0]} naprema ${tiles[1]}.`;
+        const holds = !duel() && winner === HOME ? 'Držiš' : `${nameOf(winner)} drži`;
+        return `${lead} ${holds} više polja: ${tiles[0]} naprema ${tiles[1]}.`;
       }
       return `${lead} Polja je jednako, pa odlučuju jedinice: ${units[0]} naprema ${units[1]}.`;
     };
@@ -4350,10 +4450,10 @@ dialog p { font-weight: 500; }
       if (settings.mode === 'adventure') {
         rows.push(['Skupljeni biseri', (side) => state.stats[side].pearls], ['Odigrani trikovi', (side) => state.stats[side].tricks]);
       }
-      $('endRivalName').textContent = rival().short;
+      SIDES.forEach((side) => { $(`endName${side}`).textContent = nameOf(side); });
       $('endTally').replaceChildren(...rows.map(([label, value]) => {
         const row = document.createElement('tr');
-        [label, value(HUMAN), value(COMPUTER)].forEach((text, column) => {
+        [label, value(HOME), value(AWAY)].forEach((text, column) => {
           const cell = document.createElement('td');
           cell.textContent = text;
           if (column) cell.className = `col-${column - 1}`;
@@ -4386,21 +4486,34 @@ dialog p { font-weight: 500; }
     const showResult = async () => {
       await animator.wait(T.gameOver);
       const { winner } = state.result;
-      const outcome = winner === null ? 'draw' : winner === HUMAN ? 'win' : 'loss';
-      const verdict = Career.judge({ state, facts, human: HUMAN, level: settings.rival, profile });
-      const step = Career.advance(profile, verdict, settings.rival);
+      const versus = duel();
+      // In a duel the outcome only picks the colour of the title: nobody at the device "loses" to the game.
+      const outcome = winner === null ? 'draw' : winner === HOME ? 'win' : 'loss';
+      const verdict = versus ? Career.judgeDuel() : Career.judge({ state, facts, human: HOME, level: settings.rival, profile });
+      const step = Career.advance(profile, verdict, versus ? null : settings.rival);
       const before = Career.levelOf(profile.xp);
       const after = Career.levelOf(step.profile.xp);
       profile = step.profile;
       save();
 
       $('end').dataset.outcome = outcome;
-      $('endTitle').textContent = { win: 'Pobjeda!', loss: 'Poraz', draw: 'Neriješeno' }[outcome];
+      $('endTitle').textContent = versus && winner !== null
+        ? `${nameOf(winner)} pobjeđuje!`
+        : { win: 'Pobjeda!', loss: 'Poraz', draw: 'Neriješeno' }[outcome];
       $('endDetail').textContent = resultDetail();
-      $('endPortrait').innerHTML = PORTRAITS[settings.rival];
-      $('endPortrait').classList.toggle('sour', outcome === 'win');
-      $('endQuote').textContent = { win: rival().lost, loss: rival().won, draw: rival().drew }[outcome];
+      const face = $('endPortrait');
+      if (versus) {
+        face.className = winner === AWAY ? 'avatar away' : 'avatar';
+        face.innerHTML = icon('ship');
+        $('endQuote').textContent = `${winner === null ? LORE.duel.drew : LORE.duel.won} U idućem dvoboju prvi potez ima ${nameOf(duelCount % 2)}.`;
+      } else {
+        face.className = 'portrait';
+        face.innerHTML = PORTRAITS[settings.rival];
+        face.classList.toggle('sour', outcome === 'win');
+        $('endQuote').textContent = { win: rival().lost, loss: rival().won, draw: rival().drew }[outcome];
+      }
 
+      $('endGoals').hidden = versus; // stars are won against the computer only
       $('endGoals').replaceChildren(...LORE.goals.map((goal, i) => {
         const item = make('li', verdict.goals[i] ? 'won' : '', icon('star'));
         item.append(goal);
@@ -4424,7 +4537,7 @@ dialog p { font-weight: 500; }
       fill.style.width = `${100 * share(profile.xp, after)}%`;
 
       if (outcome === 'draw') sound.play('turn', true);
-      else sound.play(outcome === 'win' ? 'win' : 'lose');
+      else sound.play(versus || outcome === 'win' ? 'win' : 'lose');
       verdict.goals.forEach((won, i) => won && window.setTimeout(() => sound.play('star', i), 700 + i * 260));
       if (step.levelAfter > step.levelBefore) window.setTimeout(() => sound.play('levelUp'), 1700);
     };
@@ -4433,7 +4546,7 @@ dialog p { font-weight: 500; }
     const computerTurn = async () => {
       busy = true;
       refresh();
-      while (!state.result && state.current === COMPUTER) {
+      while (!state.result && !isHuman(state.current)) {
         await animator.wait(T.think);
         await playAll(commit(AI.chooseAction(state, settings.rival)));
         renderScores();
@@ -4448,7 +4561,7 @@ dialog p { font-weight: 500; }
       refresh();
       renderHud();
       if (state.result) showResult();
-      else if (state.current === COMPUTER) computerTurn();
+      else if (!isHuman(state.current)) computerTurn();
     };
 
     /** Applies a move, a trick or the end of the player's turn and plays what happens. */
@@ -4485,13 +4598,18 @@ dialog p { font-weight: 500; }
     const startGame = async (seedText) => {
       const seed = MapGen.normalizeSeed(seedText) || MapGen.randomSeed(Math.random);
       const adventure = settings.mode === 'adventure';
+      const versus = duel();
       const hand = adventure ? Career.tricksAt(level()) : [];
+      const purse = adventure ? Career.pearlsAt(level()) : 0;
+      // A duel is even: both fleets get the tricks and pearls of this device's
+      // profile, and the first move passes to the other fleet with every duel.
+      const firstPlayer = versus ? duelCount++ % 2 : HOME;
       const opening = Rules.createGame({
         seed,
-        firstPlayer: HUMAN,
+        firstPlayer,
         landmarks: adventure,
-        tricks: [hand, adventure ? AI.tricksOf(settings.rival) : []],
-        pearls: [adventure ? Career.pearlsAt(level()) : 0, 0],
+        tricks: [hand, versus ? hand : adventure ? AI.tricksOf(settings.rival) : []],
+        pearls: [purse, versus ? purse : 0],
       });
       animator.clear();
       window.clearTimeout(bubbleTimer);
@@ -4508,10 +4626,11 @@ dialog p { font-weight: 500; }
       seedInput.value = seed;
       applyRival();
       // Read by tools/browser-autoplay.js, which mirrors the game from outside.
-      Object.assign(app.dataset, { screen: 'game', mode: settings.mode, seed, hand: hand.join(',') });
-      $('name1').textContent = rival().name;
-      $('portrait1').innerHTML = PORTRAITS[settings.rival];
-      $('portrait1').classList.remove('sour');
+      Object.assign(app.dataset, { screen: 'game', mode: settings.mode, seed, hand: hand.join(','), first: firstPlayer });
+      $('name0').textContent = nameOf(HOME);
+      $('name1').textContent = nameOf(AWAY, true);
+      $('portrait1').className = versus ? 'avatar away' : 'portrait';
+      $('portrait1').innerHTML = versus ? icon('ship') : PORTRAITS[settings.rival];
       $('bubble').classList.remove('show');
       $('hint').textContent = '';
       buildTrickRow();
@@ -4545,6 +4664,12 @@ dialog p { font-weight: 500; }
       document.querySelectorAll('input[name="rival"]').forEach((radio) => { radio.checked = radio.value === settings.rival; });
       document.querySelectorAll('input[name="mode"]').forEach((radio) => { radio.checked = radio.value === settings.mode; });
       $('modeNote').textContent = LORE.modes[settings.mode];
+      $('names').hidden = !duel();
+      SIDES.forEach((side) => {
+        const input = $(`playerName${side}`);
+        input.placeholder = LORE.fleets[side];
+        if (cleanName(input.value) !== settings.names[side]) input.value = settings.names[side];
+      });
       app.dataset.mode = settings.mode;
       applyRival();
       showPreview();
@@ -4586,7 +4711,7 @@ dialog p { font-weight: 500; }
         item.querySelector('small').textContent = how;
         return item;
       }));
-      $('logTotals').textContent = `Odigrane partije: ${profile.games}. Pobjede: ${profile.wins}. Značke: ${profile.badges.length} od ${Career.BADGES.length}.`;
+      $('logTotals').textContent = `Odigrane partije: ${profile.games}. Pobjede: ${profile.wins}. Dvoboji: ${profile.duels}. Značke: ${profile.badges.length} od ${Career.BADGES.length}.`;
     };
 
     const showMenu = () => {
@@ -4612,7 +4737,7 @@ dialog p { font-weight: 500; }
     };
 
     const placeAt = (tile) => {
-      if (tile < 0 || state.owner[tile] !== HUMAN) return deny('Pojačanja idu samo na tvoja polja.');
+      if (tile < 0 || state.owner[tile] !== me()) return deny('Pojačanja idu samo na tvoja polja.');
       const room = R.maxUnits - state.units[tile];
       if (room === 0) return deny(`Na polje stane najviše ${R.maxUnits} jedinica.`);
       const count = Math.min(placeStep || state.reinforcements, state.reinforcements, room);
@@ -4692,7 +4817,7 @@ dialog p { font-weight: 500; }
         scene.selected = tile;
         sound.play('select');
       } else {
-        const idleOwnTile = tile >= 0 && tile !== scene.selected && state.owner[tile] === HUMAN;
+        const idleOwnTile = tile >= 0 && tile !== scene.selected && state.owner[tile] === me();
         order = null;
         scene.selected = -1;
         if (idleOwnTile) { deny(whyIdle(tile)); return; }
@@ -4702,7 +4827,7 @@ dialog p { font-weight: 500; }
 
     const canTap = (tile) => {
       if (tile < 0 || !myTurn()) return false;
-      if (state.phase === 'reinforce') return state.owner[tile] === HUMAN && state.units[tile] < R.maxUnits;
+      if (state.phase === 'reinforce') return state.owner[tile] === me() && state.units[tile] < R.maxUnits;
       if (aim) return scene.aim.tiles.includes(tile);
       return Rules.canAct(state, tile) || scene.targets.some((target) => target.tile === tile);
     };
@@ -4776,6 +4901,14 @@ dialog p { font-weight: 500; }
       });
       bindChoice('rival', 'rival');
       bindChoice('mode', 'mode');
+      SIDES.forEach((side) => {
+        const input = $(`playerName${side}`);
+        input.maxLength = UI.nameLength;
+        input.addEventListener('input', () => {
+          settings.names[side] = cleanName(input.value);
+          save();
+        });
+      });
 
       on('endTurnBtn', () => myTurn() && state.phase === 'action' && run({ type: 'endTurn' }));
       on('undoBtn', undo);
