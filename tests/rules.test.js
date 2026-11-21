@@ -1,6 +1,9 @@
 'use strict';
 
-/* Run with: node --test */
+/*
+ * Run with: node --test
+ * Covers the classic rules; adventure.test.js covers landmarks, tricks and the career.
+ */
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -122,6 +125,9 @@ test('map: the same seed always gives the same map, seeds are normalised', () =>
 test('setup: capitals hold 5 units, neutral tiles 1 to 3, the opening income is 2', () => {
   const state = newGame('SETUP');
   const { map } = state;
+  assert.ok(map.feature.every((kind) => kind === 0), 'a classic map has no landmarks');
+  assert.deepEqual(map.lanes, []);
+  assert.deepEqual(state.tricks, [[], []]);
   assert.equal(state.owner[map.capitals[0]], 0);
   assert.equal(state.owner[map.capitals[1]], 1);
   for (let i = 0; i < map.count; i++) {
@@ -143,29 +149,29 @@ test('setup: capitals hold 5 units, neutral tiles 1 to 3, the opening income is 
 /* ── combat ──────────────────────────────────────────────────────────── */
 
 test('combat: round odds are 15/36, and 10/36 against a capital', () => {
-  assert.equal(Combat.roundOdds(false), 15 / 36);
-  assert.equal(Combat.roundOdds(true), 10 / 36);
+  assert.equal(Combat.roundOdds(0), 15 / 36);
+  assert.equal(Combat.roundOdds(1), 10 / 36);
 });
 
 test('combat: win probability matches hand-computed and brute-force values', () => {
   const close = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-12, `${actual} vs ${expected}`);
   const p = 15 / 36;
-  close(Combat.winProbability(1, 1, false), p);
-  close(Combat.winProbability(2, 1, false), 1 - (1 - p) ** 2);
-  close(Combat.winProbability(1, 2, false), p ** 2);
-  close(Combat.winProbability(1, 1, true), 10 / 36);
-  assert.equal(Combat.winProbability(3, 0, false), 1);
-  assert.equal(Combat.winProbability(0, 3, false), 0);
+  close(Combat.winProbability(1, 1), p);
+  close(Combat.winProbability(2, 1), 1 - (1 - p) ** 2);
+  close(Combat.winProbability(1, 2), p ** 2);
+  close(Combat.winProbability(1, 1, 1), 10 / 36);
+  assert.equal(Combat.winProbability(3, 0), 1);
+  assert.equal(Combat.winProbability(0, 3), 0);
 
   // Independent check: a fight of a vs d is won when d round wins come before a round losses.
   const choose = (n, k) => { let c = 1; for (let i = 1; i <= k; i++) c = c * (n - k + i) / i; return c; };
-  for (const capital of [false, true]) {
-    const win = Combat.roundOdds(capital);
+  for (const edge of [-1, 0, 1]) {
+    const win = Combat.roundOdds(edge);
     for (let a = 1; a <= 11; a++) {
       for (let d = 1; d <= 12; d++) {
         let expected = 0;
         for (let lost = 0; lost < a; lost++) expected += choose(d - 1 + lost, lost) * win ** d * (1 - win) ** lost;
-        close(Combat.winProbability(a, d, capital), expected);
+        close(Combat.winProbability(a, d, edge), expected);
       }
     }
   }
@@ -174,11 +180,11 @@ test('combat: win probability matches hand-computed and brute-force values', () 
 test('combat: more attackers help, more defenders and a capital hurt', () => {
   for (let a = 1; a <= 11; a++) {
     for (let d = 1; d <= 12; d++) {
-      const odds = Combat.winProbability(a, d, false);
+      const odds = Combat.winProbability(a, d);
       assert.ok(odds > 0 && odds < 1);
-      assert.ok(Combat.winProbability(a + 1, d, false) > odds);
-      if (d < 12) assert.ok(Combat.winProbability(a, d + 1, false) < odds);
-      assert.ok(Combat.winProbability(a, d, true) < odds);
+      assert.ok(Combat.winProbability(a + 1, d) > odds);
+      if (d < 12) assert.ok(Combat.winProbability(a, d + 1) < odds);
+      assert.ok(Combat.winProbability(a, d, 1) < odds);
     }
   }
 });
@@ -188,14 +194,13 @@ test('combat: every round removes one unit from the lower roll, ties go to the d
   for (let fight = 0; fight < 3000; fight++) {
     const attackers = 1 + rng.int(11);
     const defenders = 1 + rng.int(12);
-    const capital = fight % 3 === 0;
-    const result = Combat.resolve(rng, attackers, defenders, capital);
+    const defenseBonus = fight % 3 === 0 ? 1 : 0;
+    const result = Combat.resolve(rng, attackers, defenders, { defenseBonus });
     assert.ok((result.attackersLeft === 0) !== (result.defendersLeft === 0), 'exactly one side is wiped out');
     let attackerLosses = 0;
     for (const round of result.rounds) {
       assert.ok(round.attack >= 1 && round.attack <= 6 && round.defense >= 1 && round.defense <= 6);
-      assert.equal(round.bonus, capital ? 1 : 0);
-      assert.equal(round.attackerHit, round.attack <= round.defense + round.bonus);
+      assert.equal(round.attackerHit, round.attack <= round.defense + defenseBonus);
       attackerLosses += round.attackerHit ? 1 : 0;
     }
     assert.equal(attackers - attackerLosses, result.attackersLeft);
@@ -206,12 +211,12 @@ test('combat: every round removes one unit from the lower roll, ties go to the d
 test('combat: simulated fights agree with the exact probability', () => {
   const rng = Prng.create(7);
   const fights = 40000;
-  for (const [attackers, defenders, capital] of [[5, 3, false], [3, 3, false], [11, 5, true], [8, 2, true]]) {
+  for (const [attackers, defenders, defenseBonus] of [[5, 3, 0], [3, 3, 0], [11, 5, 1], [8, 2, 1]]) {
     let wins = 0;
     for (let i = 0; i < fights; i++) {
-      if (Combat.resolve(rng, attackers, defenders, capital).attackersLeft > 0) wins++;
+      if (Combat.resolve(rng, attackers, defenders, { defenseBonus }).attackersLeft > 0) wins++;
     }
-    const exact = Combat.winProbability(attackers, defenders, capital);
+    const exact = Combat.winProbability(attackers, defenders, defenseBonus);
     assert.ok(Math.abs(wins / fights - exact) < 0.01, `${attackers}v${defenders}: ${wins / fights} vs ${exact}`);
   }
 });
@@ -340,7 +345,7 @@ test('movement: targets list attacks and merges with the right limits', () => {
   assert.equal(targets.length, state.map.adj[capital].length);
   assert.deepEqual(targets.find((t) => t.tile === friend), { tile: friend, kind: 'merge', max: 7 });
   assert.deepEqual(targets.find((t) => t.tile === target), { tile: target, kind: 'attack', max: 7 });
-  assert.equal(Rules.winOdds(state, capital, target, 7), Combat.winProbability(7, 2, false));
+  assert.equal(Rules.winOdds(state, target, 7), Combat.winProbability(7, 2));
 });
 
 test('attack: a won fight moves the survivors in and locks the tile', () => {
@@ -387,20 +392,24 @@ test('attack: a capital defends with +1, any other tile of its owner does not', 
 
   const onCapital = Rules.applyAction(state, { type: 'move', from: attackerTile, to: enemyCapital, count: 8 });
   assert.ok(onCapital.events[0].capital);
-  assert.ok(onCapital.events[0].rounds.every((round) => round.bonus === 1));
+  assert.equal(onCapital.events[0].defenseBonus, 1);
+  assert.equal(onCapital.events[0].odds, Combat.winProbability(8, 5, 1));
   const onPlain = Rules.applyAction(state, { type: 'move', from: attackerTile, to: plainTile, count: 8 });
   assert.ok(!onPlain.events[0].capital);
-  assert.ok(onPlain.events[0].rounds.every((round) => round.bonus === 0));
-  assert.equal(Rules.winOdds(state, attackerTile, enemyCapital, 8), Combat.winProbability(8, 5, true));
+  assert.equal(onPlain.events[0].defenseBonus, 0);
+  assert.equal(Rules.winOdds(state, enemyCapital, 8), Combat.winProbability(8, 5, 1));
+  assert.equal(Rules.winOdds(state, plainTile, 8), Combat.winProbability(8, 3));
 });
 
 test('rules: applying an action never changes the state it was given', () => {
   const { state, capital, target } = actionSetup();
-  const snapshot = JSON.stringify([state.owner, state.units, state.locked, state.stats, state.rng, state.step]);
+  const watched = () => JSON.stringify([state.owner, state.units, state.locked, state.shield, state.loot,
+    state.pearls, state.stats, state.rng, state.step]);
+  const snapshot = watched();
   Rules.applyAction(state, { type: 'move', from: capital, to: target, count: 7 });
   Rules.applyAction(state, { type: 'endTurn' });
   AI.LEVELS.forEach((level) => AI.chooseAction(state, level));
-  assert.equal(JSON.stringify([state.owner, state.units, state.locked, state.stats, state.rng, state.step]), snapshot);
+  assert.equal(watched(), snapshot);
 });
 
 /* ── victory ─────────────────────────────────────────────────────────── */
@@ -526,7 +535,8 @@ test('language: nouns agree with their number', () => {
   const units = { 0: '0 jedinica', 1: '1 jedinica', 2: '2 jedinice', 4: '4 jedinice', 5: '5 jedinica',
     11: '11 jedinica', 12: '12 jedinica', 14: '14 jedinica', 21: '21 jedinica', 22: '22 jedinice',
     25: '25 jedinica', 101: '101 jedinica', 112: '112 jedinica' };
-  for (const [n, text] of Object.entries(units)) assert.equal(Lang.units(Number(n)), text);
+  for (const [n, text] of Object.entries(units)) assert.equal(Lang.counted('unit', Number(n)), text);
+  assert.deepEqual([1, 2, 5, 22].map((n) => Lang.counted('pearl', n)), ['1 biser', '2 bisera', '5 bisera', '22 bisera']);
   assert.deepEqual([1, 3, 7, 21, 22].map((n) => Lang.noun('tile', n)), ['polje', 'polja', 'polja', 'polje', 'polja']);
   const rounds = ['krug', 'kruga', 'krugova'];
   assert.deepEqual([1, 2, 5, 21, 40].map((n) => Lang.plural(n, rounds)), ['krug', 'kruga', 'krugova', 'krug', 'krugova']);

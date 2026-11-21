@@ -6,8 +6,10 @@
  *   node tools/simulate.js                      100 games for every pair of levels
  *   node tools/simulate.js --games 300          more games per pair
  *   node tools/simulate.js --pairs hard:normal  only the listed pairs (comma separated)
+ *   node tools/simulate.js --mode adventure     only one kind of game (classic | adventure)
  *
- * Every map is played twice, once with each side moving first.
+ * Every map is played twice, once with each side moving first. Classic games
+ * use the bare rules; adventure games add landmarks and each level's tricks.
  */
 
 const os = require('node:os');
@@ -18,11 +20,17 @@ const { playGame } = require('./arena');
 const ALL_PAIRS = ['normal:easy', 'hard:normal', 'hard:easy', 'easy:easy', 'normal:normal', 'hard:hard'];
 
 function parseArgs(argv) {
-  const options = { games: 100, pairs: ALL_PAIRS, jobs: Math.max(1, os.availableParallelism() - 2) };
+  const options = {
+    games: 100,
+    pairs: ALL_PAIRS,
+    modes: ['classic', 'adventure'],
+    jobs: Math.max(1, os.availableParallelism() - 2),
+  };
   for (let i = 0; i < argv.length; i += 2) {
     const value = argv[i + 1];
     if (argv[i] === '--games') options.games = Number(value);
     else if (argv[i] === '--pairs') options.pairs = value.split(',');
+    else if (argv[i] === '--mode') options.modes = [value];
     else if (argv[i] === '--jobs') options.jobs = Number(value);
     else throw new Error(`Unknown option ${argv[i]}`);
   }
@@ -30,11 +38,13 @@ function parseArgs(argv) {
 }
 
 /** One task per game: player 0 is always the first level of the pair. */
-function buildTasks({ games, pairs }) {
+function buildTasks({ games, pairs, modes }) {
   const tasks = [];
-  for (const pair of pairs) {
-    for (let game = 0; game < games; game++) {
-      tasks.push({ pair, seed: `SIM${game >> 1}`, firstPlayer: game % 2 });
+  for (const mode of modes) {
+    for (const pair of pairs) {
+      for (let game = 0; game < games; game++) {
+        tasks.push({ mode, pair, seed: `SIM${game >> 1}`, firstPlayer: game % 2 });
+      }
     }
   }
   return tasks;
@@ -45,7 +55,11 @@ function runWorker() {
   const results = workerData.tasks.map((task) => {
     const started = process.hrtime.bigint();
     try {
-      const { winner, reason, rounds, actions } = playGame(core, { ...task, levels: task.pair.split(':') });
+      const { winner, reason, rounds, actions } = playGame(core, {
+        ...task,
+        levels: task.pair.split(':'),
+        adventure: task.mode === 'adventure',
+      });
       return { ...task, winner, reason, rounds, actions, ms: Number(process.hrtime.bigint() - started) / 1e6 };
     } catch (error) {
       return { ...task, error: error.message };
@@ -90,11 +104,14 @@ async function main() {
     worker.once('error', reject);
   })))).flat();
 
-  console.table(options.pairs.map((pair) => summarize(pair, results.filter((r) => r.pair === pair))));
+  for (const mode of options.modes) {
+    console.log(`\n${mode} games`);
+    console.table(options.pairs.map((pair) => summarize(pair, results.filter((r) => r.mode === mode && r.pair === pair))));
+  }
   console.log(`Total games: ${results.length}`);
 
   const failures = results.filter((r) => r.error);
-  failures.slice(0, 10).forEach((r) => console.error(`FAILED ${r.pair} seed ${r.seed}: ${r.error}`));
+  failures.slice(0, 10).forEach((r) => console.error(`FAILED ${r.mode} ${r.pair} seed ${r.seed}: ${r.error}`));
   process.exitCode = failures.length ? 1 : 0;
 }
 
