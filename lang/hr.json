@@ -140,6 +140,7 @@
     "order.goMove": "Premjesti",
     "order.defense": "Obrana: {units}",
     "order.fortified": "utvrđeno, +{n} na kocki",
+    "order.walls": "zidine prvo uzmu {units}",
     "order.drive": "tvoj napad baca s +{n}",
 
     "hint.over": "Partija je završena.",
@@ -187,7 +188,7 @@
     "perk.charge.name": "Juriš",
     "perk.charge.text": "Tvoj prvi napad u svakom potezu baca s +{n} na kocki.",
     "perk.rampart.name": "Bedem",
-    "perk.rampart.text": "Tvoja se prijestolnica brani s +{n} na kocki umjesto +{base}.",
+    "perk.rampart.text": "Svaki napad na tvoju prijestolnicu prvo izgubi {units} na zidinama.",
     "perk.bulwark.name": "Straža",
     "perk.bulwark.text": "Tvoja polja do prijestolnice brane se s +{n} na kocki.",
     "perk.hoard.name": "Školjkar",

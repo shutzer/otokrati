@@ -140,6 +140,7 @@
     "order.goMove": "Sposta",
     "order.defense": "Difesa: {units}",
     "order.fortified": "fortificata, +{n} sul dado",
+    "order.walls": "le mura prendono prima {units}",
     "order.drive": "il tuo attacco tira con +{n}",
 
     "hint.over": "La partita è finita.",
@@ -187,7 +188,7 @@
     "perk.charge.name": "Carica",
     "perk.charge.text": "Il tuo primo attacco di ogni turno tira con +{n} sul dado.",
     "perk.rampart.name": "Bastione",
-    "perk.rampart.text": "La tua capitale si difende con +{n} sul dado invece di +{base}.",
+    "perk.rampart.text": "Ogni attacco alla tua capitale perde prima {units} sulle mura.",
     "perk.bulwark.name": "Guardia",
     "perk.bulwark.text": "Le tue caselle vicine alla capitale si difendono con +{n} sul dado.",
     "perk.hoard.name": "Pescaperle",

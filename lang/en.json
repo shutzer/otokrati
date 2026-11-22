@@ -140,6 +140,7 @@
     "order.goMove": "Move",
     "order.defense": "Defence: {units}",
     "order.fortified": "fortified, +{n} on the die",
+    "order.walls": "the walls take {units} first",
     "order.drive": "your attack rolls +{n}",
 
     "hint.over": "The game is over.",
@@ -187,7 +188,7 @@
     "perk.charge.name": "Charge",
     "perk.charge.text": "Your first attack every turn rolls with +{n} on the die.",
     "perk.rampart.name": "Rampart",
-    "perk.rampart.text": "Your capital defends with +{n} on the die instead of +{base}.",
+    "perk.rampart.text": "Every attack on your capital first loses {units} at the walls.",
     "perk.bulwark.name": "Guard",
     "perk.bulwark.text": "Your tiles next to your capital defend with +{n} on the die.",
     "perk.hoard.name": "Shell collector",

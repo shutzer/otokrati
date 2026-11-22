@@ -140,6 +140,7 @@
     "order.goMove": "Mueve",
     "order.defense": "Defensa: {units}",
     "order.fortified": "fortificada, +{n} en el dado",
+    "order.walls": "las murallas se llevan primero {units}",
     "order.drive": "tu ataque tira con +{n}",
 
     "hint.over": "Fin de la partida.",
@@ -187,7 +188,7 @@
     "perk.charge.name": "Embestida",
     "perk.charge.text": "Tu primer ataque de cada turno tira con +{n} en el dado.",
     "perk.rampart.name": "Muralla",
-    "perk.rampart.text": "Tu capital se defiende con +{n} en el dado en vez de +{base}.",
+    "perk.rampart.text": "Cada ataque a tu capital pierde primero {units} en las murallas.",
     "perk.bulwark.name": "Guardia",
     "perk.bulwark.text": "Tus casillas junto a tu capital se defienden con +{n} en el dado.",
     "perk.hoard.name": "Buscaconchas",

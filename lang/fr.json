@@ -140,6 +140,7 @@
     "order.goMove": "Déplace",
     "order.defense": "Défense : {units}",
     "order.fortified": "case fortifiée, +{n} au dé",
+    "order.walls": "les remparts prennent d’abord {units}",
     "order.drive": "ton attaque a +{n} au dé",
 
     "hint.over": "La partie est finie.",
@@ -187,7 +188,7 @@
     "perk.charge.name": "Charge",
     "perk.charge.text": "Ta première attaque de chaque tour a +{n} au dé.",
     "perk.rampart.name": "Rempart",
-    "perk.rampart.text": "Ta capitale se défend avec +{n} au dé au lieu de +{base}.",
+    "perk.rampart.text": "Chaque attaque contre ta capitale perd d’abord {units} sur les remparts.",
     "perk.bulwark.name": "Garde",
     "perk.bulwark.text": "Tes cases voisines de ta capitale se défendent avec +{n} au dé.",
     "perk.hoard.name": "Pêche aux perles",

@@ -555,10 +555,25 @@ test('powers: each one does what it says, for its owner only', () => {
   assert.equal(Rules.attackBonus(theirTurn), 0, 'the other side has no such power');
   assert.equal(Rules.attackBonus(apply(theirTurn, { type: 'endTurn' })), K.charge.bonus, 'and again in the next turn');
 
-  // rampart and bulwark: the capital and the tiles beside it
-  assert.equal(Rules.defenseBonus(holding(start, 1, 'rampart'), theirs), R.fortifiedBonus + K.rampart.bonus);
-  assert.equal(Rules.defenseBonus(holding(start, 1, 'rampart'), mine), R.fortifiedBonus);
-  assert.ok(Combat.winProbability(8, 5, R.fortifiedBonus + K.rampart.bonus) < Combat.winProbability(8, 5, R.fortifiedBonus));
+  // rampart: every attack on the capital first loses units at the walls; the dice stay as they are
+  const walled = holding(start, 1, 'rampart');
+  assert.equal(Rules.wallToll(walled, theirs), K.rampart.toll);
+  assert.equal(Rules.wallToll(walled, mine), 0, 'only the owner\'s own capital');
+  assert.equal(Rules.wallToll(start, theirs), 0);
+  assert.equal(Rules.defenseBonus(walled, theirs), R.fortifiedBonus);
+  const gate = start.map.adj[theirs][0];
+  const siege = withBoard(walled, { [gate]: [0, 12], [theirs]: [1, 6] });
+  assert.equal(Rules.winOdds(siege, theirs, 10), Combat.winProbability(10 - K.rampart.toll, 6, R.fortifiedBonus));
+  assert.equal(Rules.winOdds(siege, theirs, K.rampart.toll), 0, 'too few to get past the walls');
+  const stormed = Rules.applyAction(siege, { type: 'move', from: gate, to: theirs, count: 10 });
+  const storm = stormed.events.find((event) => event.type === 'combat');
+  assert.equal(storm.toll, K.rampart.toll);
+  const fallen = storm.rounds.filter((round) => round.attackerHit).length;
+  assert.equal(storm.conquered ? storm.survivors : 0, storm.conquered ? 10 - K.rampart.toll - fallen : 0);
+  const bounced = Rules.applyAction(siege, { type: 'move', from: gate, to: theirs, count: K.rampart.toll });
+  assert.deepEqual([bounced.state.units[gate], bounced.state.units[theirs], bounced.events[0].rounds.length], [12 - K.rampart.toll, 6, 0]);
+
+  // bulwark: the tiles beside the capital
   assert.ok(Combat.winProbability(8, 5, -K.charge.bonus - TRICKS.lucky.bonus) > Combat.winProbability(8, 5, -K.charge.bonus));
   const guarded = holding(withBoard(start, { [beside]: [0, 3] }), 0, 'bulwark');
   assert.equal(Rules.isFortified(guarded, beside), true);

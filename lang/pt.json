@@ -140,6 +140,7 @@
     "order.goMove": "Mover",
     "order.defense": "Defesa: {units}",
     "order.fortified": "fortificado, +{n} no dado",
+    "order.walls": "as muralhas levam primeiro {units}",
     "order.drive": "seu ataque tem +{n} no dado",
 
     "hint.over": "A partida terminou.",
@@ -187,7 +188,7 @@
     "perk.charge.name": "Investida",
     "perk.charge.text": "O seu primeiro ataque a cada turno tem +{n} no dado.",
     "perk.rampart.name": "Muralha",
-    "perk.rampart.text": "A sua capital defende com +{n} no dado em vez de +{base}.",
+    "perk.rampart.text": "Todo ataque à sua capital perde primeiro {units} nas muralhas.",
     "perk.bulwark.name": "Guarda",
     "perk.bulwark.text": "Os seus territórios vizinhos à capital defendem com +{n} no dado.",
     "perk.hoard.name": "Caça-pérolas",

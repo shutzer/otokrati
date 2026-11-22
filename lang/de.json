@@ -140,6 +140,7 @@
     "order.goMove": "Ziehen",
     "order.defense": "Abwehr: {units}",
     "order.fortified": "befestigt, +{n} auf den Wurf",
+    "order.walls": "die Mauer nimmt zuerst {units}",
     "order.drive": "dein Angriff würfelt mit +{n}",
 
     "hint.over": "Das Spiel ist aus.",
@@ -187,7 +188,7 @@
     "perk.charge.name": "Ansturm",
     "perk.charge.text": "Dein erster Angriff in jedem Zug würfelt mit +{n}.",
     "perk.rampart.name": "Mauer",
-    "perk.rampart.text": "Deine Hauptstadt verteidigt mit +{n} auf den Wurf statt mit +{base}.",
+    "perk.rampart.text": "Jeder Angriff auf deine Hauptstadt verliert zuerst {units} an der Mauer.",
     "perk.bulwark.name": "Wache",
     "perk.bulwark.text": "Deine Felder neben deiner Hauptstadt verteidigen mit +{n} auf den Wurf.",
     "perk.hoard.name": "Perlentaucher",
