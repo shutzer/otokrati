@@ -3,7 +3,8 @@
 **Bitka za otočje, nacrtana pod satom.** Potezna igra osvajanja otočja za preglednik, za djecu od 10 do 13 godina.
 Cijela igra je jedna HTML datoteka: bez instalacije, bez interneta, bez reklama.
 
-*A turn-based island-conquest game for kids aged 10–13, in Croatian. One HTML file, no install, works offline.*
+*A turn-based island-conquest game for kids aged 10–13, in English, Croatian, German, Spanish, French, Italian and
+Portuguese. One HTML file, no install, works offline.*
 
 ![Partija protiv galebice Gite u 9. krugu: žuta i ružičasta flota na heksagonalnom otočju nacrtanom u bilježnici](.github/readme/partija.png)
 
@@ -97,6 +98,11 @@ prijatelju pa vidite tko bolje igra na istom otočju.
   <img src=".github/readme/mobitel.png" alt="Partija na mobitelu, uspravno" width="200">
 </p>
 
+### Jezici
+
+Igra govori engleski, hrvatski, njemački, španjolski, francuski, talijanski i portugalski. Prvi put se otvara na
+jeziku preglednika, a ako ga nema, na engleskom. Jezik se mijenja na početnom zaslonu i pamti se.
+
 ### Upravljanje
 
 Igra se mišem ili dodirom: dodirni svoje polje, pa susjedno. Na tipkovnici `←` `→` (ili `-` `+`) mijenjaju koliko
@@ -116,7 +122,7 @@ drugi preglednik ili ista igra s web adrese počinju ispočetka. Napredak briše
 Treba **Node 22** ili noviji. Ovisnosti nema, pa se ništa ne instalira.
 
 ```sh
-node --test                                    # 55 testova: pravila, borba, AI, napredovanje, dvoboj, moći
+node --test                                    # 60 testova: pravila, borba, AI, napredovanje, dvoboj, moći, prijevodi
 node tools/simulate.js --games 300             # turnir računala protiv računala, obje vrste igre
 node tools/simulate.js --games 100 --mode adventure --pairs hard:normal   # jedan par, jedna vrsta igre
 ```
@@ -142,11 +148,24 @@ partija potpuno određena kodom mape i potezima.
 | 6 | `Rules` | stanje igre i prijelazi |
 | 7 | `AI` | tri protivnika kao čiste funkcije stanja |
 | 8 | `Career` | iskustvo, razine, zvjezdice, značke |
-| 9 | `Lang` | hrvatski oblici uz brojeve |
+| 9 | `Lang` | riječi u odabranom jeziku, s oblicima uz brojeve, postocima i popisima kroz `Intl` |
 | 10 | preglednik | crtanje, zvuk, animacije, unos, zasloni |
 
 Moduli 1–9 ne diraju DOM, pa ih testovi i alati učitavaju izravno iz `index.html`
 ([tools/load-core.js](tools/load-core.js)).
+
+### Prijevodi
+
+Svaki tekst za igrača je ključ u `lang/<jezik>.json`. Izvor je [lang/en.json](lang/en.json): ostali jezici imaju
+iste ključeve, iste `{parametre}` i sve oblike množine koje njihov jezik treba. Jer igra radi otvorena s diska, a
+preglednik tada ne smije učitavati datoteke, prijevodi se upisuju u `index.html`:
+
+```sh
+node tools/lang.js           # provjeri lang/*.json i upiše ih u index.html (isto: pnpm lang)
+node tools/lang.js --check   # samo provjera
+```
+
+Novi jezik je nova datoteka `lang/<kod>.json` s istim ključevima kao `en.json`, pa `node tools/lang.js`.
 
 ### Alati
 
@@ -176,8 +195,9 @@ uz iste seedove klasična partija potpuno određena.
 
 ```text
 index.html        cijela igra
-tests/            node --test: rules.test.js (klasika), adventure.test.js (pustolovina, dvoboj, moći)
-tools/            turnir, partija računala, provjera kroz preglednik
+lang/             prijevodi, po jedna datoteka za svaki jezik; izvor je en.json
+tests/            node --test: rules.test.js (klasika), adventure.test.js (pustolovina, dvoboj, moći), lang.test.js
+tools/            turnir, partija računala, provjera kroz preglednik, lang.js (prijevodi u index.html)
 .github/readme/   snimke zaslona za ovaj README (igra ih ne koristi)
 .githooks/        pre-push provjere: git config core.hooksPath .githooks
 LICENSE           MIT

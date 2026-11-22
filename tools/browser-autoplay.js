@@ -18,7 +18,7 @@ async () => {
   const LANE_MARGIN = 1.8; // must match createPainter in index.html
   const TIME_SCALE = 12;
 
-  const source = document.scripts[0].textContent;
+  const source = [...document.scripts].find((script) => !script.type).textContent; // the game, not its language packs
   const box = { exports: {} };
   new Function('module', 'document', source)(box, undefined);
   const { CONFIG, Rules, AI, Career, Hex } = box.exports;
@@ -111,10 +111,13 @@ async () => {
         if ($('panel').dataset.mode !== 'order') throw new Error(`no order panel for ${JSON.stringify(action)}`);
         while (Number($('orderCount').textContent) > action.count) $('orderLess').click();
         if (state.owner[action.to] !== state.current) {
-          const expected = (Rules.winOdds(state, action.to, action.count) * 100).toFixed(1).replace('.', ',');
+          // The page writes the odds in its language ("78.4%", "78,4 %"): compare the number only.
+          const expected = Rules.winOdds(state, action.to, action.count) * 100;
           const shown = $('orderOdds').textContent;
-          if (!shown.startsWith(expected.slice(0, -1)) && !/^(100|99,9|0,1|0) %$/.test(shown)) {
-            status.errors.push(`odds: page shows ${shown}, expected ${expected} %`);
+          const value = Number(shown.replace(/[^\d.,]/g, '').replace(',', '.'));
+          const edge = [0, 0.1, 99.9, 100].includes(value);
+          if (!(Math.abs(value - expected) <= 0.051) && !edge) {
+            status.errors.push(`odds: page shows ${shown}, expected ${expected.toFixed(1)}`);
           }
         }
         $('goBtn').click();

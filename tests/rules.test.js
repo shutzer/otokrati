@@ -11,6 +11,7 @@ const { loadCore } = require('../tools/load-core');
 const { playGame } = require('../tools/arena');
 
 const core = loadCore();
+const packs = require('../tools/lang').loadPacks();
 const { CONFIG, NEUTRAL, WATER, Prng, MapGen, Combat, Rules, AI, Lang } = core;
 const R = CONFIG.rules;
 const MAP_SEEDS = 2000;
@@ -532,21 +533,39 @@ test('ai: hard takes a capital that is there for the taking and guards its own',
 /* ── wording ─────────────────────────────────────────────────────────── */
 
 test('language: nouns agree with their number', () => {
+  const hr = Lang.create(packs.hr, packs.en);
   const units = { 0: '0 jedinica', 1: '1 jedinica', 2: '2 jedinice', 4: '4 jedinice', 5: '5 jedinica',
     11: '11 jedinica', 12: '12 jedinica', 14: '14 jedinica', 21: '21 jedinica', 22: '22 jedinice',
     25: '25 jedinica', 101: '101 jedinica', 112: '112 jedinica' };
-  for (const [n, text] of Object.entries(units)) assert.equal(Lang.counted('unit', Number(n)), text);
-  assert.deepEqual([1, 2, 5, 22].map((n) => Lang.counted('pearl', n)), ['1 biser', '2 bisera', '5 bisera', '22 bisera']);
-  assert.deepEqual([1, 3, 7, 21, 22].map((n) => Lang.noun('tile', n)), ['polje', 'polja', 'polja', 'polje', 'polja']);
-  const rounds = ['krug', 'kruga', 'krugova'];
-  assert.deepEqual([1, 2, 5, 21, 40].map((n) => Lang.plural(n, rounds)), ['krug', 'kruga', 'krugova', 'krug', 'krugova']);
+  for (const [n, text] of Object.entries(units)) assert.equal(hr.counted('unit', Number(n)), text);
+  assert.deepEqual([1, 2, 5, 22].map((n) => hr.counted('pearl', n)), ['1 biser', '2 bisera', '5 bisera', '22 bisera']);
+  assert.deepEqual([1, 3, 7, 21, 22].map((n) => hr.noun('tile', n)), ['polje', 'polja', 'polja', 'polje', 'polja']);
+
+  const en = Lang.create(packs.en);
+  assert.deepEqual([0, 1, 2, 21].map((n) => en.counted('unit', n)), ['0 units', '1 unit', '2 units', '21 units']);
+  assert.equal(en.t('banner.round', { round: 9, max: 40 }), 'Round 9 of 40');
+  assert.throws(() => en.t('count.unit'), /needs a count/);
 });
 
-test('language: percentages use a decimal comma and never claim false certainty', () => {
-  assert.equal(Lang.percent(0.7843), '78,4 %');
-  assert.equal(Lang.percent(15 / 36), '41,7 %');
-  assert.equal(Lang.percent(0.99999), '99,9 %');
-  assert.equal(Lang.percent(0.00001), '0,1 %');
-  assert.equal(Lang.percent(1), '100 %');
-  assert.equal(Lang.percent(0), '0 %');
+test('language: percentages follow the language and never claim false certainty', () => {
+  const hr = Lang.create(packs.hr, packs.en);
+  const nbsp = '\u00a0';
+  assert.equal(hr.percent(0.7843), `78,4${nbsp}%`);
+  assert.equal(hr.percent(15 / 36), `41,7${nbsp}%`);
+  assert.equal(hr.percent(0.99999), `99,9${nbsp}%`);
+  assert.equal(hr.percent(0.00001), `0,1${nbsp}%`);
+  assert.equal(hr.percent(1), `100${nbsp}%`);
+  assert.equal(hr.percent(0), `0${nbsp}%`);
+  const en = Lang.create(packs.en);
+  assert.equal(en.percent(0.7843), '78.4%');
+  assert.equal(en.percentRounded(0.996), '99%');
+  assert.equal(en.percentRounded(0.004), '1%');
+  assert.equal(en.join([3, 7, 12]), '3, 7, and 12');
+  assert.equal(hr.join([3, 7, 12]), '3, 7 i 12');
+});
+
+test('language: the first visit follows the browser, otherwise English', () => {
+  assert.equal(Lang.pick(['hr-HR', 'en'], ['en', 'hr'], 'en'), 'hr');
+  assert.equal(Lang.pick(['sv-SE', 'de-AT'], ['en', 'hr'], 'en'), 'en');
+  assert.equal(Lang.pick([], ['en', 'hr'], 'en'), 'en');
 });
