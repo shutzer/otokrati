@@ -312,6 +312,9 @@
     "log.stars": "Zvjezdice",
     "log.badges": "Značke",
     "log.close": "Zatvori",
+    "rotate.title": "Okreni mobitel!",
+    "rotate.text": "Otokrati su složeni za uspravan mobitel. Ništa se ne gubi: sve čeka točno kako je bilo.",
+
     "crew.title": "Tko plovi?",
     "crew.intro": "Svatko na ovom uređaju može ploviti svojim brodom, sa svojom razinom, zvjezdicama, značkama i spremljenom partijom.",
     "crew.name": "Ime",

@@ -28,7 +28,7 @@ const PLACEHOLDER = /\{(\w+)\}/g;
  * cannot be drawn fall back to plain type, which looks out of place.
  */
 const LETTERED = ['fx.capital', 'fx.boom', 'fx.streak', 'fx.here', 'end.win', 'end.loss', 'end.draw', 'end.wins',
-  'pick.title', 'help.title', 'leave.title', 'log.title', 'crew.title', 'banner.you', 'banner.rival', 'banner.duel'];
+  'pick.title', 'help.title', 'leave.title', 'log.title', 'crew.title', 'rotate.title', 'banner.you', 'banner.rival', 'banner.duel'];
 const LETTERING = /^(?:[A-Za-z0-9 !?.,:%+\-×'’¡¿\u00A0\u202FčćđšžČĆĐŠŽàáâãäçèéêëìíîïñòóôõöùúûüÿßÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜŸ]|\{\w+\})*$/u;
 
 /** Every pack, English first and the rest by code. */

@@ -312,6 +312,9 @@
     "log.stars": "Étoiles",
     "log.badges": "Badges",
     "log.close": "Fermer",
+    "rotate.title": "Tourne ton téléphone !",
+    "rotate.text": "Otokrati se joue avec le téléphone à la verticale. Rien n’est perdu : tout t’attend exactement comme avant.",
+
     "crew.title": "Qui navigue ?",
     "crew.intro": "Chacun sur cet appareil peut naviguer sur son propre bateau, avec son niveau, ses étoiles, ses badges et sa partie sauvegardée.",
     "crew.name": "Nom",

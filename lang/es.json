@@ -312,6 +312,9 @@
     "log.stars": "Estrellas",
     "log.badges": "Insignias",
     "log.close": "Cerrar",
+    "rotate.title": "¡Gira el móvil!",
+    "rotate.text": "Otokrati está hecho para el móvil en vertical. No se pierde nada: todo espera tal como estaba.",
+
     "crew.title": "¿Quién navega?",
     "crew.intro": "Cada persona en este dispositivo puede navegar con su propio barco, con su nivel, estrellas, insignias y partida guardada.",
     "crew.name": "Nombre",
