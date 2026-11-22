@@ -123,7 +123,8 @@ Igra je izrađena i provjerena u **Chromeu**, na računalu i u rasporedima mobit
 Safari još nisu isprobani**, kao ni zvuk na pravim uređajima. Ako nešto ne radi, otvori issue.
 
 Napredak i partija u tijeku spremljeni su u `localStorage` preglednika. Zatvorena kartica ne gubi partiju: početni
-zaslon nudi „Nastavi partiju”. Spremljeno je vezano uz taj preglednik i uz adresu s koje se igra otvara, pa drugi
+zaslon nudi „Nastavi partiju”. Na istom uređaju može ploviti do četvero djece, svako svojim brodom (gumb „Tko plovi?”
+uz karticu broda), sa svojom razinom, zvjezdicama, značkama i spremljenom partijom. Spremljeno je vezano uz taj preglednik i uz adresu s koje se igra otvara, pa drugi
 preglednik ili ista igra s web adrese počinju ispočetka. Sve briše čišćenje podataka preglednika.
 
 ## Za razvoj

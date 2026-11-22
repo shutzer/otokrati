@@ -64,7 +64,9 @@ async () => {
     const duel = rival === 'friend';
     const adventure = app.dataset.mode === 'adventure';
     const stored = JSON.parse(window.localStorage.getItem(CONFIG.ui.storageKey) ?? 'null');
-    const level = Career.levelOf(Career.restore(stored?.profile).xp).level;
+    // The career is the active ship's; a save from before there were ships keeps it at the top.
+    const ship = stored?.crew?.list?.find((entry) => entry.id === stored.crew.active);
+    const level = Career.levelOf(Career.restore(ship ? ship.profile : stored?.profile).xp).level;
     const hand = adventure ? Career.tricksAt(level) : [];
     if (hand.join(',') !== app.dataset.hand) status.errors.push(`hand: page has "${app.dataset.hand}", expected "${hand}"`);
     const purse = adventure ? Career.pearlsAt(level) : 0;
