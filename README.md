@@ -180,9 +180,10 @@ tests/            node --test: rules.test.js (klasika), adventure.test.js (pusto
 tools/            turnir, partija računala, provjera kroz preglednik
 .github/readme/   snimke zaslona za ovaj README (igra ih ne koristi)
 .githooks/        pre-push provjere: git config core.hooksPath .githooks
+LICENSE           MIT
 ```
 
 ## Licenca
 
-Licenca još nije odabrana, pa zasad vrijedi zadano: sva prava pridržana. Igru smiješ preuzeti i igrati, ali ne i
-dalje objavljivati ni mijenjati bez dopuštenja.
+[MIT](LICENSE): igru smiješ igrati, mijenjati, dijeliti i postaviti na svoju stranicu, i u komercijalne svrhe, uz uvjet
+da uz nju ostane napomena o autoru i licenci (vrh `index.html` i datoteka `LICENSE`).

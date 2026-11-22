@@ -2,6 +2,7 @@
   "name": "otokrati",
   "version": "0.0.0",
   "private": true,
+  "license": "MIT",
   "description": "Otokrati: potezna igra osvajanja otočja za preglednik, za djecu od 10 do 13 godina. Cijela igra je index.html.",
   "engines": {
     "node": ">=22"
