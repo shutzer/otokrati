@@ -70,7 +70,7 @@ do 40. kruga, pobjeđuje onaj s više polja.
 | --- | --- |
 | Regruti | +1 pojačanje u svakom potezu |
 | Juriš | prvi napad u svakom potezu baca s +1 |
-| Bedem | prijestolnica se brani s +2 umjesto +1 |
+| Bedem | svaki napad na tvoju prijestolnicu prvo izgubi 2 jedinice na zidinama |
 | Straža | tvoja polja uz prijestolnicu brane se s +1 |
 | Školjkar | +1 biser za svako osvojeno polje |
 | Cjenkanje | svaki trik stoji biser manje |
@@ -122,8 +122,9 @@ igra poštuje postavku sustava za smanjeno kretanje.
 Igra je izrađena i provjerena u **Chromeu**, na računalu i u rasporedima mobitela, uspravno i položeno. **Firefox i
 Safari još nisu isprobani**, kao ni zvuk na pravim uređajima. Ako nešto ne radi, otvori issue.
 
-Napredak je spremljen u `localStorage` preglednika. Vezan je uz taj preglednik i uz adresu s koje se igra otvara, pa
-drugi preglednik ili ista igra s web adrese počinju ispočetka. Napredak briše čišćenje podataka preglednika.
+Napredak i partija u tijeku spremljeni su u `localStorage` preglednika. Zatvorena kartica ne gubi partiju: početni
+zaslon nudi „Nastavi partiju”. Spremljeno je vezano uz taj preglednik i uz adresu s koje se igra otvara, pa drugi
+preglednik ili ista igra s web adrese počinju ispočetka. Sve briše čišćenje podataka preglednika.
 
 ## Za razvoj
 
