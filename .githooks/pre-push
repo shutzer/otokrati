@@ -25,8 +25,14 @@ else note "✓ docs/ i CLAUDE.md nisu praćeni"; fi
 if [ -n "$(git ls-files .env '.env.*' 2>/dev/null)" ]; then note "✗ .env je praćen u gitu"; fail=1
 else note "✓ .env nije praćen"; fi
 
-if git grep -nIE "(Bearer|_SECRET[[:space:]]*=|_TOKEN[[:space:]]*=)[[:space:]]*[\"']?[A-Za-z0-9_-]{30,}|BEGIN (RSA )?PRIVATE KEY" -- . ':!.githooks/pre-push'; then
-  note "✗ moguć token ili ključ u praćenoj datoteci"; fail=1
+# Iznimka je samo ova jedna vrijednost: token Cloudflare Web Analyticsa u index.html [ODLUKA-0045]. Javan je po
+# prirodi, jer ga beacon šalje iz preglednika svakog posjetitelja. Svaki drugi token, pod bilo kojim imenom, i dalje
+# zaustavlja push.
+public_tokens='8de0e0b3de55426bafdecfbd8eafc0df'
+secrets=$(git grep -nIE "(Bearer|_SECRET[[:space:]]*=|_TOKEN[[:space:]]*=)[[:space:]]*[\"']?[A-Za-z0-9_-]{30,}|BEGIN (RSA )?PRIVATE KEY" -- . ':!.githooks/pre-push' \
+  | grep -vF "$public_tokens" || true)
+if [ -n "$secrets" ]; then
+  printf '%s\n' "$secrets"; note "✗ moguć token ili ključ u praćenoj datoteci"; fail=1
 else note "✓ nema token-like stringova"; fi
 
 # 4) adresa autora mora biti postavljena lokalno, a svaki commit koji odlazi mora nositi baš nju
