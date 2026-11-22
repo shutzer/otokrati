@@ -1,0 +1,50 @@
+#!/bin/sh
+# Provjere prije pusha: testovi, ništa privatno u praćenim datotekama, tajne i adresa autora.
+#
+# Uključi se jednom po klonu:  git config core.hooksPath .githooks
+# Preskoči iznimno:            git push --no-verify
+
+set -eu
+cd "$(git rev-parse --show-toplevel)"
+
+fail=0
+note() { printf '  %s\n' "$1"; }
+printf 'pre-push: provjere...\n'
+
+# 1) testovi pravila, AI-ja i napredovanja
+if ! command -v node >/dev/null 2>&1; then note "✗ nema node, testovi nisu pokrenuti"; fail=1
+elif ! out=$(node --test 2>&1); then note "✗ testovi"; printf '%s\n' "$out" | tail -40; fail=1
+else note "✓ testovi ($(printf '%s' "$out" | sed -n 's/^ℹ pass //p') prolazi)"; fi
+
+# 2) docs/ i CLAUDE.md vode se izvan ovog repoa i ne smiju u njega ući
+tracked=$(git ls-files docs CLAUDE.md)
+if [ -n "$tracked" ]; then note "✗ praćeno, a ne smije biti:"; printf '%s\n' "$tracked" | head -10; fail=1
+else note "✓ docs/ i CLAUDE.md nisu praćeni"; fi
+
+# 3) tajne ne smiju biti praćene
+if [ -n "$(git ls-files .env '.env.*' 2>/dev/null)" ]; then note "✗ .env je praćen u gitu"; fail=1
+else note "✓ .env nije praćen"; fi
+
+if git grep -nIE "(Bearer|_SECRET[[:space:]]*=|_TOKEN[[:space:]]*=)[[:space:]]*[\"']?[A-Za-z0-9_-]{30,}|BEGIN (RSA )?PRIVATE KEY" -- . ':!.githooks/pre-push'; then
+  note "✗ moguć token ili ključ u praćenoj datoteci"; fail=1
+else note "✓ nema token-like stringova"; fi
+
+# 4) adresa autora mora biti postavljena lokalno, a svaki commit koji odlazi mora nositi baš nju
+#    (autor i committer); usto nijedan commit koji odlazi ne smije dirati docs/ ni CLAUDE.md
+want=$(git config --local user.email || true)
+zero=0000000000000000000000000000000000000000
+bad=""; leak=""
+while read -r _lref lsha _rref rsha; do
+  [ "$lsha" = "$zero" ] && continue
+  if [ "$rsha" = "$zero" ]; then range="$lsha"; else range="$rsha..$lsha"; fi
+  [ -n "$want" ] && bad="$bad$(git log --format='%h %ae %ce' "$range" | awk -v w="$want" '$2 != w || $3 != w')"
+  leak="$leak$(git log --format='%h' "$range" -- docs CLAUDE.md)"
+done
+if [ -z "$want" ]; then note "✗ user.email nije postavljen lokalno za ovaj repo (git config user.email <adresa>)"; fail=1
+elif [ -n "$bad" ]; then note "✗ commitovi pod drugom adresom:"; printf '%s\n' "$bad"; fail=1
+else note "✓ svi commitovi pod lokalnom adresom"; fi
+if [ -n "$leak" ]; then note "✗ commitovi koji diraju docs/ ili CLAUDE.md:"; printf '%s\n' "$leak"; fail=1
+else note "✓ nijedan commit ne dira docs/ ni CLAUDE.md"; fi
+
+if [ "$fail" -ne 0 ]; then printf '\npre-push: ODUSTAJEM. Popravi gore navedeno ili gurni s --no-verify.\n' >&2; exit 1; fi
+printf 'pre-push: sve prolazi.\n'

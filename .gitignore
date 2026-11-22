@@ -1,2 +1,13 @@
+# Dokumentacija i upute za Claude Code vode se zasebno, izvan ovog repoa
+/docs/
+/CLAUDE.md
+
 .remember/
 .DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Node (ovisnosti nema; pnpm ovdje ostavlja samo svoje stanje)
+node_modules/
