@@ -81,6 +81,11 @@ async () => {
     const lastRound = window.autoplayUntilRound ?? Infinity;
     while (!state.result && state.round < lastRound) {
       await idle();
+      // The guide of a first game holds the board until its notes are read: read on, as a child would.
+      while (!$('coach').hidden && !$('coachNext').hidden) {
+        $('coachNext').click();
+        await wait(60);
+      }
       if (state.current === 1 && !duel) { // mirror the rival's whole turn; the interface plays it on its own
         while (!state.result && state.current === 1) state = Rules.applyAction(state, AI.chooseAction(state, rival)).state;
         await wait(60);
