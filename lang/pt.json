@@ -22,6 +22,8 @@
     "menu.seedTitle": "O mesmo código (seed) dá sempre o mesmo mapa e os mesmos lançamentos de dado",
     "menu.shuffle": "Novo mapa",
     "menu.start": "Zarpar!",
+    "menu.resume": "Continuar a partida",
+    "resume.note": "Rodada {round} de {max} · {who}",
     "menu.help": "Como jogar",
 
     "custom.open": "Avançado",
@@ -288,7 +290,7 @@
     "help.ok": "Entendi!",
 
     "leave.title": "Sair da partida?",
-    "leave.text": "A partida não fica guardada e não dá experiência. Você pode jogar o mesmo mapa de novo com o mesmo código.",
+    "leave.text": "A partida fica guardada: você a continua na tela inicial. Uma partida nova a substitui.",
     "leave.stay": "Voltar ao jogo",
     "leave.go": "Sair da partida",
 

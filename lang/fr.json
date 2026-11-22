@@ -22,6 +22,8 @@
     "menu.seedTitle": "Le même code (seed) donne toujours la même carte et les mêmes lancers de dé",
     "menu.shuffle": "Nouvelle carte",
     "menu.start": "En mer !",
+    "menu.resume": "Reprendre la partie",
+    "resume.note": "Manche {round} sur {max} · {who}",
     "menu.help": "Comment jouer",
 
     "custom.open": "Avancé",
@@ -288,7 +290,7 @@
     "help.ok": "Compris !",
 
     "leave.title": "Quitter la partie ?",
-    "leave.text": "La partie n’est pas sauvegardée et ne rapporte pas d’expérience. Tu peux rejouer la même carte avec le même code.",
+    "leave.text": "La partie reste sauvegardée : tu la reprends depuis l’écran d’accueil. Une nouvelle partie la remplace.",
     "leave.stay": "Continuer",
     "leave.go": "Quitter la partie",
 

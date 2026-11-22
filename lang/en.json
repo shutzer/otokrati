@@ -22,6 +22,8 @@
     "menu.seedTitle": "The same code (seed) always gives the same map and the same dice rolls",
     "menu.shuffle": "New map",
     "menu.start": "Set sail!",
+    "menu.resume": "Continue the game",
+    "resume.note": "Round {round} of {max} · {who}",
     "menu.help": "How to play",
 
     "custom.open": "Advanced",
@@ -288,7 +290,7 @@
     "help.ok": "Got it!",
 
     "leave.title": "Leave the game?",
-    "leave.text": "The game isn't saved and earns no experience. You can play the same map again with the same code.",
+    "leave.text": "The game stays saved: continue it from the start screen. Starting a new game replaces it.",
     "leave.stay": "Keep playing",
     "leave.go": "Leave the game",
 

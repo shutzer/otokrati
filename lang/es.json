@@ -22,6 +22,8 @@
     "menu.seedTitle": "El mismo código (seed) da siempre el mismo mapa y las mismas tiradas de dado",
     "menu.shuffle": "Mapa nuevo",
     "menu.start": "¡Zarpa!",
+    "menu.resume": "Continuar la partida",
+    "resume.note": "Ronda {round} de {max} · {who}",
     "menu.help": "Cómo se juega",
 
     "custom.open": "Avanzado",
@@ -288,7 +290,7 @@
     "help.ok": "¡Entendido!",
 
     "leave.title": "¿Salir de la partida?",
-    "leave.text": "La partida no se guarda y no da experiencia. Puedes volver a jugar el mismo mapa con el mismo código.",
+    "leave.text": "La partida queda guardada: la continúas desde la pantalla de inicio. Una partida nueva la sustituye.",
     "leave.stay": "Seguir jugando",
     "leave.go": "Salir de la partida",
 

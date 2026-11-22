@@ -682,3 +682,26 @@ test('duel: both fleets start level, either may move first, and the game plays o
     assert.equal(state.firstPlayer, firstPlayer);
   }
 });
+
+test('saved game: the opening options and the actions since, through JSON, rebuild the game exactly', () => {
+  // The page saves a game in progress this way and replays it when the player comes back.
+  const options = { seed: 'RESUME', firstPlayer: 1, landmarks: true, tricks: [ALL_TRICKS, AI.tricksOf('hard')], pearls: [3, 0], perks: true };
+  let { state } = Rules.createGame(options);
+  const actions = [];
+  while (!state.result && actions.length < 600) {
+    const action = AI.chooseAction(state, state.current === 0 ? 'normal' : 'hard');
+    actions.push(action);
+    state = apply(state, action);
+  }
+  assert.ok(actions.some((action) => action.type === 'trick') && actions.some((action) => action.type === 'perk'));
+
+  const saved = JSON.parse(JSON.stringify({ options, actions }));
+  let rebuilt = Rules.createGame(saved.options).state;
+  for (const action of saved.actions) {
+    assert.equal(Rules.validate(rebuilt, action), null);
+    rebuilt = apply(rebuilt, action);
+  }
+  for (const field of ['owner', 'units', 'locked', 'shield', 'loot', 'pearls', 'perks', 'history', 'result', 'rng', 'round', 'current']) {
+    assert.deepEqual(rebuilt[field], state[field], field);
+  }
+});

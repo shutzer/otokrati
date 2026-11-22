@@ -22,6 +22,8 @@
     "menu.seedTitle": "Lo stesso codice (seed) dà sempre la stessa mappa e gli stessi tiri di dado",
     "menu.shuffle": "Nuova mappa",
     "menu.start": "Salpa!",
+    "menu.resume": "Riprendi la partita",
+    "resume.note": "Round {round} di {max} · {who}",
     "menu.help": "Come si gioca",
 
     "custom.open": "Avanzate",
@@ -288,7 +290,7 @@
     "help.ok": "Capito!",
 
     "leave.title": "Uscire dalla partita?",
-    "leave.text": "La partita non viene salvata e non dà esperienza. Puoi rigiocare la stessa mappa con lo stesso codice.",
+    "leave.text": "La partita resta salvata: la riprendi dalla schermata iniziale. Una nuova partita la sostituisce.",
     "leave.stay": "Continua a giocare",
     "leave.go": "Esci dalla partita",
 

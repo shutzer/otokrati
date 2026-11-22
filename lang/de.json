@@ -22,6 +22,8 @@
     "menu.seedTitle": "Derselbe Code (Seed) ergibt immer dieselbe Karte und dieselben Würfe",
     "menu.shuffle": "Neue Karte",
     "menu.start": "Leinen los!",
+    "menu.resume": "Spiel fortsetzen",
+    "resume.note": "Runde {round} von {max} · {who}",
     "menu.help": "So geht's",
 
     "custom.open": "Erweitert",
@@ -288,7 +290,7 @@
     "help.ok": "Alles klar!",
 
     "leave.title": "Spiel verlassen?",
-    "leave.text": "Das Spiel wird nicht gespeichert und bringt keine Erfahrung. Mit demselben Code kannst du dieselbe Karte noch mal spielen.",
+    "leave.text": "Das Spiel bleibt gespeichert: Du setzt es auf dem Startbildschirm fort. Ein neues Spiel ersetzt es.",
     "leave.stay": "Weiterspielen",
     "leave.go": "Spiel verlassen",
 

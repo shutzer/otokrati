@@ -22,6 +22,8 @@
     "menu.seedTitle": "Isti kod (seed) uvijek daje istu mapu i ista bacanja kocke",
     "menu.shuffle": "Nova mapa",
     "menu.start": "Zaplovi!",
+    "menu.resume": "Nastavi partiju",
+    "resume.note": "Krug {round} od {max} · {who}",
     "menu.help": "Kako se igra",
 
     "custom.open": "Napredno",
@@ -288,7 +290,7 @@
     "help.ok": "Jasno!",
 
     "leave.title": "Napustiti partiju?",
-    "leave.text": "Partija se ne sprema i ne donosi iskustvo. Istu mapu možeš ponovno odigrati s istim kodom.",
+    "leave.text": "Partija ostaje spremljena: nastaviš je s početnog zaslona. Nova partija je zamjenjuje.",
     "leave.stay": "Nastavi igrati",
     "leave.go": "Napusti partiju",
 
