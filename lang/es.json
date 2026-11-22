@@ -1,6 +1,9 @@
 {
-  "meta": { "code": "es", "locale": "es", "name": "Español" },
+  "meta": { "code": "es", "locale": "es", "name": "Español", "og": "es_ES" },
   "strings": {
+    "meta.title": "Otokrati – juego de conquistar islas para niños",
+    "meta.description": "Un juego de estrategia por turnos para niños de 10 a 13 años: conquista un archipiélago dibujado a mano contra un cangrejo, una gaviota y un pulpo, o contra un amigo. Gratis, en el navegador, sin instalar nada.",
+
     "count.unit": { "one": "{n} unidad", "other": "{n} unidades" },
     "count.pearl": { "one": "{n} perla", "other": "{n} perlas" },
     "noun.unit": { "one": "unidad", "other": "unidades" },

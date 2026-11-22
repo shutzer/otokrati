@@ -1,6 +1,9 @@
 {
-  "meta": { "code": "it", "locale": "it", "name": "Italiano" },
+  "meta": { "code": "it", "locale": "it", "name": "Italiano", "og": "it_IT" },
   "strings": {
+    "meta.title": "Otokrati – gioco di conquista delle isole per ragazzi",
+    "meta.description": "Un gioco di strategia a turni per ragazzi dai 10 ai 13 anni: conquista un arcipelago disegnato a mano contro un granchio, una gabbiana e una piovra, o contro un amico. Gratis, nel browser, senza installare nulla.",
+
     "count.unit": { "one": "{n} unità", "other": "{n} unità" },
     "count.pearl": { "one": "{n} perla", "other": "{n} perle" },
     "noun.unit": { "one": "unità", "other": "unità" },

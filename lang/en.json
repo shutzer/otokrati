@@ -1,6 +1,9 @@
 {
-  "meta": { "code": "en", "locale": "en", "name": "English" },
+  "meta": { "code": "en", "locale": "en", "name": "English", "og": "en_US" },
   "strings": {
+    "meta.title": "Otokrati – island conquest game for kids",
+    "meta.description": "A turn-based strategy game for kids aged 10–13: conquer a hand-drawn archipelago against a crab, a gull and an octopus, or against a friend. Free, in your browser, nothing to install.",
+
     "count.unit": { "one": "{n} unit", "other": "{n} units" },
     "count.pearl": { "one": "{n} pearl", "other": "{n} pearls" },
     "noun.unit": { "one": "unit", "other": "units" },

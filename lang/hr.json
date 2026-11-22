@@ -1,6 +1,9 @@
 {
-  "meta": { "code": "hr", "locale": "hr", "name": "Hrvatski" },
+  "meta": { "code": "hr", "locale": "hr", "name": "Hrvatski", "og": "hr_HR" },
   "strings": {
+    "meta.title": "Otokrati – igra osvajanja otočja za djecu",
+    "meta.description": "Potezna strateška igra za djecu od 10 do 13 godina: osvoji otočje nacrtano u bilježnici protiv raka, galebice i hobotnice ili protiv prijatelja. Besplatno, u pregledniku, bez instalacije.",
+
     "count.unit": { "one": "{n} jedinica", "few": "{n} jedinice", "other": "{n} jedinica" },
     "count.pearl": { "one": "{n} biser", "few": "{n} bisera", "other": "{n} bisera" },
     "noun.unit": { "one": "jedinica", "few": "jedinice", "other": "jedinica" },

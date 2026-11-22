@@ -1,6 +1,9 @@
 {
-  "meta": { "code": "de", "locale": "de", "name": "Deutsch" },
+  "meta": { "code": "de", "locale": "de", "name": "Deutsch", "og": "de_DE" },
   "strings": {
+    "meta.title": "Otokrati – Insel-Eroberungsspiel für Kinder",
+    "meta.description": "Ein rundenbasiertes Strategiespiel für Kinder von 10 bis 13: Erobere eine handgezeichnete Inselwelt gegen eine Krabbe, eine Möwe und einen Oktopus oder gegen Freunde. Kostenlos im Browser, ohne Installation.",
+
     "count.unit": { "one": "{n} Einheit", "other": "{n} Einheiten" },
     "count.pearl": { "one": "{n} Perle", "other": "{n} Perlen" },
     "noun.unit": { "one": "Einheit", "other": "Einheiten" },

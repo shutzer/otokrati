@@ -1,6 +1,9 @@
 {
-  "meta": { "code": "fr", "locale": "fr", "name": "Français" },
+  "meta": { "code": "fr", "locale": "fr", "name": "Français", "og": "fr_FR" },
   "strings": {
+    "meta.title": "Otokrati – jeu de conquête d’îles pour enfants",
+    "meta.description": "Un jeu de stratégie au tour par tour pour les 10–13 ans : conquiers un archipel dessiné à la main face à un crabe, une mouette et une pieuvre, ou contre un ami. Gratuit, dans le navigateur, sans installation.",
+
     "count.unit": { "one": "{n} unité", "other": "{n} unités" },
     "count.pearl": { "one": "{n} perle", "other": "{n} perles" },
     "noun.unit": { "one": "unité", "other": "unités" },

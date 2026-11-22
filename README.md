@@ -108,7 +108,8 @@ iza crtice (`M4ZATH-R20S6` je 20 krugova na velikom otočju), pa prijatelj s ist
 ### Jezici
 
 Igra govori engleski, hrvatski, njemački, španjolski, francuski, talijanski i portugalski. Prvi put se otvara na
-jeziku preglednika, a ako ga nema, na engleskom. Jezik se mijenja na početnom zaslonu i pamti se.
+jeziku preglednika, a ako ga nema, na engleskom. Jezik se mijenja na početnom zaslonu i pamti se, a link ga može
+nositi: [?lang=hr](https://shutzer.github.io/otokrati/?lang=hr), `?lang=de` i tako dalje.
 
 ### Upravljanje
 
@@ -210,6 +211,8 @@ tests/            node --test: rules.test.js (klasika), adventure.test.js (pusto
 tools/            turnir, partija računala, provjera kroz preglednik, lang.js (prijevodi u index.html)
 .github/readme/   snimke zaslona za ovaj README (igra ih ne koristi)
 .githooks/        pre-push provjere: git config core.hooksPath .githooks
+web/              slika za dijeljenje linka i ikone za početni zaslon mobitela (igra radi i bez njih)
+manifest.webmanifest  ime i ikone igre kad se doda na početni zaslon
 LICENSE           MIT
 ```
 
