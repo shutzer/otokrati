@@ -171,14 +171,19 @@ b, strong { font-weight: 700; }
 .portrait { background: var(--rival-soft); }
 .portrait .sour, .portrait.sour .glad { display: none; }
 .portrait.sour .sour { display: inline; }
-/* Eyes follow the pointer and blink now and then. */
+/*
+ * Eyes follow the pointer and blink now and then. Every pair gets its own
+ * --look-x/--look-y (-1..1, towards the pointer from where the pair sits);
+ * --reach is how far its pupils may travel inside the whites of its drawing.
+ */
 .pupils {
   transform-box: fill-box;
   transform-origin: center;
-  translate: calc(var(--look-x, 0) * 2.4px) calc(var(--look-y, 0) * 1.8px);
+  translate: calc(var(--look-x, 0) * var(--reach-x, 2.4px)) calc(var(--look-y, 0) * var(--reach-y, 1.8px));
   animation: blink 5.2s infinite;
 }
 .rival:nth-of-type(2n) .pupils, .side-1 .pupils { animation-delay: -1.7s; }
+.brand .pupils { --reach-x: 1.3px; --reach-y: 1.1px; } /* the logo's O's are small: white r 3.4, pupil r 1.7 */
 @keyframes blink { 0%, 95%, 100% { scale: 1 1; } 97% { scale: 1 0.1; } }
 
 /* Stars are stickers: gold once earned, an empty spot until then. */
@@ -6353,15 +6358,25 @@ dialog .menu-actions { margin-top: 20px; }
           boilers.forEach((show) => show(drawing));
         }, UI.boilMs);
       }
-      // ...and every pair of eyes follows the pointer, or the last touch.
+      // ...and every pair of eyes looks at the pointer, or the last touch, from where it sits on the page.
+      // Closer than LOOK_REACH pixels the eyes turn only part of the way, so they do not snap about.
+      const LOOK_REACH = 160;
       let looking = false;
       const look = (event) => {
         if (looking) return;
         looking = true;
         window.requestAnimationFrame(() => {
           looking = false;
-          app.style.setProperty('--look-x', ((event.clientX / window.innerWidth) * 2 - 1).toFixed(2));
-          app.style.setProperty('--look-y', ((event.clientY / window.innerHeight) * 2 - 1).toFixed(2));
+          document.querySelectorAll('.pupils').forEach((pair) => {
+            const box = pair.getBoundingClientRect();
+            if (!box.width) return; // not on screen
+            const dx = event.clientX - (box.left + box.width / 2);
+            const dy = event.clientY - (box.top + box.height / 2);
+            const distance = Math.hypot(dx, dy);
+            const pull = distance ? Math.min(1, distance / LOOK_REACH) / distance : 0;
+            pair.style.setProperty('--look-x', (dx * pull).toFixed(2));
+            pair.style.setProperty('--look-y', (dy * pull).toFixed(2));
+          });
         });
       };
       document.addEventListener('pointermove', look);
