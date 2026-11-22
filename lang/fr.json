@@ -105,12 +105,14 @@
 
     "game.label": "Partie",
     "game.board": "Carte des îles",
+    "board.fit": "Voir toute la carte",
     "bar.round": "Manche",
     "bar.of": "sur",
     "bar.sound": "Son",
     "bar.soundTitle": "Son (M)",
     "bar.speed": "Vitesse des animations",
     "bar.leave": "Quitter la partie",
+    "bar.more": "Menu",
     "side.you": "Toi",
     "side.perTurn": "par tour",
     "tricks.label": "Atouts",
@@ -124,6 +126,7 @@
     "panel.chipAll": "toutes",
     "panel.undo": "Défaire",
     "panel.endTurn": "Fin du tour",
+    "panel.endShort": "Fini",
     "panel.cancel": "Annuler",
 
     "order.less": "Une unité de moins",

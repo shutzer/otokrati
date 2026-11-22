@@ -105,12 +105,14 @@
 
     "game.label": "Partita",
     "game.board": "Mappa delle isole",
+    "board.fit": "Mostra tutta la mappa",
     "bar.round": "Round",
     "bar.of": "di",
     "bar.sound": "Suono",
     "bar.soundTitle": "Suono (M)",
     "bar.speed": "Velocità delle animazioni",
     "bar.leave": "Esci dalla partita",
+    "bar.more": "Menu",
     "side.you": "Tu",
     "side.perTurn": "per turno",
     "tricks.label": "Trucchi",
@@ -124,6 +126,7 @@
     "panel.chipAll": "tutte",
     "panel.undo": "Indietro",
     "panel.endTurn": "Fine turno",
+    "panel.endShort": "Fatto",
     "panel.cancel": "Annulla",
 
     "order.less": "Un'unità in meno",

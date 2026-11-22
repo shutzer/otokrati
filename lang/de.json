@@ -105,12 +105,14 @@
 
     "game.label": "Spiel",
     "game.board": "Karte der Inseln",
+    "board.fit": "Ganze Karte zeigen",
     "bar.round": "Runde",
     "bar.of": "von",
     "bar.sound": "Ton",
     "bar.soundTitle": "Ton (M)",
     "bar.speed": "Animationstempo",
     "bar.leave": "Spiel verlassen",
+    "bar.more": "Menü",
     "side.you": "Du",
     "side.perTurn": "pro Zug",
     "tricks.label": "Tricks",
@@ -124,6 +126,7 @@
     "panel.chipAll": "alle",
     "panel.undo": "Zurück",
     "panel.endTurn": "Zug beenden",
+    "panel.endShort": "Fertig",
     "panel.cancel": "Abbrechen",
 
     "order.less": "Eine Einheit weniger",

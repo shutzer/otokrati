@@ -105,12 +105,14 @@
 
     "game.label": "Partija",
     "game.board": "Mapa otočja",
+    "board.fit": "Prikaži cijelu mapu",
     "bar.round": "Krug",
     "bar.of": "od",
     "bar.sound": "Zvuk",
     "bar.soundTitle": "Zvuk (M)",
     "bar.speed": "Brzina animacija",
     "bar.leave": "Napusti partiju",
+    "bar.more": "Izbornik",
     "side.you": "Ti",
     "side.perTurn": "po potezu",
     "tricks.label": "Trikovi",
@@ -124,6 +126,7 @@
     "panel.chipAll": "sve",
     "panel.undo": "Poništi",
     "panel.endTurn": "Završi potez",
+    "panel.endShort": "Gotovo",
     "panel.cancel": "Odustani",
 
     "order.less": "Jedna jedinica manje",

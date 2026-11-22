@@ -105,12 +105,14 @@
 
     "game.label": "Game",
     "game.board": "Map of the islands",
+    "board.fit": "Show the whole map",
     "bar.round": "Round",
     "bar.of": "of",
     "bar.sound": "Sound",
     "bar.soundTitle": "Sound (M)",
     "bar.speed": "Animation speed",
     "bar.leave": "Leave the game",
+    "bar.more": "Menu",
     "side.you": "You",
     "side.perTurn": "per turn",
     "tricks.label": "Tricks",
@@ -124,6 +126,7 @@
     "panel.chipAll": "all",
     "panel.undo": "Undo",
     "panel.endTurn": "End turn",
+    "panel.endShort": "Done",
     "panel.cancel": "Cancel",
 
     "order.less": "One unit fewer",

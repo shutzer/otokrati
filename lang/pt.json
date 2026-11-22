@@ -105,12 +105,14 @@
 
     "game.label": "Partida",
     "game.board": "Mapa das ilhas",
+    "board.fit": "Ver o mapa inteiro",
     "bar.round": "Rodada",
     "bar.of": "de",
     "bar.sound": "Som",
     "bar.soundTitle": "Som (M)",
     "bar.speed": "Velocidade das animações",
     "bar.leave": "Sair da partida",
+    "bar.more": "Menu",
     "side.you": "Você",
     "side.perTurn": "por turno",
     "tricks.label": "Truques",
@@ -124,6 +126,7 @@
     "panel.chipAll": "todas",
     "panel.undo": "Desfazer",
     "panel.endTurn": "Encerrar turno",
+    "panel.endShort": "Pronto",
     "panel.cancel": "Cancelar",
 
     "order.less": "Uma unidade a menos",
