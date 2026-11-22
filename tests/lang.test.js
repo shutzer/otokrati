@@ -29,7 +29,7 @@ const literalKeys = () => {
   return found;
 };
 
-/** Keys the page builds from ids: tricks, powers, badges, rivals, modes, outcomes. */
+/** Keys the page builds from ids: tricks, powers, badges, rivals, modes, outcomes, advanced options. */
 const builtKeys = () => {
   const found = new Set();
   for (const id of Object.keys(CONFIG.tricks)) {
@@ -44,6 +44,7 @@ const builtKeys = () => {
   for (const part of ['name', 'about']) found.add(`rival.friend.${part}`);
   for (const mode of ['adventure', 'classic']) found.add(`mode.${mode}.about`);
   for (const outcome of ['win', 'loss', 'draw']) found.add(`end.${outcome}`);
+  for (const option of Object.keys(CONFIG.custom)) found.add(`custom.${option}`);
   return found;
 };
 

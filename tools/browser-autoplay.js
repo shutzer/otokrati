@@ -21,7 +21,7 @@ async () => {
   const source = [...document.scripts].find((script) => !script.type).textContent; // the game, not its language packs
   const box = { exports: {} };
   new Function('module', 'document', source)(box, undefined);
-  const { CONFIG, Rules, AI, Career, Hex } = box.exports;
+  const { CONFIG, Career, Hex, Custom, createCore } = box.exports;
 
   const nativeFrame = window.requestAnimationFrame.bind(window);
   window.requestAnimationFrame = (callback) => nativeFrame((time) => callback(time * TIME_SCALE));
@@ -58,7 +58,8 @@ async () => {
     $('setup').requestSubmit();
     await wait(50);
 
-    // The shadow game is set up the way the app sets up its own.
+    // The shadow game is set up the way the app sets up its own, by the rules in its map code.
+    const { Rules, AI } = createCore(Custom.configFor(Custom.decode(app.dataset.rules)));
     const rival = app.dataset.rival;
     const duel = rival === 'friend';
     const adventure = app.dataset.mode === 'adventure';

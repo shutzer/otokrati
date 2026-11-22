@@ -98,6 +98,13 @@ prijatelju pa vidite tko bolje igra na istom otočju.
   <img src=".github/readme/mobitel.png" alt="Partija na mobitelu, uspravno" width="200">
 </p>
 
+### Napredna pravila
+
+Gumb **Napredno** na početnom zaslonu mijenja deset pravila: broj krugova, veličinu otočja, koliko je mora, jedinice u
+prijestolnici, najviše jedinica na polju, pojačanja, trikove po potezu, bisere po osvajanju i jesu li moći uključene.
+Takve se partije igraju za zabavu i ne donose iskustvo, zvjezdice ni značke. Promijenjena pravila putuju u kodu mape
+iza crtice (`M4ZATH-R20S6` je 20 krugova na velikom otočju), pa prijatelj s istim kodom dobiva istu partiju.
+
 ### Jezici
 
 Igra govori engleski, hrvatski, njemački, španjolski, francuski, talijanski i portugalski. Prvi put se otvara na
@@ -122,7 +129,7 @@ drugi preglednik ili ista igra s web adrese počinju ispočetka. Napredak briše
 Treba **Node 22** ili noviji. Ovisnosti nema, pa se ništa ne instalira.
 
 ```sh
-node --test                                    # 60 testova: pravila, borba, AI, napredovanje, dvoboj, moći, prijevodi
+node --test                                    # testovi: pravila, borba, AI, napredovanje, dvoboj, moći, napredna pravila, prijevodi
 node tools/simulate.js --games 300             # turnir računala protiv računala, obje vrste igre
 node tools/simulate.js --games 100 --mode adventure --pairs hard:normal   # jedan par, jedna vrsta igre
 ```
@@ -143,6 +150,7 @@ partija potpuno određena kodom mape i potezima.
 | 1 | `CONFIG` | sve vrijednosti za podešavanje: mapa, pravila, trikovi, moći, AI, napredovanje, tempo animacija |
 | 2 | `Prng` | generator slučajnih brojeva sa seedom |
 | 3 | `Hex` | geometrija heksagonalne mreže |
+| 3a | `Custom` | napredna pravila i njihov zapis u kodu mape |
 | 4 | `MapGen` | kod mape → otočje sa znamenitostima |
 | 5 | `Combat` | kocke i točne vjerojatnosti pobjede |
 | 6 | `Rules` | stanje igre i prijelazi |
@@ -151,7 +159,8 @@ partija potpuno određena kodom mape i potezima.
 | 9 | `Lang` | riječi u odabranom jeziku, s oblicima uz brojeve, postocima i popisima kroz `Intl` |
 | 10 | preglednik | crtanje, zvuk, animacije, unos, zasloni |
 
-Moduli 1–9 ne diraju DOM, pa ih testovi i alati učitavaju izravno iz `index.html`
+Module 4–7 gradi `createCore(config)` za jedan skup pravila, pa partija s naprednim pravilima ima svoju jezgru, a zadana
+pravila svoju. Moduli 1–9 ne diraju DOM, pa ih testovi i alati učitavaju izravno iz `index.html`
 ([tools/load-core.js](tools/load-core.js)).
 
 ### Prijevodi
@@ -196,7 +205,8 @@ uz iste seedove klasična partija potpuno određena.
 ```text
 index.html        cijela igra
 lang/             prijevodi, po jedna datoteka za svaki jezik; izvor je en.json
-tests/            node --test: rules.test.js (klasika), adventure.test.js (pustolovina, dvoboj, moći), lang.test.js
+tests/            node --test: rules.test.js (klasika), adventure.test.js (pustolovina, dvoboj, moći),
+                  custom.test.js (napredna pravila), lang.test.js (prijevodi)
 tools/            turnir, partija računala, provjera kroz preglednik, lang.js (prijevodi u index.html)
 .github/readme/   snimke zaslona za ovaj README (igra ih ne koristi)
 .githooks/        pre-push provjere: git config core.hooksPath .githooks
