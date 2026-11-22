@@ -11,6 +11,8 @@ Portuguese. One HTML file, no install, works offline.*
 ## Igraj
 
 **[shutzer.github.io/otokrati](https://shutzer.github.io/otokrati/)**: igra se otvara u pregledniku, i na mobitelu.
+Stranica broji posjete kroz [Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics/), bez kolačića i bez
+ičega što prepoznaje igrača; ne bilježi se ništa o partiji.
 
 Može i bez interneta: otvori [index.html](index.html) na GitHubu, klikni **Download raw file** i dvaput klikni
 preuzetu datoteku. Ništa se ne instalira i ništa ne ide na mrežu. Napredak se sprema u pregledniku, posebno za

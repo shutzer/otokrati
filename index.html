@@ -7158,6 +7158,21 @@ dialog .menu-actions { margin-top: 20px; }
       };
       link('apple-touch-icon', 'web/icon-180.png', '180x180');
       link('manifest', 'manifest.webmanifest');
+      countVisit();
+    };
+
+    /**
+     * Cloudflare Web Analytics counts visits to the published page, without cookies. It loads only when the page is
+     * served from the web, so the game opened from disk still sends nothing [ODLUKA-0001, ODLUKA-0045].
+     */
+    const ANALYTICS_TOKEN = '8de0e0b3de55426bafdecfbd8eafc0df';
+    const countVisit = () => {
+      if (!ANALYTICS_TOKEN) return;
+      const script = document.createElement('script');
+      script.defer = true;
+      script.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+      script.dataset.cfBeacon = JSON.stringify({ token: ANALYTICS_TOKEN });
+      document.head.append(script);
     };
 
     const start = () => {

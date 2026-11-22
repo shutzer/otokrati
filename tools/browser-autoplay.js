@@ -18,7 +18,8 @@ async () => {
   const LANE_MARGIN = 1.8; // must match createPainter in index.html
   const TIME_SCALE = 12;
 
-  const source = [...document.scripts].find((script) => !script.type).textContent; // the game, not its language packs
+  // the game, not its language packs or the analytics beacon the web page loads
+  const source = [...document.scripts].find((script) => !script.type && !script.src).textContent;
   const box = { exports: {} };
   new Function('module', 'document', source)(box, undefined);
   const { CONFIG, Career, Hex, Custom, createCore } = box.exports;
