@@ -10,11 +10,11 @@ Portuguese. One HTML file, no install, works offline.*
 
 ## Igraj
 
-1. Otvori [index.html](index.html) na GitHubu i klikni **Download raw file** (ili kloniraj repo).
-2. Dvaput klikni preuzetu datoteku. Igra se otvara u pregledniku.
-3. Odaberi protivnika i klikni **Zaplovi!**
+**[shutzer.github.io/otokrati](https://shutzer.github.io/otokrati/)**: igra se otvara u pregledniku, i na mobitelu.
 
-Ništa se ne instalira i ništa ne ide na mrežu. Napredak se sprema u pregledniku, na uređaju na kojem se igra.
+Može i bez interneta: otvori [index.html](index.html) na GitHubu, klikni **Download raw file** i dvaput klikni
+preuzetu datoteku. Ništa se ne instalira i ništa ne ide na mrežu. Napredak se sprema u pregledniku, posebno za
+stranicu i posebno za preuzetu datoteku.
 
 ## O igri
 
