@@ -1,5 +1,5 @@
 #!/bin/sh
-# Provjere prije pusha: testovi, ništa privatno u praćenim datotekama, tajne i adresa autora.
+# Provjere prije pusha: testovi, ništa privatno u praćenim datotekama, tajne, adresa autora i povijest.
 #
 # Uključi se jednom po klonu:  git config core.hooksPath .githooks
 # Preskoči iznimno:            git push --no-verify
@@ -33,9 +33,10 @@ else note "✓ nema token-like stringova"; fi
 #    (autor i committer); usto nijedan commit koji odlazi ne smije dirati docs/ ni CLAUDE.md
 want=$(git config --local user.email || true)
 zero=0000000000000000000000000000000000000000
-bad=""; leak=""
-while read -r _lref lsha _rref rsha; do
-  [ "$lsha" = "$zero" ] && continue
+bad=""; leak=""; rewrite=""
+while read -r _lref lsha rref rsha; do
+  if [ "$lsha" = "$zero" ]; then rewrite="$rewrite brisanje:$rref"; continue; fi
+  if [ "$rsha" != "$zero" ] && ! git merge-base --is-ancestor "$rsha" "$lsha" 2>/dev/null; then rewrite="$rewrite $rref"; fi
   if [ "$rsha" = "$zero" ]; then range="$lsha"; else range="$rsha..$lsha"; fi
   [ -n "$want" ] && bad="$bad$(git log --format='%h %ae %ce' "$range" | awk -v w="$want" '$2 != w || $3 != w')"
   leak="$leak$(git log --format='%h' "$range" -- docs CLAUDE.md)"
@@ -45,6 +46,13 @@ elif [ -n "$bad" ]; then note "✗ commitovi pod drugom adresom:"; printf '%s\n'
 else note "✓ svi commitovi pod lokalnom adresom"; fi
 if [ -n "$leak" ]; then note "✗ commitovi koji diraju docs/ ili CLAUDE.md:"; printf '%s\n' "$leak"; fail=1
 else note "✓ nijedan commit ne dira docs/ ni CLAUDE.md"; fi
+
+# 5) push je slobodan, ali prepravljanje povijesti i brisanje grane na GitHubu nisu: traže Borisovo izričito „da”
+#    za taj push i onda OTOKRATI_PREPRAVI=1 git push … [ODLUKA-0032]
+if [ -n "$rewrite" ] && [ "${OTOKRATI_PREPRAVI:-}" != 1 ]; then
+  note "✗ push prepravlja povijest ili briše granu:$rewrite (dopušteno samo uz OTOKRATI_PREPRAVI=1)"; fail=1
+elif [ -n "$rewrite" ]; then note "! prepravljanje povijesti dopušteno (OTOKRATI_PREPRAVI=1):$rewrite"
+else note "✓ samo fast-forward"; fi
 
 if [ "$fail" -ne 0 ]; then printf '\npre-push: ODUSTAJEM. Popravi gore navedeno ili gurni s --no-verify.\n' >&2; exit 1; fi
 printf 'pre-push: sve prolazi.\n'
